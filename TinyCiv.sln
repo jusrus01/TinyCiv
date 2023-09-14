@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{4E2FED6F-9B17-4045-A8DB-26C70EB8DAF1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "server", "server", "{F5A5A22B-80E4-4757-B4BD-884D97108EF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCiv.Server", "TinyCiv.Server\TinyCiv.Server.csproj", "{1CF830A0-6F47-40D5-8CD6-11C3EA8F5486}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{A76FFE88-3F4E-4D9A-AA63-3AF4900CECFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCiv.Shared", "TinyCiv.Shared\TinyCiv.Shared.csproj", "{430DA8C2-7F41-48EC-841A-92BBDE655B85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCiv.Cli", "TinyCiv.Cli\TinyCiv.Cli.csproj", "{085206FC-38CE-4B3C-8CE3-E27433E4B490}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCiv.Server.Client", "TinyCiv.Server.Client\TinyCiv.Server.Client.csproj", "{99C58954-4C7A-496C-87CF-0A3C6F1C1080}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1CF830A0-6F47-40D5-8CD6-11C3EA8F5486}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CF830A0-6F47-40D5-8CD6-11C3EA8F5486}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CF830A0-6F47-40D5-8CD6-11C3EA8F5486}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CF830A0-6F47-40D5-8CD6-11C3EA8F5486}.Release|Any CPU.Build.0 = Release|Any CPU
+		{430DA8C2-7F41-48EC-841A-92BBDE655B85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{430DA8C2-7F41-48EC-841A-92BBDE655B85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{430DA8C2-7F41-48EC-841A-92BBDE655B85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{430DA8C2-7F41-48EC-841A-92BBDE655B85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{085206FC-38CE-4B3C-8CE3-E27433E4B490}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{085206FC-38CE-4B3C-8CE3-E27433E4B490}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{085206FC-38CE-4B3C-8CE3-E27433E4B490}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{085206FC-38CE-4B3C-8CE3-E27433E4B490}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99C58954-4C7A-496C-87CF-0A3C6F1C1080}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99C58954-4C7A-496C-87CF-0A3C6F1C1080}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99C58954-4C7A-496C-87CF-0A3C6F1C1080}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99C58954-4C7A-496C-87CF-0A3C6F1C1080}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1CF830A0-6F47-40D5-8CD6-11C3EA8F5486} = {F5A5A22B-80E4-4757-B4BD-884D97108EF6}
+		{430DA8C2-7F41-48EC-841A-92BBDE655B85} = {A76FFE88-3F4E-4D9A-AA63-3AF4900CECFC}
+		{085206FC-38CE-4B3C-8CE3-E27433E4B490} = {4E2FED6F-9B17-4045-A8DB-26C70EB8DAF1}
+		{99C58954-4C7A-496C-87CF-0A3C6F1C1080} = {4E2FED6F-9B17-4045-A8DB-26C70EB8DAF1}
+	EndGlobalSection
+EndGlobal
