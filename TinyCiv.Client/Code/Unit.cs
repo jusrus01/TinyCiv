@@ -13,25 +13,11 @@ namespace TinyCiv.Client.Code
 {
     public class Unit : GameObject
     {
-        public Border border;
-        
-        public Unit(BitmapImage imageSource, int r, int c) : base(r,c) 
+        public Unit(int r, int c)
         {
-            border = new Border();
-            border.BorderBrush = Brushes.Transparent;
-            border.MouseDown += On_Click;
-
-            Image image = new Image();
-            if (imageSource != null )
-            {
-                image.Source = imageSource;
-            }
-            border.Child = image;
+            imageSource = new BitmapImage(new Uri("Assets/warrior.png", UriKind.Relative));
+            position = new Position(r, c);
         }
 
-        private void On_Click(object sender, MouseButtonEventArgs e)
-        {
-            MessageBox.Show(String.Format("Pressed {0},{1}", r, c));
-        }
     }
 }

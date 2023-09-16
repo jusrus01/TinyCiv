@@ -19,7 +19,7 @@ namespace TinyCiv.Client.Code
             client = GameServerClient.Create("http://localhost:5000");
         }
 
-        public static EventHandler GetClient()
+        public static EventHandler GetInstance()
         {
             if (instance == null)
             {

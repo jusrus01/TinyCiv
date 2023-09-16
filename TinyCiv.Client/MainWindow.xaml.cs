@@ -13,19 +13,10 @@ namespace TinyCiv.Client
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Image[,] mapImages = new Image[20, 20];
-        private GameObject[,] gameObjects = new GameObject[20, 20];
-        private bool isUnitSelected = false;
-        private Position unitPosition;
-
+        private GameGrid gameGrid;
 
         public MainWindow()
         {
-            gameObjects[5, 5] = new Unit(new BitmapImage(new Uri("Assets/warrior.png", UriKind.Relative)), 5, 5);
-
-            gameObjects[5, 10] = new Unit(new BitmapImage(new Uri("Assets/warrior.png", UriKind.Relative)), 5, 10);
-
-
             InitializeComponent();
             InitializeMap();
             InitalizeUnitGrid();
@@ -33,24 +24,10 @@ namespace TinyCiv.Client
 
         private void InitalizeUnitGrid()
         {
-            UnitGrid.Children.Clear();
-            for (int r = 0; r < 20; r++)
-            {
-                for (int c = 0; c < 20; c++)
-                {
-                    Image image = new Image();
-                    if (gameObjects[r, c] != null)
-                    {
-                        image.Source = new BitmapImage(new Uri("Assets/warrior.png", UriKind.Relative));
-                    }
-                    Border border = new Border();
-                    border.Background = Brushes.Transparent;
-                    border.Tag = new Position(r, c);
-                    border.MouseDown += Tile_Click;
-                    border.Child = image;
-                    UnitGrid.Children.Add(border);
-                }
-            }
+            gameGrid = new GameGrid(UnitGrid,20,20);
+            gameGrid.gameObjects.Add(new Unit(2, 0));
+            gameGrid.gameObjects.Add(new Unit(2, 10));
+            gameGrid.Update();
         }
 
         private void InitializeMap()
@@ -63,28 +40,6 @@ namespace TinyCiv.Client
                     MapGrid.Children.Add(image);
                 }
             }            
-        }
-
-        private void Tile_Click(object sender, MouseButtonEventArgs e)
-        {
-            var border = (Border)sender;
-            var clickedPosition = border.Tag as Position;
-
-            if (gameObjects[clickedPosition.row, clickedPosition.column] != null && !isUnitSelected)
-            {
-                isUnitSelected = true;
-                unitPosition = clickedPosition;
-            }
-            else if (gameObjects[clickedPosition.row, clickedPosition.column] == null && isUnitSelected)
-            {
-                isUnitSelected = false;
-
-                gameObjects[clickedPosition.row, clickedPosition.column] = gameObjects[unitPosition.row, unitPosition.column];
-                gameObjects[unitPosition.row, unitPosition.column] = null;
-
-            }
-
-            InitalizeUnitGrid();
         }
     }
 }
