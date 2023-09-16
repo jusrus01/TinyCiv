@@ -12,11 +12,11 @@ namespace TinyCiv.Client.Code
     {
         public static EventHandler instance;
 
-        public IGameServerClient client;
+        public IServerClient client;
 
         private EventHandler()
         {
-            client = GameServerClient.Create("http://localhost:5000");
+            client = ServerClient.Create("http://localhost:5000");
         }
 
         public static EventHandler GetInstance()
