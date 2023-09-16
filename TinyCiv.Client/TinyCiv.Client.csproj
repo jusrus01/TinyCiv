@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\game_tile.png" />
+    <None Remove="Assets\sh2326_4_.png" />
+    <None Remove="Assets\warrior.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\TinyCiv.Cli\TinyCiv.Example.csproj" />
+    <ProjectReference Include="..\src\TinyCiv.Server.Client\TinyCiv.Server.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\game_tile.png" />
+    <Resource Include="Assets\sh2326_4_.png" />
+    <Resource Include="Assets\warrior.png" />
+  </ItemGroup>
+
+</Project>
