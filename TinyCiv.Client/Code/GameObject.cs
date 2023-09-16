@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -12,8 +13,8 @@ namespace TinyCiv.Client.Code
     public class GameObject
     {
         public ImageSource imageSource { get; protected set; }
-        DateTime LastUpdate;
-        TimeSpan TimeDelta;
+        protected DateTime LastUpdate;
+        protected TimeSpan TimeDelta;
         public Position position;
 
         public GameObject() { }
@@ -24,12 +25,12 @@ namespace TinyCiv.Client.Code
             this.position = position;
         }
 
-        public void Start()
+        public virtual void Start()
         {
             LastUpdate = DateTime.Now;
         }
 
-        public void Update()
+        public virtual void Update()
         {
             DateTime now = DateTime.Now;
             TimeDelta = now-LastUpdate;

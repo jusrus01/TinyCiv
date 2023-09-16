@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -75,7 +77,9 @@ namespace TinyCiv.Client.Code
             if (isUnitSelected)
             {
                 isUnitSelected = false;
-                gameObjects[unitIndex].position = clickedPosition;
+                var unit = (Unit)gameObjects[unitIndex];
+                unit.onUpdate = Update;
+                unit.moveTowards(clickedPosition);
                 Update();
             }
         }

@@ -16,5 +16,40 @@ namespace TinyCiv.Client.Code
             this.row = row;
             this.column = column;
         }
+
+        public override bool Equals(object obj)
+        {
+            if(obj is Position)
+            {
+                var other = (Position)obj;
+                return other.row == this.row && other.column == this.column;
+            }
+            return false;
+        }
+
+        public Position Direction()
+        {
+            return new Position(Math.Sign(this.row), Math.Sign(this.column));
+        }
+
+        public static bool operator == (Position a, Position b)
+        {
+            return a.Equals(b);
+        }
+
+        public static bool operator != (Position a, Position b)
+        {
+            return !a.Equals(b);
+        }
+
+        public static Position operator + (Position a, Position b)
+        {
+            return new Position(a.row + b.row, a.column + b.column);
+        }
+
+        public static Position operator - (Position a, Position b)
+        {
+            return new Position(a.row - b.row, a.column - b.column);
+        }
     }
 }
