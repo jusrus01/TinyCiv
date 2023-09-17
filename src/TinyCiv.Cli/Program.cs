@@ -2,9 +2,11 @@
 // IMPORTANT: DO NOT REFERENCE ANYTHING FROM "server" folder in the client and vice versa
 
 using System.Text.Json;
+using TinyCiv.Example;
 using TinyCiv.Server.Client;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
+using TinyCiv.Shared.Game;
 
 // await SampleCommunicationDemo();
 await SampleIdAssignmentDemo();
@@ -16,10 +18,13 @@ Console.ReadKey();
 async Task SampleIdAssignmentDemo()
 {
     var client = ServerClient.Create("http://localhost:5000");
-    
+
+    List<Player> playerList = new();
+
     Action<JoinLobbyServerEvent> joinCallback = (response) =>
     {
         Console.WriteLine($"Player created: {JsonSerializer.Serialize(response)}");
+        playerList.Add(response.Created);
     };
 
     // NOT READY
@@ -32,29 +37,38 @@ async Task SampleIdAssignmentDemo()
     Action<GameStartServerEvent> startCallback = (response) =>
     {
         Console.WriteLine("Game started since two players already joined");
-        Console.WriteLine($"Map to render: {JsonSerializer.Serialize(response)}");
-        
+        //Console.WriteLine($"Map to render: {JsonSerializer.Serialize(response)}");
+
+        response.Map.Print();
+
         // start some game loop, etc, probably best via delegate
         // NOT READY
         // StartGameLoop().GetAwaiter();
     };
-    
+
     // NOT READY
     Action<MapChangeServerEvent> mapChangeCallback = (response) =>
     {
         Console.WriteLine("Map changed since something happened...");
-        Console.WriteLine($"Map to render: {JsonSerializer.Serialize(response)}");
+        //Console.WriteLine($"Map to render: {JsonSerializer.Serialize(response)}");
+
+        response.Map.Print();
     };
 
     client.ListenForNewPlayerCreation(joinCallback);
     client.ListenForGameStart(startCallback);
-    
     client.ListenForMapChange(mapChangeCallback);
-    
+
     // first player joins
     var p1 = client.SendAsync(new JoinLobbyClientEvent());
     // second player joins
     var p2 = client.SendAsync(new JoinLobbyClientEvent());
 
     await Task.WhenAll(p1, p2);
+
+    await Task.Delay(2000);
+
+    await client.SendAsync(new AddNewUnitClientEvent(playerList[0].Id, 1, 1));
+    await client.SendAsync(new AddNewUnitClientEvent(playerList[0].Id, 2, 2));
+    await client.SendAsync(new AddNewUnitClientEvent(playerList[1].Id, 5, 2));
 }
