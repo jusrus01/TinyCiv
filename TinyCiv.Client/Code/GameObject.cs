@@ -10,17 +10,20 @@ using System.Windows.Media.Imaging;
 
 namespace TinyCiv.Client.Code
 {
-    public class GameObject
+    public abstract class GameObject
     {
+        public int ownerId { get; protected set; }
         public ImageSource imageSource { get; protected set; }
+
         protected DateTime LastUpdate;
         protected TimeSpan TimeDelta;
         public Position position;
 
         public GameObject() { }
-        public GameObject(BitmapImage imageSource, int r, int c) : this(imageSource, new Position(r, c)) { }
-        public GameObject(BitmapImage imageSource, Position position)
+        public GameObject(int ownerId, ImageSource imageSource, int r, int c) : this(ownerId, imageSource, new Position(r, c)) { }
+        public GameObject(int ownerId, ImageSource imageSource, Position position)
         {
+            this.ownerId = ownerId;
             this.imageSource = imageSource;
             this.position = position;
         }

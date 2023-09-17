@@ -11,8 +11,9 @@ namespace TinyCiv.Client.Code
         public Action onUpdate;
         public Position target;
 
-        public Unit(int r, int c)
+        public Unit(int playerId, int r, int c)
         {
+            ownerId = playerId;
             imageSource = new BitmapImage(new Uri("Assets/warrior.png", UriKind.Relative));
             position = new Position(r, c);
         }
