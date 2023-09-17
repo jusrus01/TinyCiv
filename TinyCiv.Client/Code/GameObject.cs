@@ -12,32 +12,19 @@ namespace TinyCiv.Client.Code
 {
     public abstract class GameObject
     {
-        public int ownerId { get; protected set; }
-        public ImageSource imageSource { get; protected set; }
+        public int playerId { get; protected set; }
+        public abstract GameObjectType Type { get; }
 
         protected DateTime LastUpdate;
         protected TimeSpan TimeDelta;
         public Position position;
 
-        public GameObject() { }
-        public GameObject(int ownerId, ImageSource imageSource, int r, int c) : this(ownerId, imageSource, new Position(r, c)) { }
-        public GameObject(int ownerId, ImageSource imageSource, Position position)
+        protected GameObject() { }
+        protected GameObject(int playerId, int r, int c) : this(playerId, new Position(r, c)) { }
+        protected GameObject(int playerId, Position position)
         {
-            this.ownerId = ownerId;
-            this.imageSource = imageSource;
+            this.playerId = playerId;
             this.position = position;
-        }
-
-        public virtual void Start()
-        {
-            LastUpdate = DateTime.Now;
-        }
-
-        public virtual void Update()
-        {
-            DateTime now = DateTime.Now;
-            TimeDelta = now-LastUpdate;
-            LastUpdate = now;
         }
     }
 }

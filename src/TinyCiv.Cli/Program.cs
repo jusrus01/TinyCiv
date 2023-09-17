@@ -16,22 +16,22 @@ async Task SampleIdAssignmentDemo()
 {
     var client = ServerClient.Create("http://localhost:5000");
     
-    Guid? playerId1 = null;
-    Guid? playerId2 = null;
+    int? playerId1 = null;
+    int? playerId2 = null;
 
-    bool gameStarted = false;
+    //bool gameStarted = false;
     
     Action<JoinLobbyServerEvent> joinCallback = (response) =>
     {
         if (playerId1 == null)
         {
             Console.WriteLine("Player 1 received id");
-            playerId1 = response.AssignedPlayerId;
+            playerId1 = response.NewPlayer.Id;
         }
         else if (playerId2 == null)
         {
             Console.WriteLine("Player 2 received id");
-            playerId2 = response.AssignedPlayerId;
+            playerId2 = response.NewPlayer.Id;
         }
         else
         {

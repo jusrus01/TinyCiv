@@ -32,6 +32,11 @@ namespace TinyCiv.Client.Code
             return new Position(Math.Sign(this.row), Math.Sign(this.column));
         }
 
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(row, column);
+        }
+
         public static bool operator == (Position a, Position b)
         {
             return a.Equals(b);
@@ -51,5 +56,7 @@ namespace TinyCiv.Client.Code
         {
             return new Position(a.row - b.row, a.column - b.column);
         }
+
+
     }
 }

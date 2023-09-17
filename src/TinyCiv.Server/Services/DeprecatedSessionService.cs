@@ -1,5 +1,6 @@
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
+using TinyCiv.Shared.Dto;
 
 namespace TinyCiv.Server.Services;
 
@@ -11,7 +12,7 @@ public class DeprecatedSessionService : ISessionService
     private readonly object _newPlayerLocker;
     private readonly object _mapChangeLocker;
     
-    private readonly List<Guid> _userIds;
+    private readonly List<int> _userIds;
     
     private string _map = string.Empty;
 
@@ -20,7 +21,7 @@ public class DeprecatedSessionService : ISessionService
         _newPlayerLocker = new object();
         _mapChangeLocker = new object();
         
-        _userIds = new List<Guid>();
+        _userIds = new List<int>();
     }
 
     public string StartSession()
@@ -32,7 +33,7 @@ public class DeprecatedSessionService : ISessionService
         }
     }
 
-    public bool IsValidPlayer(Guid playerId)
+    public bool IsValidPlayer(int playerId)
     {
         return _userIds.Contains(playerId);
     }
@@ -72,19 +73,21 @@ public class DeprecatedSessionService : ISessionService
         throw new NotSupportedException();
     }
 
-    public Guid? AddNewPlayerToGame()
+    public PlayerDto? AddNewPlayerToGame()
     {
-        var newUserId = Guid.NewGuid();
+        Random random = new Random();
+        var newUser = new PlayerDto(random.Next(1, 4));
+
         lock (_newPlayerLocker)
         {
             if (_userIds.Count >= Constants.Game.MaxPlayerCount)
             {
-                return null;
+                return new PlayerDto(-1);
             }
             
-            _userIds.Add(newUserId);
+            _userIds.Add(newUser.Id);
         }
 
-        return newUserId;
+        return newUser;
     }
 }

@@ -6,7 +6,14 @@ using System.Threading.Tasks;
 
 namespace TinyCiv.Client.Code
 {
-    internal class UnitType
+    public enum GameObjectType
     {
+        // UNITS
+        Warrior,
+        Cavalry,
+        Colonist,
+
+        // STRUCTURES
+        City
     }
 }

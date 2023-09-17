@@ -25,7 +25,7 @@ public class LobbyHandler : ClientHandler<JoinLobbyClientEvent>
         
         var newUserId = _sessionService.AddNewPlayerToGame();
         await caller
-            .SendEventAsync(Constants.Server.SendGeneratedId, new JoinLobbyServerEvent(newUserId!.Value))
+            .SendEventAsync(Constants.Server.SendGeneratedId, new JoinLobbyServerEvent(newUserId!))
             .ConfigureAwait(false);
         
         if (_sessionService.AllPlayersInLobby())

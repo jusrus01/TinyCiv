@@ -1,24 +1,24 @@
 ﻿using System;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
-namespace TinyCiv.Client.Code
+namespace TinyCiv.Client.Code.units
 {
-    public class Unit : GameObject
+    public abstract class Unit : GameObject
     {
-        public TimeSpan MoveSpeed = new TimeSpan(0,0,1);
+        public TimeSpan MoveSpeed = new TimeSpan(0, 0, 1);
         DispatcherTimer moveChargeUp;
         public Action onUpdate;
         public Position target;
 
-        public Unit(int playerId, int r, int c)
+        protected Unit(int playerId, int r, int c) : base(playerId, r, c)
         {
-            ownerId = playerId;
-            imageSource = new BitmapImage(new Uri("Assets/warrior.png", UriKind.Relative));
-            position = new Position(r, c);
+
         }
 
-        public void moveTowards(Position target)
+        public virtual void moveTowards(Position target)
         {
             if (moveChargeUp != null)
             {
@@ -33,10 +33,10 @@ namespace TinyCiv.Client.Code
 
         private void moveTowardsTarget(object sender, EventArgs e)
         {
-            var delta = this.target - this.position;
+            var delta = target - position;
             position += delta.Direction();
             onUpdate?.Invoke();
-            if (position==target)
+            if (position == target)
             {
                 moveChargeUp.Stop();
                 moveChargeUp = new DispatcherTimer();

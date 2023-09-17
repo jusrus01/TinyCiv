@@ -11,7 +11,7 @@ namespace TinyCiv.Client.Code.units
     {
         public override GameObjectType Type => GameObjectType.Cavalry;
 
-        public Cavalry(int playerId, int r, int c) : base(playerId, Images.GetImage(playerId, GameObjectType.Cavalry), r, c)
+        public Cavalry(int playerId, int r, int c) : base(playerId, r, c)
         {
         }
 

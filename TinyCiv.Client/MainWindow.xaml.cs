@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using TinyCiv.Client.Code;
+using TinyCiv.Client.Code.units;
+using TinyCiv.Server.Client;
+using TinyCiv.Shared.Events.Client;
+using TinyCiv.Shared.Events.Server;
 
 namespace TinyCiv.Client
 {
@@ -14,20 +20,65 @@ namespace TinyCiv.Client
     public partial class MainWindow : Window
     {
         private GameGrid gameGrid;
+        private int playerId;
+        private bool isRunning = false;
+
+        private static IServerClient Client = ClientManager.Instance.Client;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            Loaded += PlayerConnection;           
+
+            gameGrid = new GameGrid(UnitGrid, 20, 20);
             InitializeMap();
-            InitalizeUnitGrid();
+            
+            Client.ListenForPlayerIdAssignment(OnPlayerJoin);
+            Client.ListenForGameStart(OnGameStart);
+            Client.ListenForMapChange(OnMapChange);
+        }
+        private async void PlayerConnection(object sender, RoutedEventArgs e)
+        {
+            await Client.SendAsync(new JoinLobbyClientEvent());                    
         }
 
-        private void InitalizeUnitGrid()
+        private void OnPlayerJoin(JoinLobbyServerEvent response)
         {
-            gameGrid = new GameGrid(UnitGrid,20,20);
-            gameGrid.gameObjects.Add(new Unit(2, 0));
-            gameGrid.gameObjects.Add(new Unit(2, 10));
+            playerId = response.NewPlayer.Id;
+            Console.WriteLine("Player received id: " + playerId);
+
+            // If the party is full
+            if (playerId == -1)
+            {
+                MessageBox.Show("The game party is full! Try again later.");
+            }
+        }
+
+        private void OnGameStart(GameStartServerEvent response)
+        {
+            Console.WriteLine("Game started since two players already joined");
+            Console.WriteLine($"Map to render: {response.Map}");
+
+            // Start the game loop
+            isRunning = true;
             gameGrid.Update();
+        }
+
+        private void OnMapChange(MapChangeServerEvent response)
+        {
+            //gameGrid.gameObjects = response;
+            Console.WriteLine("Mp changes received");
+            gameGrid.Update();
+        }
+
+        private void InitalizeUnitGrid(GameGrid gameGrid)
+        {
+            // initial GameGrid should be sent by the server
+            // TODO: transfer logic to the server
+
+            gameGrid.gameObjects.Add(new Warrior(playerId, 2, 0));
+            gameGrid.gameObjects.Add(new Warrior(playerId, 2, 10));          
         }
 
         private void InitializeMap()

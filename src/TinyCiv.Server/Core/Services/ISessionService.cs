@@ -1,12 +1,14 @@
+using TinyCiv.Shared.Dto;
+
 namespace TinyCiv.Server.Core.Services;
 
 public interface ISessionService
 {
-    Guid? AddNewPlayerToGame();
+    PlayerDto? AddNewPlayerToGame();
     
     string StartSession();
 
-    bool IsValidPlayer(Guid playerId);
+    bool IsValidPlayer(int playerId);
     bool IsSessionStarted();
     bool AllPlayersInLobby();
 

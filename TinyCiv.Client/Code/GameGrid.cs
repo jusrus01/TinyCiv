@@ -11,6 +11,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using TinyCiv.Client.Code.units;
 
 namespace TinyCiv.Client.Code
 {
@@ -53,14 +54,13 @@ namespace TinyCiv.Client.Code
             //For every game object, insert image
             for(int i = 0; i < gameObjects.Count; i++)
             {
-                var imageSource = gameObjects[i].imageSource;
                 int indexPosition = gameObjects[i].position.row * columnCount + gameObjects[i].position.column;
                 var border = (Border)SpriteGrid.Children[indexPosition];
                 border.Tag = i;
                 border.MouseDown -= Tile_Click;
                 border.MouseDown += Unit_Click;
                 var image = (Image)border.Child;
-                image.Source = imageSource;
+                image.Source = Images.GetImage(gameObjects[i]);
                 if (isUnitSelected && unitIndex == i)
                 {
                     border.BorderBrush = Brushes.Aquamarine;

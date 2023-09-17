@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace TinyCiv.Client.Code.units
 {
-    internal class Warrior
+    public class Warrior : Unit
     {
+        public override GameObjectType Type => GameObjectType.Warrior;
+
+        public Warrior(int playerId, int r, int c) : base(playerId, r, c)
+        {
+        }
+
     }
 }
