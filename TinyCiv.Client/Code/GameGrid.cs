@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using TinyCiv.Shared.Game;
 using TinyCiv.Client.Code.units;
 
 namespace TinyCiv.Client.Code
@@ -54,7 +48,7 @@ namespace TinyCiv.Client.Code
             //For every game object, insert image
             for(int i = 0; i < gameObjects.Count; i++)
             {
-                int indexPosition = gameObjects[i].position.row * columnCount + gameObjects[i].position.column;
+                int indexPosition = gameObjects[i].Position.row * columnCount + gameObjects[i].Position.column;
                 var border = (Border)SpriteGrid.Children[indexPosition];
                 border.Tag = i;
                 border.MouseDown -= Tile_Click;
@@ -88,7 +82,7 @@ namespace TinyCiv.Client.Code
         {
             var border = (Border)sender;
             var gameObjectIndex = (int)border.Tag;
-            var position = gameObjects[gameObjectIndex].position;
+            var position = gameObjects[gameObjectIndex].Position;
 
             if (!isUnitSelected)
             {

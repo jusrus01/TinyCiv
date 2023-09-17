@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using TinyCiv.Client.Code;
 using TinyCiv.Client.Code.units;
@@ -22,7 +19,6 @@ namespace TinyCiv.Client
     {
         private GameGrid gameGrid;
         private Player currentPlayer;
-        private bool isRunning = false;
 
         private static IServerClient Client = ClientManager.Instance.Client;
 
@@ -31,10 +27,7 @@ namespace TinyCiv.Client
             InitializeComponent();
 
             Loaded += PlayerConnection;           
-
-            gameGrid = new GameGrid(UnitGrid, 20, 20);
-            InitializeMap();
-            
+  
             Client.ListenForNewPlayerCreation(OnPlayerJoin);
             Client.ListenForGameStart(OnGameStart);
             Client.ListenForMapChange(OnMapChange);
@@ -59,9 +52,13 @@ namespace TinyCiv.Client
         {
             Console.WriteLine("Game started since two players already joined");
             Console.WriteLine($"Map to render: {response.Map}");
+            
+            gameGrid = new GameGrid(UnitGrid, 20, 20);
 
-            // Start the game loop
-            isRunning = true;
+            gameGrid.gameObjects = response.Map.Objects.Select(serverGameObect => new Warrior(serverGameObect))
+                .ToList<GameObject>();
+
+            InitializeMap();
             gameGrid.Update();
         }
 
@@ -69,16 +66,8 @@ namespace TinyCiv.Client
         {
             //gameGrid.gameObjects = response;
             Console.WriteLine("Mp changes received");
+
             gameGrid.Update();
-        }
-
-        private void InitalizeUnitGrid(GameGrid gameGrid)
-        {
-            // initial GameGrid should be sent by the server
-            // TODO: transfer logic to the server
-
-            gameGrid.gameObjects.Add(new Warrior(currentPlayer.Id, 2, 0));
-            gameGrid.gameObjects.Add(new Warrior(currentPlayer.Id, 2, 10));          
         }
 
         private void InitializeMap()

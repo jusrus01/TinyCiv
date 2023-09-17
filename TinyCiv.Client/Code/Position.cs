@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
 {
@@ -15,6 +16,12 @@ namespace TinyCiv.Client.Code
         {
             this.row = row;
             this.column = column;
+        }
+
+        public Position(ServerPosition serverPosition)
+        {
+            row = serverPosition.row;
+            column = serverPosition.column;
         }
 
         public override bool Equals(object obj)

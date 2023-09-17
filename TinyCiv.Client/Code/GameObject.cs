@@ -3,28 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
 {
     public abstract class GameObject
     {
-        public int playerId { get; protected set; }
-        public abstract GameObjectType Type { get; }
+        public GameObjectType Type { get; }
+        public Position Position { get; set; }
+        public Guid OwnerId { get; }
+        public Guid Id { get; }
+        public PlayerColor Color { get; }
 
-        protected DateTime LastUpdate;
-        protected TimeSpan TimeDelta;
-        public Position position;
-
-        protected GameObject() { }
-        protected GameObject(int playerId, int r, int c) : this(playerId, new Position(r, c)) { }
-        protected GameObject(int playerId, Position position)
+        public GameObject(ServerGameObject serverGameObject)
         {
-            this.playerId = playerId;
-            this.position = position;
+            Type = serverGameObject.Type;
+            Position = new Position(serverGameObject.Position);
+            OwnerId = serverGameObject.OwnerPlayerId;
+            Id = serverGameObject.Id;
+            Color = serverGameObject.Color;
         }
     }
 }

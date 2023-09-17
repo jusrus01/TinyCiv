@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.units
 {
@@ -13,9 +14,8 @@ namespace TinyCiv.Client.Code.units
         public Action onUpdate;
         public Position target;
 
-        protected Unit(int playerId, int r, int c) : base(playerId, r, c)
+        protected Unit(ServerGameObject serverGameObject) : base(serverGameObject)
         {
-
         }
 
         public virtual void moveTowards(Position target)
@@ -33,10 +33,10 @@ namespace TinyCiv.Client.Code.units
 
         private void moveTowardsTarget(object sender, EventArgs e)
         {
-            var delta = target - position;
-            position += delta.Direction();
+            var delta = target - Position;
+            Position += delta.Direction();
             onUpdate?.Invoke();
-            if (position == target)
+            if (Position == target)
             {
                 moveChargeUp.Stop();
                 moveChargeUp = new DispatcherTimer();

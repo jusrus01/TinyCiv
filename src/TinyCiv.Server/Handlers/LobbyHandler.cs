@@ -32,11 +32,7 @@ public class LobbyHandler : ClientHandler<JoinLobbyClientEvent>
         }
         
         await caller
-<<<<<<< HEAD:src/TinyCiv.Server/Handlers/Client/LobbyHandler.cs
-            .SendEventAsync(Constants.Server.SendGeneratedId, new JoinLobbyServerEvent(newUserId!))
-=======
             .SendEventAsync(Constants.Server.SendCreatedPlayer, new JoinLobbyServerEvent(newPlayer))
->>>>>>> master:src/TinyCiv.Server/Handlers/LobbyHandler.cs
             .ConfigureAwait(false);
         
         if (_sessionService.IsLobbyFull())
