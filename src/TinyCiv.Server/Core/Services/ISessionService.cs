@@ -1,15 +1,12 @@
+using TinyCiv.Shared.Game;
+
 namespace TinyCiv.Server.Core.Services;
 
 public interface ISessionService
 {
-    Guid? AddNewPlayerToGame();
+    Player? AddPlayer();
+    Map InitMap();
     
-    string StartSession();
-
-    bool IsValidPlayer(Guid playerId);
-    bool IsSessionStarted();
-    bool AllPlayersInLobby();
-
-    string GetMap();
-    void PlaceUnit(int x, int y);
+    bool IsLobbyFull();
+    bool IsStarted();
 }

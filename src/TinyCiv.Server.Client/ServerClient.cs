@@ -46,9 +46,9 @@ public class ServerClient : IServerClient
         return _connection.SendAsync(Constants.Server.ReceiveFromClient, content, @event.Type, token);
     }
 
-    public void ListenForPlayerIdAssignment(Action<JoinLobbyServerEvent> callback)
+    public void ListenForNewPlayerCreation(Action<JoinLobbyServerEvent> callback)
     {
-        Listen(Constants.Server.SendGeneratedId, callback);
+        Listen(Constants.Server.SendCreatedPlayer, callback);
     }
 
     public void ListenForGameStart(Action<GameStartServerEvent> callback)
