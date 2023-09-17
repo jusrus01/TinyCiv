@@ -1,3 +1,5 @@
+using TinyCiv.Shared.Game;
+
 namespace TinyCiv.Shared.Events.Server;
 
-public record MapChangeServerEvent(string Map) : ServerEvent;
+public record MapChangeServerEvent(Map Map) : ServerEvent;

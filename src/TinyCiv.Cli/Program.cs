@@ -1,6 +1,7 @@
 ﻿// NOTE: Need to run TinyCiv.Server
 // IMPORTANT: DO NOT REFERENCE ANYTHING FROM "server" folder in the client and vice versa
 
+using System.Text.Json;
 using TinyCiv.Server.Client;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
@@ -16,58 +17,44 @@ async Task SampleIdAssignmentDemo()
 {
     var client = ServerClient.Create("http://localhost:5000");
     
-    Guid? playerId1 = null;
-    Guid? playerId2 = null;
-
-    bool gameStarted = false;
-    
     Action<JoinLobbyServerEvent> joinCallback = (response) =>
     {
-        if (playerId1 == null)
-        {
-            Console.WriteLine("Player 1 received id");
-            playerId1 = response.AssignedPlayerId;
-        }
-        else if (playerId2 == null)
-        {
-            Console.WriteLine("Player 2 received id");
-            playerId2 = response.AssignedPlayerId;
-        }
-        else
-        {
-            throw new Exception();
-        }
+        Console.WriteLine($"Player created: {JsonSerializer.Serialize(response)}");
     };
 
-    async Task StartGameLoop()
-    {
-        // player (this instance)
-        await client.SendAsync(new AddNewUnitClientEvent(playerId1.Value, 1, 1));
-    }
+    // NOT READY
+    // async Task StartGameLoop()
+    // {
+    //     // player (this instance)
+    //     await client.SendAsync(new AddNewUnitClientEvent(playerId1.Value, 1, 1));
+    // }
 
     Action<GameStartServerEvent> startCallback = (response) =>
     {
         Console.WriteLine("Game started since two players already joined");
-        Console.WriteLine($"Map to render: {response.Map}");
+        Console.WriteLine($"Map to render: {JsonSerializer.Serialize(response)}");
         
         // start some game loop, etc, probably best via delegate
-        StartGameLoop().GetAwaiter();
+        // NOT READY
+        // StartGameLoop().GetAwaiter();
     };
     
+    // NOT READY
     Action<MapChangeServerEvent> mapChangeCallback = (response) =>
     {
         Console.WriteLine("Map changed since something happened...");
-        Console.WriteLine($"Map to render: {response.Map}");
+        Console.WriteLine($"Map to render: {JsonSerializer.Serialize(response)}");
     };
 
-    client.ListenForPlayerIdAssignment(joinCallback);
+    client.ListenForNewPlayerCreation(joinCallback);
     client.ListenForGameStart(startCallback);
     
     client.ListenForMapChange(mapChangeCallback);
     
     // first player joins
-    await client.SendAsync(new JoinLobbyClientEvent());
-    
+    var p1 = client.SendAsync(new JoinLobbyClientEvent());
     // second player joins
-    await client.SendAsync(new JoinLobbyClientEvent());
+    var p2 = client.SendAsync(new JoinLobbyClientEvent());
+
+    await Task.WhenAll(p1, p2);
 }

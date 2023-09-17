@@ -1,3 +1,5 @@
+using TinyCiv.Shared.Game;
+
 namespace TinyCiv.Shared.Events.Server;
 
-public record JoinLobbyServerEvent(Guid AssignedPlayerId) : ServerEvent;
+public record JoinLobbyServerEvent(Player Created) : ServerEvent;
