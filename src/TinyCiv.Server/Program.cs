@@ -1,13 +1,13 @@
 using TinyCiv.Server.Core.Handlers;
 using TinyCiv.Server.Core.Services;
-using TinyCiv.Server.Handlers.Client;
+using TinyCiv.Server.Handlers;
 using TinyCiv.Server.Hubs;
 using TinyCiv.Server.Services;
 using TinyCiv.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<ISessionService, DeprecatedSessionService>();
+builder.Services.AddSingleton<ISessionService, SessionService>();
 
 builder.Services.AddTransient<IClientHandler, UnitAddHandler>();
 builder.Services.AddTransient<IClientHandler, LobbyHandler>();

@@ -11,6 +11,7 @@ using TinyCiv.Client.Code.units;
 using TinyCiv.Server.Client;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client
 {
@@ -20,7 +21,7 @@ namespace TinyCiv.Client
     public partial class MainWindow : Window
     {
         private GameGrid gameGrid;
-        private int playerId;
+        private Player currentPlayer;
         private bool isRunning = false;
 
         private static IServerClient Client = ClientManager.Instance.Client;
@@ -34,7 +35,7 @@ namespace TinyCiv.Client
             gameGrid = new GameGrid(UnitGrid, 20, 20);
             InitializeMap();
             
-            Client.ListenForPlayerIdAssignment(OnPlayerJoin);
+            Client.ListenForNewPlayerCreation(OnPlayerJoin);
             Client.ListenForGameStart(OnGameStart);
             Client.ListenForMapChange(OnMapChange);
         }
@@ -45,11 +46,10 @@ namespace TinyCiv.Client
 
         private void OnPlayerJoin(JoinLobbyServerEvent response)
         {
-            playerId = response.NewPlayer.Id;
-            Console.WriteLine("Player received id: " + playerId);
+            currentPlayer = response.Created;
 
             // If the party is full
-            if (playerId == -1)
+            if (currentPlayer == null)
             {
                 MessageBox.Show("The game party is full! Try again later.");
             }
@@ -77,8 +77,8 @@ namespace TinyCiv.Client
             // initial GameGrid should be sent by the server
             // TODO: transfer logic to the server
 
-            gameGrid.gameObjects.Add(new Warrior(playerId, 2, 0));
-            gameGrid.gameObjects.Add(new Warrior(playerId, 2, 10));          
+            gameGrid.gameObjects.Add(new Warrior(currentPlayer.Id, 2, 0));
+            gameGrid.gameObjects.Add(new Warrior(currentPlayer.Id, 2, 10));          
         }
 
         private void InitializeMap()

@@ -1,3 +1,5 @@
+using TinyCiv.Shared.Game;
+
 namespace TinyCiv.Shared.Events.Server;
 
-public record GameStartServerEvent(string Map) : ServerEvent;
+public record GameStartServerEvent(Map Map) : ServerEvent;

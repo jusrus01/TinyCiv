@@ -1,9 +1,14 @@
+<<<<<<< HEAD
 using TinyCiv.Shared.Dto;
+=======
+using TinyCiv.Shared.Game;
+>>>>>>> master
 
 namespace TinyCiv.Server.Core.Services;
 
 public interface ISessionService
 {
+<<<<<<< HEAD
     PlayerDto? AddNewPlayerToGame();
     
     string StartSession();
@@ -14,4 +19,11 @@ public interface ISessionService
 
     string GetMap();
     void PlaceUnit(int x, int y);
+=======
+    Player? AddPlayer();
+    Map InitMap();
+    
+    bool IsLobbyFull();
+    bool IsStarted();
+>>>>>>> master
 }
