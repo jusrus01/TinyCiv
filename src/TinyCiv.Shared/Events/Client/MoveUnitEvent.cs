@@ -1,4 +1,4 @@
 ﻿namespace TinyCiv.Shared.Events.Client;
 
 //  Requires implementation
-public record MoveUnitEvent(Guid unitId, int newRow, int newColumn) : ClientEvent;
+public record MoveUnitEvent(Guid UnitId, int X, int Y) : ClientEvent;

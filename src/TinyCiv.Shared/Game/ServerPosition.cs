@@ -2,6 +2,6 @@ namespace TinyCiv.Shared.Game;
 
 public class ServerPosition
 {
-    public int row { get; set; }
-    public int column { get; set; }
+    public int X { get; set; }
+    public int Y { get; set; }
 }

@@ -33,14 +33,14 @@ namespace TinyCiv.Client.Code
             return new BitmapImage(new Uri(filePath, UriKind.Relative));
         }
 
-        public static ImageSource GetImage(PlayerColor color, GameObjectType unitType)
+        public static ImageSource GetImage(TeamColor color, GameObjectType unitType)
         {
             return color switch
             {
-                PlayerColor.Red => playerRedSources[unitType],
-                PlayerColor.Green => playerGreenSources[unitType],
-                PlayerColor.Yellow => playerYellowSources[unitType],
-                PlayerColor.Purple => playerPurpleSources[unitType],
+                TeamColor.Red => playerRedSources[unitType],
+                TeamColor.Green => playerGreenSources[unitType],
+                TeamColor.Yellow => playerYellowSources[unitType],
+                TeamColor.Purple => playerPurpleSources[unitType],
                 _ => null
             };
         }

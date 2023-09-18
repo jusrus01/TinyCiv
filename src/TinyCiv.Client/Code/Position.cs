@@ -20,8 +20,8 @@ namespace TinyCiv.Client.Code
 
         public Position(ServerPosition serverPosition)
         {
-            row = serverPosition.row;
-            column = serverPosition.column;
+            row = serverPosition.X;
+            column = serverPosition.Y;
         }
 
         public override bool Equals(object obj)

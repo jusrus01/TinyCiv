@@ -1,3 +1,3 @@
 namespace TinyCiv.Shared.Events.Client;
 
-public record AddNewUnitClientEvent(int PlayerId, int X, int Y) : ClientEvent;
+public record AddNewUnitClientEvent(Guid PlayerId, int X, int Y) : ClientEvent;

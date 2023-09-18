@@ -13,7 +13,7 @@ namespace TinyCiv.Client.Code
         public Position Position { get; set; }
         public Guid OwnerId { get; }
         public Guid Id { get; }
-        public PlayerColor Color { get; }
+        public TeamColor Color { get; }
 
         public GameObject(ServerGameObject serverGameObject)
         {

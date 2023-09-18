@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Linq;
-using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using TinyCiv.Client.Code;
-using TinyCiv.Client.Code.units;
+using TinyCiv.Client.Code.Units;
 using TinyCiv.Server.Client;
+using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
 using TinyCiv.Shared.Game;
@@ -23,11 +21,8 @@ namespace TinyCiv.Client
     public partial class MainWindow : Window
     {
         IServerClient Client;
-        private GameGrid gameGrid;
-        private Player currentPlayer;
-
-        private bool isUnitSelected = false;
-        private int unitIndex;
+        private GameGrid _gameGrid;
+        private Player _currentPlayer;
 
         public MainWindow()
         {
@@ -36,9 +31,9 @@ namespace TinyCiv.Client
             Loaded += PlayerConnection;
             Closed += PlayerDisconnect;
         }
-        private async void PlayerConnection(object sender, RoutedEventArgs e)
+        private void PlayerConnection(object sender, RoutedEventArgs e)
         {
-            await Task.Run(async () =>
+            Thread playerConnectionThread = new Thread(() =>
             {
                 Client = ServerClient.Create("http://localhost:5000");
 
@@ -47,8 +42,10 @@ namespace TinyCiv.Client
                 Client.ListenForGameStart(OnGameStart);
                 Client.ListenForMapChange(OnMapChange);
 
-                await Client.SendAsync(new JoinLobbyClientEvent());
+                Client.SendAsync(new JoinLobbyClientEvent()).Wait();
             });
+
+            playerConnectionThread.Start();
         }
 
         // Waiting for event implementation
@@ -59,11 +56,11 @@ namespace TinyCiv.Client
 
         private void OnPlayerJoin(JoinLobbyServerEvent response)
         {
-            currentPlayer = response.Created;
-            MessageBox.Show("Player: " + currentPlayer.Id + " has joined the game!");
+            _currentPlayer = response.Created;
+            MessageBox.Show($"Player: {_currentPlayer.Id} has joined the game!");
 
             // If the party is full
-            if (currentPlayer == null)
+            if (_currentPlayer == null)
             {
                 MessageBox.Show("The game party is full! Try again later.");
             }
@@ -71,9 +68,9 @@ namespace TinyCiv.Client
 
         private void OnGameStart(GameStartServerEvent response)
         {
-            gameGrid = new GameGrid(UnitGrid, 20, 20);
+            _gameGrid = new GameGrid(UnitGrid, Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
 
-            gameGrid.gameObjects = response.Map.Objects.Select(serverGameObect => new Warrior(serverGameObect))
+            _gameGrid.GameObjects = response.Map.Objects.Select(serverGameObect => new Warrior(serverGameObect))
                 .ToList<GameObject>();
 
             InitializeMap();
@@ -82,8 +79,8 @@ namespace TinyCiv.Client
 
         private void OnMapChange(MapChangeServerEvent response)
         {
-            gameGrid.gameObjects = response.Map.Objects.Select(serverGameObect => new Warrior(serverGameObect))
-                .ToList<GameObject>(); ;            
+            _gameGrid.GameObjects = response.Map.Objects.Select(serverGameObect => new Warrior(serverGameObect))
+                .ToList<GameObject>();          
 
             DrawGameObjects();
         }
@@ -92,12 +89,12 @@ namespace TinyCiv.Client
         {
             Dispatcher.Invoke(() =>
             {
-                for (int r = 0; r < 20; r++)
+                for (int r = 0; r < Constants.Game.HeightSquareCount; r++)
                 {
-                    for (int c = 0; c < 20; c++)
+                    for (int c = 0; c < Constants.Game.WidthSquareCount; c++)
                     {
                         Image image = new Image();
-                        image.Source = new BitmapImage(new Uri("Assets/game_tile.png", UriKind.Relative));
+                        image.Source = new BitmapImage(new Uri(Constants.Assets.GameTile, UriKind.Relative));
                         MapGrid.Children.Add(image);
                     }
                 }
@@ -108,7 +105,7 @@ namespace TinyCiv.Client
         {
             Dispatcher.Invoke(() =>
             {
-                gameGrid.Update();
+                _gameGrid.Update();
             });
         }              
     }

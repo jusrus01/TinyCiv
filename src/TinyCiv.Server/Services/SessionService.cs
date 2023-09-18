@@ -32,7 +32,7 @@ public class SessionService : ISessionService
                 return null;
             }
             
-            if (!Enum.TryParse<PlayerColor>(_players.Count.ToString(), out var playerColor))
+            if (!Enum.TryParse<TeamColor>(_players.Count.ToString(), out var playerColor))
             {
                 return null;
             }
@@ -96,8 +96,8 @@ public class SessionService : ISessionService
                 Color = player.Color,
                 Pos = new ServerPosition
                 {
-                    row = new Random().Next(Constants.Game.WidthSquareCount),
-                    column = new Random().Next(Constants.Game.HeightSquareCount)
+                    X = new Random().Next(Constants.Game.WidthSquareCount),
+                    Y = new Random().Next(Constants.Game.HeightSquareCount)
                 }
             })
             .ToList();
@@ -106,7 +106,7 @@ public class SessionService : ISessionService
             for (var x = 0; x < Constants.Game.WidthSquareCount; x++)
             {
                 var playerPosition = playerPositions
-                    .FirstOrDefault(p => p.Pos.row == x && p.Pos.column == y);
+                    .FirstOrDefault(p => p.Pos.X == x && p.Pos.Y == y);
                 if (playerPosition != null)
                 { 
                     objects.Add(new ServerGameObject
@@ -114,8 +114,8 @@ public class SessionService : ISessionService
                         Id = Guid.NewGuid(),
                         Position = new ServerPosition
                         {
-                            row = x,
-                            column = y
+                            X = x,
+                            Y = y
                         },
                         OwnerPlayerId = playerPosition.OwnerId,
                         Type = GameObjectType.Warrior,

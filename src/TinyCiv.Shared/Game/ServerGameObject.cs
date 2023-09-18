@@ -6,5 +6,5 @@ public class ServerGameObject
     public ServerPosition? Position { get; init; }
     public Guid OwnerPlayerId { get; init; }
     public Guid Id { get; init; }
-    public PlayerColor Color { get; init; }
+    public TeamColor Color { get; init; }
 }

@@ -1,6 +1,6 @@
 namespace TinyCiv.Shared.Game;
 
-public enum PlayerColor
+public enum TeamColor
 {
     Red,
     Green,
