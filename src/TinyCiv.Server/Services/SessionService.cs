@@ -1,3 +1,4 @@
+using System.Drawing;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Game;
@@ -23,6 +24,7 @@ public class SessionService : ISessionService
     
     public Player? AddPlayer()
     {
+        Console.WriteLine("adding new player");
         lock (_newPlayerLocker)
         {
             if (_players.Count >= Constants.Game.MaxPlayerCount)
@@ -30,7 +32,7 @@ public class SessionService : ISessionService
                 return null;
             }
             
-            if (!Enum.TryParse<Color>(_players.Count.ToString(), out var playerColor))
+            if (!Enum.TryParse<TeamColor>(_players.Count.ToString(), out var playerColor))
             {
                 return null;
             }
@@ -82,16 +84,17 @@ public class SessionService : ISessionService
     }
     
     [Obsolete("Temporary")]
-    private List<GameObject> GenerateObjects()
+    private List<ServerGameObject> GenerateObjects()
     {
-        var objects = new List<GameObject>();
+        var objects = new List<ServerGameObject>();
             
         // TODO: read map from file or some other way
         var playerPositions = _players
             .Select(player => new
             {
                 OwnerId = player.Id,
-                Pos = new Position
+                Color = player.Color,
+                Pos = new ServerPosition
                 {
                     X = new Random().Next(Constants.Game.WidthSquareCount),
                     Y = new Random().Next(Constants.Game.HeightSquareCount)
@@ -104,32 +107,20 @@ public class SessionService : ISessionService
             {
                 var playerPosition = playerPositions
                     .FirstOrDefault(p => p.Pos.X == x && p.Pos.Y == y);
-                if (playerPosition == null)
-                {
-                    objects.Add(new GameObject
+                if (playerPosition != null)
+                { 
+                    objects.Add(new ServerGameObject
                     {
                         Id = Guid.NewGuid(),
-                        Position = new Position
-                        {
-                            X = x,
-                            Y = y
-                        },
-                        Type = GameObjectType.Empty
-                    });
-                }
-                else
-                {
-                    objects.Add(new GameObject
-                    {
-                        Id = Guid.NewGuid(),
-                        Position = new Position
+                        Position = new ServerPosition
                         {
                             X = x,
                             Y = y
                         },
                         OwnerPlayerId = playerPosition.OwnerId,
-                        Type = GameObjectType.Warrior
-                    }); 
+                        Type = GameObjectType.Warrior,
+                        Color = playerPosition.Color
+                    });
                 }
             }
         }

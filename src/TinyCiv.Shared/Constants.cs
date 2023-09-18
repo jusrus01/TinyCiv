@@ -28,4 +28,9 @@ public static class Constants
         public const string SendGameStartToAll = nameof(SendGameStartToAll);
         public const string SendMapChangeToAll = nameof(SendMapChangeToAll);
     }
+
+    public static class Assets
+    {
+        public const String GameTile = "Assets/game_tile.png";
+    }
 }
