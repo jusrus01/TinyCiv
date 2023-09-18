@@ -10,22 +10,22 @@ namespace TinyCiv.Client.Code
     {
         private static Dictionary<GameObjectType, ImageSource> playerRedSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/warrior.png") }
+            { GameObjectType.Warrior, LoadImage("Assets/warriorRed.png") }
         };
 
         private static Dictionary<GameObjectType, ImageSource> playerGreenSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/warrior.png") }
+            { GameObjectType.Warrior, LoadImage("Assets/warriorGreen.png") }
         };
 
-        private static Dictionary<GameObjectType, ImageSource> playerBlueSources = new()
+        private static Dictionary<GameObjectType, ImageSource> playerYellowSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/warrior.png") }
+            { GameObjectType.Warrior, LoadImage("Assets/warriorYellow.png") }
         };
 
-        private static Dictionary<GameObjectType, ImageSource> playerWhiteSources = new()
+        private static Dictionary<GameObjectType, ImageSource> playerPurpleSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/warrior.png") }
+            { GameObjectType.Warrior, LoadImage("Assets/warriorPurple.png") }
         };
 
         private static ImageSource LoadImage(string filePath)
@@ -39,8 +39,8 @@ namespace TinyCiv.Client.Code
             {
                 PlayerColor.Red => playerRedSources[unitType],
                 PlayerColor.Green => playerGreenSources[unitType],
-                PlayerColor.Blue => playerBlueSources[unitType],
-                PlayerColor.White => playerWhiteSources[unitType],
+                PlayerColor.Yellow => playerYellowSources[unitType],
+                PlayerColor.Purple => playerPurpleSources[unitType],
                 _ => null
             };
         }
