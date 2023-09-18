@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\TinyCiv.Server.Client\TinyCiv.Server.Client.csproj" />
+    <ProjectReference Include="..\TinyCiv.Server.Client\TinyCiv.Server.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

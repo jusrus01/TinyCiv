@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using TinyCiv.Shared.Game;
 using TinyCiv.Client.Code.units;
+using System.Windows.Threading;
 
 namespace TinyCiv.Client.Code
 {

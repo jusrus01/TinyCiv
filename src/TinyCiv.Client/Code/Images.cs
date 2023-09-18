@@ -10,22 +10,22 @@ namespace TinyCiv.Client.Code
     {
         private static Dictionary<GameObjectType, ImageSource> playerRedSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/WarriorR.png") }
+            { GameObjectType.Warrior, LoadImage("Assets/warrior.png") }
         };
 
         private static Dictionary<GameObjectType, ImageSource> playerGreenSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/WarriorG.png") }
+            { GameObjectType.Warrior, LoadImage("Assets/warrior.png") }
         };
 
         private static Dictionary<GameObjectType, ImageSource> playerBlueSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/WarriorB.png") }
+            { GameObjectType.Warrior, LoadImage("Assets/warrior.png") }
         };
 
         private static Dictionary<GameObjectType, ImageSource> playerWhiteSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/WarriorB.png") }
+            { GameObjectType.Warrior, LoadImage("Assets/warrior.png") }
         };
 
         private static ImageSource LoadImage(string filePath)

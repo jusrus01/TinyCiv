@@ -37,6 +37,8 @@ public class ServerClient : IServerClient
         connection.StartAsync().Wait();
 
         _client = new ServerClient(connection);
+
+        Console.WriteLine("New connection created");
         return _client;
     }
     

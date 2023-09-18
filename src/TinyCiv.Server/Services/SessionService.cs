@@ -24,6 +24,7 @@ public class SessionService : ISessionService
     
     public Player? AddPlayer()
     {
+        Console.WriteLine("adding new player");
         lock (_newPlayerLocker)
         {
             if (_players.Count >= Constants.Game.MaxPlayerCount)
@@ -106,21 +107,8 @@ public class SessionService : ISessionService
             {
                 var playerPosition = playerPositions
                     .FirstOrDefault(p => p.Pos.row == x && p.Pos.column == y);
-                if (playerPosition == null)
-                {
-                    objects.Add(new ServerGameObject
-                    {
-                        Id = Guid.NewGuid(),
-                        Position = new ServerPosition
-                        {
-                            row = x,
-                            column = y
-                        },
-                        Type = GameObjectType.Empty
-                    });
-                }
-                else
-                {
+                if (playerPosition != null)
+                { 
                     objects.Add(new ServerGameObject
                     {
                         Id = Guid.NewGuid(),
@@ -132,7 +120,7 @@ public class SessionService : ISessionService
                         OwnerPlayerId = playerPosition.OwnerId,
                         Type = GameObjectType.Warrior,
                         Color = playerPosition.Color
-                    }); ; 
+                    });
                 }
             }
         }
