@@ -33,12 +33,17 @@ public class UnitAddHandler : ClientHandler<AddNewUnitClientEvent>
         //     .SendEventAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_sessionService.GetMap()))
         //     .ConfigureAwait(false);
 
-        _mapService.AddUnit(@event.PlayerId, new Position { X = @event.X, Y = @event.Y });
+        try
+        {
+            _mapService.AddUnit(@event.PlayerId, new Position { X = @event.X, Y = @event.Y });
+        }
+        catch
+        {
+            return;
+        }
 
         await all
             .SendEventAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
             .ConfigureAwait(false);
-
-        //throw new NotImplementedException();
     }
 }
