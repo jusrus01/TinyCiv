@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
 {
@@ -15,6 +16,12 @@ namespace TinyCiv.Client.Code
         {
             this.row = row;
             this.column = column;
+        }
+
+        public Position(ServerPosition serverPosition)
+        {
+            row = serverPosition.X;
+            column = serverPosition.Y;
         }
 
         public override bool Equals(object obj)
@@ -30,6 +37,11 @@ namespace TinyCiv.Client.Code
         public Position Direction()
         {
             return new Position(Math.Sign(this.row), Math.Sign(this.column));
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(row, column);
         }
 
         public static bool operator == (Position a, Position b)
@@ -51,5 +63,7 @@ namespace TinyCiv.Client.Code
         {
             return new Position(a.row - b.row, a.column - b.column);
         }
+
+
     }
 }

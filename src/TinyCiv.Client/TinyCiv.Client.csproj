@@ -11,16 +11,24 @@
     <None Remove="Assets\game_tile.png" />
     <None Remove="Assets\sh2326_4_.png" />
     <None Remove="Assets\warrior.png" />
+    <None Remove="Assets\warriorGreen.png" />
+    <None Remove="Assets\warriorPurple.png" />
+    <None Remove="Assets\warriorRed.png" />
+    <None Remove="Assets\warriorYellow.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\TinyCiv.Server.Client\TinyCiv.Server.Client.csproj" />
+    <ProjectReference Include="..\TinyCiv.Server.Client\TinyCiv.Server.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Assets\game_tile.png" />
     <Resource Include="Assets\sh2326_4_.png" />
     <Resource Include="Assets\warrior.png" />
+    <Resource Include="Assets\warriorGreen.png" />
+    <Resource Include="Assets\warriorPurple.png" />
+    <Resource Include="Assets\warriorRed.png" />
+    <Resource Include="Assets\warriorYellow.png" />
   </ItemGroup>
 
 </Project>
