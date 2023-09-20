@@ -34,6 +34,7 @@ public abstract class Unit : GameObject
         var delta = target - Position;
         Position += delta.Direction();
         onUpdate?.Invoke();
+
         if (Position == target)
         {
             moveChargeUp.Stop();

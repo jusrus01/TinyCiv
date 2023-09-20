@@ -48,7 +48,6 @@ namespace TinyCiv.Client
                 Client.SendAsync(new JoinLobbyClientEvent()).Wait();
             });
 
-            viewModel.serverStatus = "Connecting";
             playerConnectionThread.Start();
         }
 
@@ -61,17 +60,17 @@ namespace TinyCiv.Client
 
         private void OnPlayerJoin(JoinLobbyServerEvent response)
         {
-            _currentPlayer = response.Created;
-            MessageBox.Show($"Player: {_currentPlayer.Id} has joined the game!");
+            if (_currentPlayer == null)
+            {
+                _currentPlayer = response.Created;
+                viewModel.PlayerColor = _currentPlayer.Color;
+            }
+            MessageBox.Show($"Player: {_currentPlayer.Id} has joined the game! They are in the {_currentPlayer.Color} team!");
 
             // If the party is full
             if (_currentPlayer == null)
             {
                 MessageBox.Show("The game party is full! Try again later.");
-            }
-            else
-            {
-                viewModel.join();
             }
         }
 
@@ -79,11 +78,14 @@ namespace TinyCiv.Client
         {
             _gameGrid = new GameGrid(UnitGrid, Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
 
-            //_gameGrid.GameObjects = response.Map.Objects.Select(serverGameObect => new Warrior(serverGameObect))
-            //    .ToList<GameObject>();
+            _gameGrid.GameObjects = response.Map.Objects
+                .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
+                .Select(serverGameObect => new Warrior(serverGameObect))
+                .ToList<GameObject>();
 
             _gameGrid.Client = Client;
             _gameGrid.CurrentPlayer = _currentPlayer;
+            viewModel.PlayerColor = _currentPlayer.Color;
 
             InitializeMap();
             DrawGameObjects();
@@ -91,8 +93,10 @@ namespace TinyCiv.Client
 
         private void OnMapChange(MapChangeServerEvent response)
         {
-            _gameGrid.GameObjects = response.Map.Objects.Select(serverGameObect => new Warrior(serverGameObect))
-                .ToList<GameObject>();          
+            _gameGrid.GameObjects = response.Map.Objects
+                .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
+                .Select(serverGameObect => new Warrior(serverGameObect))
+                .ToList<GameObject>();
 
             DrawGameObjects();
         }

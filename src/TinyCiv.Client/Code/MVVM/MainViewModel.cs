@@ -4,45 +4,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TinyCiv.Client.Code.Core;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.MVVM
 {
     public class MainViewModel : ObservableObject
     {
-        private string _serverStatus = "NULL";
-        public string serverStatus { 
+        private TeamColor _color;
+        public TeamColor PlayerColor
+        { 
             get
             {
-                return _serverStatus;
+                return _color;
             }
             set
             {
-                _serverStatus = value;
+                _color = value;
+                OnPropertyChanged();
             }
         } 
-        private int _playerCount = 0;
-        public int playerCount
-        {
-            get
-            {
-                return _playerCount;
-            }
-            set
-            {
-                playerCount = value;
-            }
-        }
 
         public MainViewModel()
         {
 
         }
 
-        public void join()
-        {
-            //serverStatus = "Connected";
-           // playerCount = playerCount + 1;
-            OnPropertyChanged();
-        }
     }
 }

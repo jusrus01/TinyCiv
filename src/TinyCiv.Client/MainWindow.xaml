@@ -50,13 +50,8 @@
             <Border Grid.Row="1">
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock>Server status: </TextBlock>
-                        <TextBlock Text="{Binding serverStatus, Mode=TwoWay}">STATUS</TextBlock>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock>Player Count: </TextBlock>
-                        <TextBlock x:Name="CurrentPlayerCount" Text="{Binding playerCount,Mode=TwoWay}">NULL</TextBlock>
-                        <TextBlock>/4</TextBlock>
+                        <TextBlock>Your color: </TextBlock>
+                        <TextBlock Text="{Binding PlayerColor, Mode=TwoWay}"></TextBlock>
                     </StackPanel>
                 </StackPanel>
             </Border>

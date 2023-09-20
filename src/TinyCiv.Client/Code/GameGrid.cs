@@ -90,7 +90,7 @@ namespace TinyCiv.Client.Code
             return border;
         }
 
-        private void Tile_Click(object sender, MouseButtonEventArgs e)
+        private async void Tile_Click(object sender, MouseButtonEventArgs e)
         {
             var border = (Border)sender;
             var clickedPosition = (Position)border.Tag;
@@ -99,9 +99,7 @@ namespace TinyCiv.Client.Code
             {
                 isUnitSelected = false;
                 var unit = (Unit)GameObjects[selectedUnitIndex];
-                unit.onUpdate = Update;
-                unit.MoveTowards(clickedPosition);
-                Update();
+                await Client.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
             }
         }
 
@@ -128,7 +126,7 @@ namespace TinyCiv.Client.Code
             var border = (Border)sender;
             var clickedPosition = (Position)border.Tag;
 
-            await Client.SendAsync(new AddNewUnitClientEvent(CurrentPlayer.Id, clickedPosition.column, clickedPosition.row));
+            await Client.SendAsync(new AddNewUnitClientEvent(CurrentPlayer.Id, clickedPosition.row, clickedPosition.column));
         }
     }
 }
