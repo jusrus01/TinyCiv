@@ -113,8 +113,8 @@ namespace TinyCiv.Client.Code
             {
                 isUnitSelected = true;
                 selectedUnitIndex = gameObjectIndex;
-                ViewModel.UnitName = typeof(Unit).ToString();
-                ViewModel.IsUnitStatVisible = "Visible";
+                ViewModel.UnitName.Value = typeof(Unit).ToString();
+                ViewModel.IsUnitStatVisible.Value = "Visible";
                 Update();
             }
             else if (isUnitSelected && gameObjectIndex == selectedUnitIndex)
@@ -126,8 +126,8 @@ namespace TinyCiv.Client.Code
         private void UnselectUnit()
         {
             isUnitSelected = false;
-            ViewModel.UnitName = "NULL";
-            ViewModel.IsUnitStatVisible = "Hidden";
+            ViewModel.UnitName.Value = "NULL";
+            ViewModel.IsUnitStatVisible.Value = "Hidden";
             Update();
         }
 

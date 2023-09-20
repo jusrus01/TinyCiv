@@ -46,16 +46,16 @@
                     <TextBlock>Units</TextBlock>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Your color:</TextBlock>
-                        <TextBlock Text="{Binding PlayerColor, Mode=TwoWay}"></TextBlock>
+                        <TextBlock Text="{Binding PlayerColor.Value}"></TextBlock>
                     </StackPanel>
                 </StackPanel>
             </Border>
 
             <Border Grid.Row="1">
-                <StackPanel Visibility="{Binding IsUnitStatVisible}" Orientation="Vertical">
+                <StackPanel Visibility="{Binding IsUnitStatVisible.Value}" Orientation="Vertical">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock>Unit: </TextBlock>
-                        <TextBlock Text="{Binding UnitName, Mode=TwoWay}"></TextBlock>
+                        <TextBlock Text="{Binding UnitName.Value}"></TextBlock>
                     </StackPanel>
                 </StackPanel>
             </Border>

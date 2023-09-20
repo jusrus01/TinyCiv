@@ -8,66 +8,14 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.MVVM
 {
-    public class MainViewModel : ObservableObject
+    public class MainViewModel
     {
-        private TeamColor _color;
-        public TeamColor PlayerColor
-        { 
-            get
-            {
-                return _color;
-            }
-            set
-            {
-                _color = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private bool _IsUnitStatVisible;
-        public string IsUnitStatVisible
-        {
-            get
-            {
-                if (_IsUnitStatVisible)
-                    return "Visible";
-                return "Hidden";
-            }
-            set
-            {
-                switch (value)
-                {
-                    case "Visible":
-                        _IsUnitStatVisible = true;
-                        break;
-                    case "Hidden":
-                        _IsUnitStatVisible = false;
-                        break;
-                    default:
-                        _IsUnitStatVisible = false;
-                        break;
-                }
-                OnPropertyChanged();
-            }
-        }
-
-        private string _UnitName;
-        public string UnitName
-        {
-            get
-            {
-                return _UnitName;
-            }
-            set
-            {
-                _UnitName = value;
-                OnPropertyChanged();
-            }
-        }
+        public ObservableValue<TeamColor> PlayerColor { get; } = new ObservableValue<TeamColor>();
+        public ObservableValue<String> IsUnitStatVisible { get; } = new ObservableValue<string>("Hidden");
+        public ObservableValue<String> UnitName { get; } = new ObservableValue<string>();
 
         public MainViewModel()
         {
-
         }
 
     }

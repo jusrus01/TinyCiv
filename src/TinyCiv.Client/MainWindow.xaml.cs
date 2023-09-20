@@ -63,7 +63,7 @@ namespace TinyCiv.Client
             if (_currentPlayer == null)
             {
                 _currentPlayer = response.Created;
-                viewModel.PlayerColor = _currentPlayer.Color;
+                viewModel.PlayerColor.Value = _currentPlayer.Color;
             }
             MessageBox.Show($"Player: {_currentPlayer.Id} has joined the game! They are in the {_currentPlayer.Color} team!");
 
@@ -86,7 +86,7 @@ namespace TinyCiv.Client
             _gameGrid.Client = Client;
             _gameGrid.CurrentPlayer = _currentPlayer;
             _gameGrid.ViewModel = viewModel;
-            viewModel.PlayerColor = _currentPlayer.Color;
+            viewModel.PlayerColor.Value = _currentPlayer.Color;
 
             InitializeMap();
             DrawGameObjects();
