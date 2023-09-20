@@ -28,6 +28,7 @@ public class LobbyHandler : ClientHandler<JoinLobbyClientEvent>
     protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, JoinLobbyClientEvent @event)
     {
         var newPlayer = _sessionService.AddPlayer();
+
         if (newPlayer == null)
         {
             return;
@@ -41,8 +42,15 @@ public class LobbyHandler : ClientHandler<JoinLobbyClientEvent>
         {
             _sessionService.StartGame();
 
+            var map = _mapService.Initialize();
+
+            if (map == null)
+            {
+                return;
+            }
+
             await all
-                .SendEventAsync(Constants.Server.SendGameStartToAll, new GameStartServerEvent(_mapService.Initialize()))
+                .SendEventAsync(Constants.Server.SendGameStartToAll, new GameStartServerEvent(map))
                 .ConfigureAwait(false);
         }
     }

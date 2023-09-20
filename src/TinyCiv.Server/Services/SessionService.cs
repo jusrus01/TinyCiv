@@ -44,6 +44,11 @@ public class SessionService : ISessionService
         }
     }
 
+    public Player? GetPlayer(Guid playerId)
+    {
+        return _players.Single(p => p.Id == playerId);
+    }
+
     public void StartGame()
     {
         _isGameStarted = true;

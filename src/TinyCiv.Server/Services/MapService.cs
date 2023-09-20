@@ -6,25 +6,35 @@ namespace TinyCiv.Server.Services
 {
     public class MapService : IMapService
     {
+        private readonly ISessionService _sessionService;
+        
         private Map? _map;
         private readonly object _mapChangeLocker;
 
         // Temporary?
         public List<(Guid, ServerPosition)> MovingUnits { get; set; }
 
-        public MapService()
+        public MapService(ISessionService sessionService)
         {
+            _sessionService = sessionService;
             _mapChangeLocker = new object();
             MovingUnits = new List<(Guid, ServerPosition)>();
         }
 
-        public ServerGameObject AddUnit(Guid playerId, ServerPosition position)
+        public ServerGameObject? AddUnit(Guid playerId, ServerPosition position)
         {
+            var player = _sessionService.GetPlayer(playerId);
+
+            if (player == null)
+            {
+                return null;
+            }
+
             lock (_mapChangeLocker)
             {
                 if (_map == null)
                 {
-                    throw new InvalidOperationException("Map is not initialized");
+                    return null;
                 }
 
                 int index = _map.Objects!
@@ -34,7 +44,7 @@ namespace TinyCiv.Server.Services
 
                 if (_map.Objects![index].Type != GameObjectType.Empty)
                 {
-                    throw new InvalidOperationException("Another GameObject is blocking specified position");
+                    return null;
                 }
 
                 var unit = new ServerGameObject
@@ -42,7 +52,8 @@ namespace TinyCiv.Server.Services
                     Id = Guid.NewGuid(),
                     OwnerPlayerId = playerId,
                     Position = position,
-                    Type = GameObjectType.Warrior
+                    Type = GameObjectType.Warrior,
+                    Color = player.Color
                 };
 
                 _map.Objects![index] = unit;
@@ -51,36 +62,37 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        public void MoveUnit(Guid unitId, ServerPosition position)
+        public bool MoveUnit(Guid unitId, ServerPosition position)
         {
             lock (_mapChangeLocker)
             {
                 if (_map == null)
                 {
-                    throw new InvalidOperationException("Map is not initialized");
+                    return false;
                 }
 
                 var occupiedUnit = _map.Objects!.Single(o => o.Position!.X == position.X && o.Position.Y == position.Y);
 
                 if (occupiedUnit.Type != GameObjectType.Empty)
                 {
-                    throw new InvalidOperationException("Specified space is occupied");
+                    return false;
                 }
 
                 var unit = _map.Objects!.Single(o => o.Id == unitId);
 
                 occupiedUnit.Position = unit.Position;
                 unit.Position = position;
+                return true;
             }
         }
 
-        public ServerGameObject GetUnit(Guid unitId)
+        public ServerGameObject? GetUnit(Guid unitId)
         {
             lock (_mapChangeLocker)
             {
                 if (_map == null)
                 {
-                    throw new InvalidOperationException("Map is not initialized");
+                    return null;
                 }
 
                 var unit = _map.Objects!.Single(o => o.Id == unitId);
@@ -89,13 +101,13 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        public ServerGameObject GetUnit(ServerPosition position)
+        public ServerGameObject? GetUnit(ServerPosition position)
         {
             lock (_mapChangeLocker)
             {
                 if (_map == null)
                 {
-                    throw new InvalidOperationException("Map is not initialized");
+                    return null;
                 }
 
                 var unit = _map.Objects!.Single(o => o.Position!.X == position.X && o.Position!.Y == position.Y);
@@ -112,13 +124,13 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        public Map Initialize()
+        public Map? Initialize()
         {
             lock (_mapChangeLocker)
             {
                 if (_map != null)
                 {
-                    throw new InvalidOperationException("Cannot initialize map twice");
+                    return null;
                 }
 
                 _map = new Map

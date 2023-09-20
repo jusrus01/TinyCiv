@@ -40,6 +40,11 @@ namespace TinyCiv.Server.Handlers
 
             var unit = _mapService.GetUnit(@event.UnitId);
 
+            if (unit == null)
+            {
+                return;
+            }
+
             _ = Task.Run(async () =>
             {
                 while (unit.Position!.X != @event.X || unit.Position.Y != @event.Y)
@@ -49,11 +54,9 @@ namespace TinyCiv.Server.Handlers
                     int diffX = Math.Clamp(@event.X - unit.Position.X, -1, 1);
                     int diffY = Math.Clamp(@event.Y - unit.Position.Y, -1, 1);
 
-                    try
-                    {
-                        _mapService.MoveUnit(@event.UnitId, new ServerPosition { X = unit.Position.X + diffX, Y = unit.Position.Y + diffY });
-                    }
-                    catch
+                    bool successful = _mapService.MoveUnit(@event.UnitId, new ServerPosition { X = unit.Position.X + diffX, Y = unit.Position.Y + diffY });
+                    
+                    if (successful == false)
                     {
                         _mapService.MovingUnits.Remove(unitMovementTuple);
 

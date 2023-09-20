@@ -19,13 +19,9 @@ public class UnitAddHandler : ClientHandler<AddNewUnitClientEvent>
     
     protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, AddNewUnitClientEvent @event)
     {
-        ServerGameObject unit;
+        var unit = _mapService.AddUnit(@event.PlayerId, new ServerPosition { X = @event.X, Y = @event.Y });
 
-        try
-        {
-            unit = _mapService.AddUnit(@event.PlayerId, new ServerPosition { X = @event.X, Y = @event.Y });
-        }
-        catch
+        if (unit == null)
         {
             return;
         }
