@@ -59,7 +59,7 @@ async Task SampleIdAssignmentDemo()
 
     Action<AddNewUnitServerEvent> newUnitCallback = (response) =>
     {
-        Console.WriteLine("New unit created");
+        Console.WriteLine($"New unit created: {JsonSerializer.Serialize(response)}");
         gameObjects.Add(response.CreatedUnit);
     };
 
@@ -86,8 +86,6 @@ async Task SampleIdAssignmentDemo()
     var p1 = client.SendAsync(new JoinLobbyClientEvent());
     // second player joins
     var p2 = client.SendAsync(new JoinLobbyClientEvent());
-
-    await Task.WhenAll(p1, p2);
 
     await Task.Delay(2000);
 
