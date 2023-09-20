@@ -6,10 +6,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Server.Client;
-using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Client;
-using TinyCiv.Shared.Events.Server;
 using TinyCiv.Shared.Game;
+using TinyCiv.Client.Code.MVVM;
+
 
 namespace TinyCiv.Client.Code
 {
@@ -19,6 +19,7 @@ namespace TinyCiv.Client.Code
         public List<GameObject> GameObjects = new List<GameObject>();
         public IServerClient Client;
         public Player CurrentPlayer;
+        public MainViewModel ViewModel;
         private int Rows;
         private int Columns;
 
@@ -97,7 +98,7 @@ namespace TinyCiv.Client.Code
 
             if (isUnitSelected)
             {
-                isUnitSelected = false;
+                UnselectUnit();
                 var unit = (Unit)GameObjects[selectedUnitIndex];
                 await Client.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
             }
@@ -112,13 +113,22 @@ namespace TinyCiv.Client.Code
             {
                 isUnitSelected = true;
                 selectedUnitIndex = gameObjectIndex;
+                ViewModel.UnitName = typeof(Unit).ToString();
+                ViewModel.IsUnitStatVisible = "Visible";
                 Update();
             }
             else if (isUnitSelected && gameObjectIndex == selectedUnitIndex)
             {
-                isUnitSelected = false;
-                Update();
+                UnselectUnit();
             }
+        }
+
+        private void UnselectUnit()
+        {
+            isUnitSelected = false;
+            ViewModel.UnitName = "NULL";
+            ViewModel.IsUnitStatVisible = "Hidden";
+            Update();
         }
 
         private async void Create_Unit(object sender, MouseButtonEventArgs e)

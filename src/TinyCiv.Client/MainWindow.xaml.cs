@@ -85,6 +85,7 @@ namespace TinyCiv.Client
 
             _gameGrid.Client = Client;
             _gameGrid.CurrentPlayer = _currentPlayer;
+            _gameGrid.ViewModel = viewModel;
             viewModel.PlayerColor = _currentPlayer.Color;
 
             InitializeMap();

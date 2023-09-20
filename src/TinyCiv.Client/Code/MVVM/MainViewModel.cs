@@ -22,7 +22,48 @@ namespace TinyCiv.Client.Code.MVVM
                 _color = value;
                 OnPropertyChanged();
             }
-        } 
+        }
+
+        private bool _IsUnitStatVisible;
+        public string IsUnitStatVisible
+        {
+            get
+            {
+                if (_IsUnitStatVisible)
+                    return "Visible";
+                return "Hidden";
+            }
+            set
+            {
+                switch (value)
+                {
+                    case "Visible":
+                        _IsUnitStatVisible = true;
+                        break;
+                    case "Hidden":
+                        _IsUnitStatVisible = false;
+                        break;
+                    default:
+                        _IsUnitStatVisible = false;
+                        break;
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        private string _UnitName;
+        public string UnitName
+        {
+            get
+            {
+                return _UnitName;
+            }
+            set
+            {
+                _UnitName = value;
+                OnPropertyChanged();
+            }
+        }
 
         public MainViewModel()
         {
