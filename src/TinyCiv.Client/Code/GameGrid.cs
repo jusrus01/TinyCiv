@@ -108,7 +108,7 @@ namespace TinyCiv.Client.Code
             var border = (Border)sender;
             var gameObjectIndex = (int)border.Tag;
 
-            if (!isUnitSelected)
+            if (!isUnitSelected && GameObjects[gameObjectIndex].OwnerId == CurrentPlayer.Id)
             {
                 isUnitSelected = true;
                 selectedUnitIndex = gameObjectIndex;
