@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using TinyCiv.Client.Code;
+using TinyCiv.Client.Code.MVVM;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Server.Client;
 using TinyCiv.Shared;
@@ -23,11 +24,13 @@ namespace TinyCiv.Client
         IServerClient Client;
         private GameGrid _gameGrid;
         private Player _currentPlayer;
+        MainViewModel viewModel = new MainViewModel();
 
         public MainWindow()
         {
             InitializeComponent();
 
+            DataContext = viewModel;
             Loaded += PlayerConnection;
             Closed += PlayerDisconnect;
         }
@@ -45,12 +48,14 @@ namespace TinyCiv.Client
                 Client.SendAsync(new JoinLobbyClientEvent()).Wait();
             });
 
+            viewModel.serverStatus = "Connecting";
             playerConnectionThread.Start();
         }
 
         // Waiting for event implementation
         private async void PlayerDisconnect(object sender, EventArgs e)
         {
+
             // await Client.SendAsync(new PlayerDisconnectEvent(currentPlayer.Id));
         }
 
@@ -64,14 +69,21 @@ namespace TinyCiv.Client
             {
                 MessageBox.Show("The game party is full! Try again later.");
             }
+            else
+            {
+                viewModel.join();
+            }
         }
 
         private void OnGameStart(GameStartServerEvent response)
         {
             _gameGrid = new GameGrid(UnitGrid, Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
 
-            _gameGrid.GameObjects = response.Map.Objects.Select(serverGameObect => new Warrior(serverGameObect))
-                .ToList<GameObject>();
+            //_gameGrid.GameObjects = response.Map.Objects.Select(serverGameObect => new Warrior(serverGameObect))
+            //    .ToList<GameObject>();
+
+            _gameGrid.Client = Client;
+            _gameGrid.CurrentPlayer = _currentPlayer;
 
             InitializeMap();
             DrawGameObjects();

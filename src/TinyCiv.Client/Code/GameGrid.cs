@@ -5,6 +5,11 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using TinyCiv.Client.Code.Units;
+using TinyCiv.Server.Client;
+using TinyCiv.Shared;
+using TinyCiv.Shared.Events.Client;
+using TinyCiv.Shared.Events.Server;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
 {
@@ -12,6 +17,8 @@ namespace TinyCiv.Client.Code
     {
         public UniformGrid SpriteGrid { get; set; }
         public List<GameObject> GameObjects = new List<GameObject>();
+        public IServerClient Client;
+        public Player CurrentPlayer;
         private int Rows;
         private int Columns;
 
@@ -56,8 +63,9 @@ namespace TinyCiv.Client.Code
                 var indexPosition = gameObject.Position;
                 var border = (Border)SpriteGrid.Children[indexPosition.row * Columns + indexPosition.column];
                 border.Tag = i;
-                border.MouseDown -= Tile_Click;
-                border.MouseDown += Unit_Click;
+                border.MouseLeftButtonDown -= Tile_Click;
+                border.MouseRightButtonDown -= Create_Unit;
+                border.MouseLeftButtonDown += Unit_Click;
                 var image = (Image)border.Child;
                 image.Source = Images.GetImage(gameObject);
                 if (isUnitSelected && selectedUnitIndex == i)
@@ -76,7 +84,8 @@ namespace TinyCiv.Client.Code
                 Background = Brushes.Transparent,
                 Tag = position
             };
-            border.MouseDown += Tile_Click;
+            border.MouseLeftButtonDown += Tile_Click;
+            border.MouseRightButtonDown += Create_Unit;
             border.Child = image;
             return border;
         }
@@ -112,6 +121,14 @@ namespace TinyCiv.Client.Code
                 isUnitSelected = false;
                 Update();
             }
+        }
+
+        private async void Create_Unit(object sender, MouseButtonEventArgs e)
+        {
+            var border = (Border)sender;
+            var clickedPosition = (Position)border.Tag;
+
+            await Client.SendAsync(new AddNewUnitClientEvent(CurrentPlayer.Id, clickedPosition.column, clickedPosition.row));
         }
     }
 }

@@ -35,6 +35,9 @@ namespace TinyCiv.Client.Code
 
         public static ImageSource GetImage(TeamColor color, GameObjectType unitType)
         {
+            if (unitType == GameObjectType.Empty)
+                return null;
+
             return color switch
             {
                 TeamColor.Red => playerRedSources[unitType],
