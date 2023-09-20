@@ -15,7 +15,7 @@ public static class Extensions
                 {
                     Console.Write("W");
                 }
-                else if (map.Objects!.Where(o => o.Position!.X == x && o.Position.Y == y).First().Type == GameObjectType.Wall)
+                else if (map.Objects!.Where(o => o.Position!.X == x && o.Position.Y == y).First().Type == GameObjectType.City)
                 {
                     Console.Write("X");
                 }

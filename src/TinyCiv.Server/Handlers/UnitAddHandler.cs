@@ -19,28 +19,20 @@ public class UnitAddHandler : ClientHandler<AddNewUnitClientEvent>
     
     protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, AddNewUnitClientEvent @event)
     {
-        // // TODO: consider moving the responsibility of validation to other classes and not handlers
-        // // e.g.: make handler execute ONLY when it can be executed
-        // if (!_sessionService.IsSessionStarted() || !_sessionService.IsValidPlayer(@event.PlayerId))
-        // {
-        //     return;
-        // }
-        //
-        // // TODO: add validation if the player can move at all
-        // // TODO: add other needed validation
-        // _sessionService.PlaceUnit(@event.X, @event.Y);
-        // await all
-        //     .SendEventAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_sessionService.GetMap()))
-        //     .ConfigureAwait(false);
+        ServerGameObject unit;
 
         try
         {
-            _mapService.AddUnit(@event.PlayerId, new Position { X = @event.X, Y = @event.Y });
+            unit = _mapService.AddUnit(@event.PlayerId, new ServerPosition { X = @event.X, Y = @event.Y });
         }
         catch
         {
             return;
         }
+
+        await caller
+            .SendEventAsync(Constants.Server.SendCreatedUnit, new AddNewUnitServerEvent(unit))
+            .ConfigureAwait(false);
 
         await all
             .SendEventAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))

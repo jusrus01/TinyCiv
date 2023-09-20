@@ -20,6 +20,8 @@ async Task SampleIdAssignmentDemo()
     var client = ServerClient.Create("http://localhost:5000");
 
     List<Player> playerList = new();
+    List<ServerGameObject> gameObjects = new();
+    List<Guid> movingUnits = new();
 
     Action<JoinLobbyServerEvent> joinCallback = (response) =>
     {
@@ -50,14 +52,35 @@ async Task SampleIdAssignmentDemo()
     Action<MapChangeServerEvent> mapChangeCallback = (response) =>
     {
         Console.WriteLine("Map changed since something happened...");
-        //Console.WriteLine($"Map to render: {JsonSerializer.Serialize(response)}");
 
+        //Console.WriteLine($"Map to render: {JsonSerializer.Serialize(response)}");
         response.Map.Print();
     };
 
+    Action<AddNewUnitServerEvent> newUnitCallback = (response) =>
+    {
+        Console.WriteLine("New unit created");
+        gameObjects.Add(response.CreatedUnit);
+    };
+
+    Action<UnitStatusUpdateServerEvent> unitStatusUpdateCallback = (response) =>
+    {
+        Console.WriteLine($"Unit {response.UnitId} received a status update: IsMoving - {response.IsMoving}");
+
+        if (response.IsMoving)
+        {
+            movingUnits.Add(response.UnitId);
+        } else
+        {
+            movingUnits.Remove(response.UnitId);
+        }
+    };
+
     client.ListenForNewPlayerCreation(joinCallback);
+    client.ListenForNewUnitCreation(newUnitCallback);
     client.ListenForGameStart(startCallback);
     client.ListenForMapChange(mapChangeCallback);
+    client.ListenForUnitStatusUpdate(unitStatusUpdateCallback);
 
     // first player joins
     var p1 = client.SendAsync(new JoinLobbyClientEvent());
@@ -68,7 +91,18 @@ async Task SampleIdAssignmentDemo()
 
     await Task.Delay(2000);
 
+    // Spawning 3 units
     await client.SendAsync(new AddNewUnitClientEvent(playerList[0].Id, 1, 1));
     await client.SendAsync(new AddNewUnitClientEvent(playerList[0].Id, 2, 2));
     await client.SendAsync(new AddNewUnitClientEvent(playerList[1].Id, 5, 2));
+
+    await Task.Delay(2000);
+
+    // Moving units
+    await client.SendAsync(new MoveUnitClientEvent(gameObjects[^1].Id, 10, 5));
+
+    await Task.Delay(500);
+
+    await client.SendAsync(new MoveUnitClientEvent(gameObjects[1].Id, 6, 7));
+    await client.SendAsync(new MoveUnitClientEvent(gameObjects[0].Id, 6, 7)); // Should not work
 }

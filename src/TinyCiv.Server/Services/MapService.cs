@@ -9,12 +9,16 @@ namespace TinyCiv.Server.Services
         private Map? _map;
         private readonly object _mapChangeLocker;
 
+        // Temporary?
+        public List<(Guid, ServerPosition)> MovingUnits { get; set; }
+
         public MapService()
         {
             _mapChangeLocker = new object();
+            MovingUnits = new List<(Guid, ServerPosition)>();
         }
 
-        public void AddUnit(Guid playerId, Position position)
+        public ServerGameObject AddUnit(Guid playerId, ServerPosition position)
         {
             lock (_mapChangeLocker)
             {
@@ -33,7 +37,7 @@ namespace TinyCiv.Server.Services
                     throw new InvalidOperationException("Another GameObject is blocking specified position");
                 }
 
-                var unit = new GameObject
+                var unit = new ServerGameObject
                 {
                     Id = Guid.NewGuid(),
                     OwnerPlayerId = playerId,
@@ -42,6 +46,61 @@ namespace TinyCiv.Server.Services
                 };
 
                 _map.Objects![index] = unit;
+
+                return unit;
+            }
+        }
+
+        public void MoveUnit(Guid unitId, ServerPosition position)
+        {
+            lock (_mapChangeLocker)
+            {
+                if (_map == null)
+                {
+                    throw new InvalidOperationException("Map is not initialized");
+                }
+
+                var occupiedUnit = _map.Objects!.Single(o => o.Position!.X == position.X && o.Position.Y == position.Y);
+
+                if (occupiedUnit.Type != GameObjectType.Empty)
+                {
+                    throw new InvalidOperationException("Specified space is occupied");
+                }
+
+                var unit = _map.Objects!.Single(o => o.Id == unitId);
+
+                occupiedUnit.Position = unit.Position;
+                unit.Position = position;
+            }
+        }
+
+        public ServerGameObject GetUnit(Guid unitId)
+        {
+            lock (_mapChangeLocker)
+            {
+                if (_map == null)
+                {
+                    throw new InvalidOperationException("Map is not initialized");
+                }
+
+                var unit = _map.Objects!.Single(o => o.Id == unitId);
+
+                return unit;
+            }
+        }
+
+        public ServerGameObject GetUnit(ServerPosition position)
+        {
+            lock (_mapChangeLocker)
+            {
+                if (_map == null)
+                {
+                    throw new InvalidOperationException("Map is not initialized");
+                }
+
+                var unit = _map.Objects!.Single(o => o.Position!.X == position.X && o.Position!.Y == position.Y);
+
+                return unit;
             }
         }
 
@@ -72,19 +131,19 @@ namespace TinyCiv.Server.Services
         }
 
         [Obsolete("Temporary")]
-        private List<GameObject> GenerateObjects()
+        private List<ServerGameObject> GenerateObjects()
         {
-            var objects = new List<GameObject>();
+            var objects = new List<ServerGameObject>();
 
             // TODO: read map from file or some other way
             for (var y = 0; y < Constants.Game.HeightSquareCount; y++)
             {
                 for (var x = 0; x < Constants.Game.WidthSquareCount; x++)
                 {
-                    objects.Add(new GameObject
+                    objects.Add(new ServerGameObject
                     {
                         Id = Guid.NewGuid(),
-                        Position = new Position
+                        Position = new ServerPosition
                         {
                             X = x,
                             Y = y

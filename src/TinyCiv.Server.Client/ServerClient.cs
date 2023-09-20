@@ -48,6 +48,16 @@ public class ServerClient : IServerClient
         return _connection.SendAsync(Constants.Server.ReceiveFromClient, content, @event.Type, token);
     }
 
+    public void ListenForUnitStatusUpdate(Action<UnitStatusUpdateServerEvent> callback)
+    {
+        Listen(Constants.Server.SendUnitStatusUpdate, callback);
+    }
+
+    public void ListenForNewUnitCreation(Action<AddNewUnitServerEvent> callback)
+    {
+        Listen(Constants.Server.SendCreatedUnit, callback);
+    }
+
     public void ListenForNewPlayerCreation(Action<JoinLobbyServerEvent> callback)
     {
         Listen(Constants.Server.SendCreatedPlayer, callback);
@@ -96,7 +106,17 @@ public class ServerClient : IServerClient
         {
             return JsonSerializer.Deserialize<MapChangeServerEvent>(content)!;
         }
-        
+
+        if (type == nameof(AddNewUnitServerEvent))
+        {
+            return JsonSerializer.Deserialize<AddNewUnitServerEvent>(content)!;
+        }
+
+        if (type == nameof(UnitStatusUpdateServerEvent))
+        {
+            return JsonSerializer.Deserialize<UnitStatusUpdateServerEvent>(content)!;
+        }
+
         throw new NotSupportedException();
     }
 }

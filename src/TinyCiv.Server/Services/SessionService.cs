@@ -27,7 +27,7 @@ public class SessionService : ISessionService
                 return null;
             }
 
-            if (!Enum.TryParse<Color>(_players.Count.ToString(), out var playerColor))
+            if (!Enum.TryParse<TeamColor>(_players.Count.ToString(), out var playerColor))
             {
                 return null;
             }
