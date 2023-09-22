@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Services;
+using TinyCiv.Server.Enums;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
@@ -12,103 +13,39 @@ namespace TinyCiv.Server.Handlers
     {
         private readonly IMapService _mapService;
 
-        private readonly object _movementLocker = new();
-
         public UnitMoveHandler(IMapService mapService)
         {
             _mapService = mapService;
         }
 
-        protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, MoveUnitClientEvent @event)
+        protected override Task OnHandleAsync(IClientProxy caller, IClientProxy all, MoveUnitClientEvent @event)
         {
-            var unitMovementTuple = (@event.UnitId, new ServerPosition { X = @event.X, Y = @event.Y });
-
-            lock (_movementLocker)
+            async void unitMoveCallback(UnitMoveResponse response)
             {
-                // Yes, it is being checked 2 times :| Just put the validation into another function?
-                if (IgnoreWhen(@event))
+                switch (response)
                 {
-                    return;
-                }
-
-                _mapService.MovingUnits.Add(unitMovementTuple);
-            }
-
-            await caller
-                .SendEventAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId, true))
-                .ConfigureAwait(false);
-
-            var unit = _mapService.GetUnit(@event.UnitId);
-
-            if (unit == null)
-            {
-                return;
-            }
-
-            _ = Task.Run(async () =>
-            {
-                while (unit.Position!.X != @event.X || unit.Position.Y != @event.Y)
-                {
-                    await Task.Delay(Constants.Game.MovementSpeedMs);
-
-                    int diffX = Math.Clamp(@event.X - unit.Position.X, -1, 1);
-                    int diffY = Math.Clamp(@event.Y - unit.Position.Y, -1, 1);
-
-                    bool successful = _mapService.MoveUnit(@event.UnitId, new ServerPosition { X = unit.Position.X + diffX, Y = unit.Position.Y + diffY });
-                    
-                    if (successful == false)
-                    {
-                        _mapService.MovingUnits.Remove(unitMovementTuple);
-
-                        // Need pathfinding algorithm, because now unit stops moving when collided with another unit
+                    case UnitMoveResponse.Started:
+                        await caller
+                            .SendEventAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId, true))
+                            .ConfigureAwait(false);
+                        break;
+                    case UnitMoveResponse.Moved:
+                        await all
+                            .SendEventAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
+                            .ConfigureAwait(false);
+                        break;
+                    case UnitMoveResponse.Stopped:
                         await caller
                             .SendEventAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId, false))
-                            .ConfigureAwait(false);
-
-                        return;
-                    }
-
-                    await all
-                        .SendEventAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
-                        .ConfigureAwait(false);
+                            .ConfigureAwait(false); 
+                        break;
                 }
-
-                _mapService.MovingUnits.Remove(unitMovementTuple);
-
-                // Should everyone know that unit stopped moving, or just the caller? Will we have a visual for moving unit?
-                await caller
-                    .SendEventAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId, false))
-                    .ConfigureAwait(false);
-
-            });
-        }
-
-        protected override bool IgnoreWhen(MoveUnitClientEvent @event)
-        {
-            if (_mapService.MovingUnits.Any(u => u.Item1 == @event.UnitId))
-            {
-                return true;
             }
 
-            if (_mapService.MovingUnits.Any(u => u.Item2 == new ServerPosition { X = @event.X, Y = @event.Y }))
-            {
-                return true;
-            }
+            ServerPosition targetPosition = new() { X = @event.X, Y = @event.Y };
+            _mapService.MoveUnitAsync(@event.UnitId, targetPosition, unitMoveCallback);
 
-            var occupiedUnit = _mapService.GetUnit(new ServerPosition { X = @event.X, Y = @event.Y });
-
-            if (occupiedUnit.Type != GameObjectType.Empty)
-            {
-                return true;
-            }
-
-            if (@event.X >= Constants.Game.WidthSquareCount || @event.X < 0 ||
-                @event.Y >= Constants.Game.HeightSquareCount || @event.Y < 0)
-            {
-                return true;
-            }
-
-            return false;
+            return Task.CompletedTask;
         }
     }
 }

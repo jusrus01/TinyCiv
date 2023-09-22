@@ -53,7 +53,7 @@ public class ServerClient : IServerClient
         Listen(Constants.Server.SendUnitStatusUpdate, callback);
     }
 
-    public void ListenForNewUnitCreation(Action<AddNewUnitServerEvent> callback)
+    public void ListenForNewUnitCreation(Action<CreateUnitServerEvent> callback)
     {
         Listen(Constants.Server.SendCreatedUnit, callback);
     }
@@ -107,9 +107,9 @@ public class ServerClient : IServerClient
             return JsonSerializer.Deserialize<MapChangeServerEvent>(content)!;
         }
 
-        if (type == nameof(AddNewUnitServerEvent))
+        if (type == nameof(CreateUnitServerEvent))
         {
-            return JsonSerializer.Deserialize<AddNewUnitServerEvent>(content)!;
+            return JsonSerializer.Deserialize<CreateUnitServerEvent>(content)!;
         }
 
         if (type == nameof(UnitStatusUpdateServerEvent))

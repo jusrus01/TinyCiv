@@ -8,7 +8,7 @@ using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Handlers;
 
-public class UnitAddHandler : ClientHandler<AddNewUnitClientEvent>
+public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
 {
     private readonly IMapService _mapService;
 
@@ -17,9 +17,9 @@ public class UnitAddHandler : ClientHandler<AddNewUnitClientEvent>
         _mapService = mapService;
     }
     
-    protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, AddNewUnitClientEvent @event)
+    protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, CreateUnitClientEvent @event)
     {
-        var unit = _mapService.AddUnit(@event.PlayerId, new ServerPosition { X = @event.X, Y = @event.Y });
+        var unit = _mapService.CreateUnit(@event.PlayerId, new ServerPosition { X = @event.X, Y = @event.Y });
 
         if (unit == null)
         {
@@ -27,7 +27,7 @@ public class UnitAddHandler : ClientHandler<AddNewUnitClientEvent>
         }
 
         await caller
-            .SendEventAsync(Constants.Server.SendCreatedUnit, new AddNewUnitServerEvent(unit))
+            .SendEventAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(unit))
             .ConfigureAwait(false);
 
         await all

@@ -136,7 +136,7 @@ namespace TinyCiv.Client.Code
             var border = (Border)sender;
             var clickedPosition = (Position)border.Tag;
 
-            await Client.SendAsync(new AddNewUnitClientEvent(CurrentPlayer.Id, clickedPosition.row, clickedPosition.column));
+            await Client.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, clickedPosition.row, clickedPosition.column));
         }
     }
 }

@@ -57,7 +57,7 @@ async Task SampleIdAssignmentDemo()
         response.Map.Print();
     };
 
-    Action<AddNewUnitServerEvent> newUnitCallback = (response) =>
+    Action<CreateUnitServerEvent> newUnitCallback = (response) =>
     {
         Console.WriteLine($"New unit created: {JsonSerializer.Serialize(response)}");
         gameObjects.Add(response.CreatedUnit);
@@ -90,9 +90,9 @@ async Task SampleIdAssignmentDemo()
     await Task.Delay(2000);
 
     // Spawning 3 units
-    await client.SendAsync(new AddNewUnitClientEvent(playerList[0].Id, 1, 1));
-    await client.SendAsync(new AddNewUnitClientEvent(playerList[0].Id, 2, 2));
-    await client.SendAsync(new AddNewUnitClientEvent(playerList[1].Id, 5, 2));
+    await client.SendAsync(new CreateUnitClientEvent(playerList[0].Id, 1, 1));
+    await client.SendAsync(new CreateUnitClientEvent(playerList[0].Id, 2, 2));
+    await client.SendAsync(new CreateUnitClientEvent(playerList[1].Id, 5, 2));
 
     await Task.Delay(2000);
 

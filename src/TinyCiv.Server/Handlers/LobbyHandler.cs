@@ -53,5 +53,5 @@ public class LobbyHandler : ClientHandler<JoinLobbyClientEvent>
                 .SendEventAsync(Constants.Server.SendGameStartToAll, new GameStartServerEvent(map))
                 .ConfigureAwait(false);
         }
-    }
+    } 
 }
