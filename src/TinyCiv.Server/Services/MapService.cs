@@ -123,15 +123,6 @@ namespace TinyCiv.Server.Services
                         return;
                     }
 
-                    var movingUnitEntry = _movingUnits.SingleOrDefault(u => u.UnitId == unitId);
-
-                    if (movingUnitEntry == null)
-                    {
-                        unitMoveCallback?.Invoke(UnitMoveResponse.Stopped);
-                        RemoveMovingUnit(unitId);
-                        return;
-                    }
-
                     await Task.Delay(Constants.Game.MovementSpeedMs);
 
                     int diffX = Math.Clamp(position.X - unit.Position.X, -1, 1);
@@ -257,11 +248,6 @@ namespace TinyCiv.Server.Services
 
         private bool IsValidPosition(ServerPosition position)
         {
-            if (_movingUnits.Any(u => u.TargetPosition! == position))
-            {
-                return false;
-            }
-
             var occupiedUnit = GetUnit(position);
 
             if (occupiedUnit != null && occupiedUnit.Type != GameObjectType.Empty)
