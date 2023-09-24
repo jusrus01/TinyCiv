@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Http.Connections.Client;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using TinyCiv.Shared;
@@ -20,7 +21,7 @@ public class ServerClient : IServerClient
     
     private static IServerClient? _client;
     
-    public static IServerClient Create(string hostUrl)
+    public static IServerClient Create(string hostUrl, Action<HttpConnectionOptions>? configureHttpConnection = null)
     {
         if (_client != null)
         {
@@ -30,7 +31,7 @@ public class ServerClient : IServerClient
         // Please modify according to your needs e.g.
         // move this or configure other way
         var connection = new HubConnectionBuilder()
-            .WithUrl($"{hostUrl}{Constants.Server.HubRoute}")
+            .WithUrl($"{hostUrl}{Constants.Server.HubRoute}", configureHttpConnection!)
             .AddJsonProtocol()
             .Build();
 

@@ -5,6 +5,7 @@ using TinyCiv.Server.Hubs;
 using TinyCiv.Server.Services;
 using TinyCiv.Shared;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<ISessionService, SessionService>();
@@ -25,3 +26,9 @@ var app = builder.Build();
 app.MapHub<ServerHub>(Constants.Server.HubRoute);
 
 app.Run();
+
+// Needed for integration tests, do not remove
+namespace TinyCiv.Server
+{
+    public partial class Program { }
+}
