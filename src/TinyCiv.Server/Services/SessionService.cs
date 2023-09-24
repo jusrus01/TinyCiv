@@ -1,4 +1,3 @@
-using System.Drawing;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Game;
@@ -11,27 +10,23 @@ public class SessionService : ISessionService
     private readonly object _newPlayerLocker;
     private readonly List<Player> _players;
 
-    private readonly object _mapChangeLocker;
-    private Map? _currentMap;
-    
+    private bool _isGameStarted = false;
+
     public SessionService()
     {
         _players = new List<Player>();
-        
         _newPlayerLocker = new object();
-        _mapChangeLocker = new object();
     }
-    
+
     public Player? AddPlayer()
     {
-        Console.WriteLine("adding new player");
         lock (_newPlayerLocker)
         {
             if (_players.Count >= Constants.Game.MaxPlayerCount)
             {
                 return null;
             }
-            
+
             if (!Enum.TryParse<TeamColor>(_players.Count.ToString(), out var playerColor))
             {
                 return null;
@@ -42,11 +37,21 @@ public class SessionService : ISessionService
                 Id = Guid.NewGuid(),
                 Color = playerColor
             };
-            
+
             _players.Add(player);
 
             return player;
         }
+    }
+
+    public Player? GetPlayer(Guid playerId)
+    {
+        return _players.Single(p => p.Id == playerId);
+    }
+
+    public void StartGame()
+    {
+        _isGameStarted = true;
     }
 
     public bool IsLobbyFull()
@@ -59,72 +64,6 @@ public class SessionService : ISessionService
 
     public bool IsStarted()
     {
-        lock (_mapChangeLocker)
-        {
-            return _currentMap != null;
-        }
-    }
-
-    public Map InitMap()
-    {
-        lock (_mapChangeLocker)
-        {
-            if (_currentMap != null)
-            {
-                throw new InvalidOperationException("Cannot initialize map twice");
-            }
-
-            _currentMap = new Map
-            {
-                Objects = GenerateObjects()
-            };
-
-            return _currentMap;
-        }
-    }
-    
-    [Obsolete("Temporary")]
-    private List<ServerGameObject> GenerateObjects()
-    {
-        var objects = new List<ServerGameObject>();
-            
-        // TODO: read map from file or some other way
-        var playerPositions = _players
-            .Select(player => new
-            {
-                OwnerId = player.Id,
-                Color = player.Color,
-                Pos = new ServerPosition
-                {
-                    X = new Random().Next(Constants.Game.WidthSquareCount),
-                    Y = new Random().Next(Constants.Game.HeightSquareCount)
-                }
-            })
-            .ToList();
-        for (var y = 0; y < Constants.Game.HeightSquareCount; y++)
-        {
-            for (var x = 0; x < Constants.Game.WidthSquareCount; x++)
-            {
-                var playerPosition = playerPositions
-                    .FirstOrDefault(p => p.Pos.X == x && p.Pos.Y == y);
-                if (playerPosition != null)
-                { 
-                    objects.Add(new ServerGameObject
-                    {
-                        Id = Guid.NewGuid(),
-                        Position = new ServerPosition
-                        {
-                            X = x,
-                            Y = y
-                        },
-                        OwnerPlayerId = playerPosition.OwnerId,
-                        Type = GameObjectType.Warrior,
-                        Color = playerPosition.Color
-                    });
-                }
-            }
-        }
-
-        return objects;
+        return _isGameStarted;
     }
 }

@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using TinyCiv.Client.Code;
+using TinyCiv.Client.Code.MVVM;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Server.Client;
 using TinyCiv.Shared;
@@ -23,11 +24,13 @@ namespace TinyCiv.Client
         IServerClient Client;
         private GameGrid _gameGrid;
         private Player _currentPlayer;
+        MainViewModel viewModel = new MainViewModel();
 
         public MainWindow()
         {
             InitializeComponent();
 
+            DataContext = viewModel;
             Loaded += PlayerConnection;
             Closed += PlayerDisconnect;
         }
@@ -51,13 +54,18 @@ namespace TinyCiv.Client
         // Waiting for event implementation
         private async void PlayerDisconnect(object sender, EventArgs e)
         {
+
             // await Client.SendAsync(new PlayerDisconnectEvent(currentPlayer.Id));
         }
 
         private void OnPlayerJoin(JoinLobbyServerEvent response)
         {
-            _currentPlayer = response.Created;
-            MessageBox.Show($"Player: {_currentPlayer.Id} has joined the game!");
+            if (_currentPlayer == null)
+            {
+                _currentPlayer = response.Created;
+                viewModel.PlayerColor.Value = _currentPlayer.Color;
+            }
+            MessageBox.Show($"Player: {_currentPlayer.Id} has joined the game! They are in the {_currentPlayer.Color} team!");
 
             // If the party is full
             if (_currentPlayer == null)
@@ -70,8 +78,15 @@ namespace TinyCiv.Client
         {
             _gameGrid = new GameGrid(UnitGrid, Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
 
-            _gameGrid.GameObjects = response.Map.Objects.Select(serverGameObect => new Warrior(serverGameObect))
+            _gameGrid.GameObjects = response.Map.Objects
+                .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
+                .Select(serverGameObect => new Warrior(serverGameObect))
                 .ToList<GameObject>();
+
+            _gameGrid.Client = Client;
+            _gameGrid.CurrentPlayer = _currentPlayer;
+            _gameGrid.ViewModel = viewModel;
+            viewModel.PlayerColor.Value = _currentPlayer.Color;
 
             InitializeMap();
             DrawGameObjects();
@@ -79,8 +94,10 @@ namespace TinyCiv.Client
 
         private void OnMapChange(MapChangeServerEvent response)
         {
-            _gameGrid.GameObjects = response.Map.Objects.Select(serverGameObect => new Warrior(serverGameObect))
-                .ToList<GameObject>();          
+            _gameGrid.GameObjects = response.Map.Objects
+                .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
+                .Select(serverGameObect => new Warrior(serverGameObect))
+                .ToList<GameObject>();
 
             DrawGameObjects();
         }

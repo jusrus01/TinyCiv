@@ -1,33 +1,37 @@
 using Microsoft.AspNetCore.SignalR;
+using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Services;
+using TinyCiv.Shared.Events.Server;
 using TinyCiv.Shared.Events.Client;
+using TinyCiv.Shared.Game;
+using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Handlers;
 
-public class UnitAddHandler : ClientHandler<AddNewUnitClientEvent>
+public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
 {
-    private readonly ISessionService _sessionService;
+    private readonly IMapService _mapService;
 
-    public UnitAddHandler(ISessionService sessionService)
+    public UnitAddHandler(IMapService mapService)
     {
-        _sessionService = sessionService;
+        _mapService = mapService;
     }
     
-    protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, AddNewUnitClientEvent @event)
+    protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, CreateUnitClientEvent @event)
     {
-        // // TODO: consider moving the responsibility of validation to other classes and not handlers
-        // // e.g.: make handler execute ONLY when it can be executed
-        // if (!_sessionService.IsSessionStarted() || !_sessionService.IsValidPlayer(@event.PlayerId))
-        // {
-        //     return;
-        // }
-        //
-        // // TODO: add validation if the player can move at all
-        // // TODO: add other needed validation
-        // _sessionService.PlaceUnit(@event.X, @event.Y);
-        // await all
-        //     .SendEventAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_sessionService.GetMap()))
-        //     .ConfigureAwait(false);
-        throw new NotImplementedException();
+        var unit = _mapService.CreateUnit(@event.PlayerId, new ServerPosition { X = @event.X, Y = @event.Y });
+
+        if (unit == null)
+        {
+            return;
+        }
+
+        await caller
+            .SendEventAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(unit))
+            .ConfigureAwait(false);
+
+        await all
+            .SendEventAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
+            .ConfigureAwait(false);
     }
 }

@@ -8,6 +8,8 @@ public static class Constants
 
         public const int WidthSquareCount = 20;
         public const int HeightSquareCount = 20;
+
+        public const int MovementSpeedMs = 1000;
         
         // Temporary map stuff, need to clarify how to best do this
         public const string Map =
@@ -24,6 +26,8 @@ public static class Constants
         public const string ReceiveFromClient = nameof(ReceiveFromClient);
 
         public const string SendCreatedPlayer = nameof(SendCreatedPlayer);
+        public const string SendCreatedUnit = nameof(SendCreatedUnit);
+        public const string SendUnitStatusUpdate = nameof(SendUnitStatusUpdate);
 
         public const string SendGameStartToAll = nameof(SendGameStartToAll);
         public const string SendMapChangeToAll = nameof(SendMapChangeToAll);
@@ -31,6 +35,6 @@ public static class Constants
 
     public static class Assets
     {
-        public const String GameTile = "Assets/game_tile.png";
+        public const string GameTile = "Assets/game_tile.png";
     }
 }

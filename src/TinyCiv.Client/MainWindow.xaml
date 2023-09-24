@@ -44,8 +44,22 @@
                 <StackPanel>
                     <TextBlock>Gold:</TextBlock>
                     <TextBlock>Units</TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>Your color:</TextBlock>
+                        <TextBlock Text="{Binding PlayerColor.Value}"></TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="1">
+                <StackPanel Visibility="{Binding IsUnitStatVisible.Value}" Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>Unit: </TextBlock>
+                        <TextBlock Text="{Binding UnitName.Value}"></TextBlock>
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
+        
     </Grid>
 </Window>
