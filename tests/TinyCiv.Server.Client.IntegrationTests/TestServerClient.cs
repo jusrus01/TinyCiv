@@ -21,7 +21,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>
     [Theory, MemberData(nameof(AvailableEvents_TestData))]
     public async Task SendAsync_When_EventPassedIn_Then_SendsEvents(ClientEvent @event)
     {
-        //assert
+        // assert
         await _sut.SendAsync(@event, CancellationToken.None);
     }
     
