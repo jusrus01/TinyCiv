@@ -21,9 +21,9 @@ public class ServerClient : IServerClient
     
     private static IServerClient? _client;
     
-    public static IServerClient Create(string hostUrl, Action<HttpConnectionOptions>? configureHttpConnection = null)
+    public static IServerClient Create(string hostUrl, Action<HttpConnectionOptions>? configureHttpConnection = null, bool createNewConnection = false)
     {
-        if (_client != null)
+        if (_client != null && !createNewConnection)
         {
             return _client;
         }
