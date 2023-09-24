@@ -27,7 +27,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
     
     public static IEnumerable<object[]> AvailableEvents_TestData()
     {
-        const int testedClientEventCount = 3;
+        const int testedClientEventCount = 4;
         var actualEventCount = Assembly.GetAssembly(typeof(ClientEvent))!.GetTypes()
             .Count(type => typeof(ClientEvent).IsAssignableFrom(type) && !type.IsAbstract);
         if (actualEventCount != testedClientEventCount)
@@ -38,10 +38,13 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         yield return new object[] { new JoinLobbyClientEvent() };
         yield return new object[] { new CreateUnitClientEvent(Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), 0, 0) };
         yield return new object[] { new MoveUnitClientEvent(Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), 0, 0) };
+        yield return new object[] { new StartGameClientEvent() };
     }
-    
+
+    #region ListenForGameStart
+
     [Fact]
-    public async Task ListenForGameStart_When_JoinLobbyClientEventSentTwice_Then_MapReceivedAndGameStartedForAll()
+    public async Task ListenForGameStart_When_StartGameClientEventSent_And_GameStateIsNotReadyToStart_Then_NoResponseReceived()
     {
         //arrange
         var isInvoked = false;
@@ -62,15 +65,114 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         });
         
         await _sut.SendAsync(new JoinLobbyClientEvent());
-        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await _sut.SendAsync(new StartGameClientEvent());
         
         await WaitForResponse();
 
+        //assert
+        Assert.False(isInvoked);
+        Assert.False(isOtherInvoked);
+    }
+    
+    [Fact]
+    public async Task ListenForGameStart_When_StartGameClientEventSent_Then_MapReceivedAndGameStartedForAll()
+    {
+        //arrange
+        var isInvoked = false;
+        var isOtherInvoked = false;
+        
+        var anotherClient = InitializeClient();
+        anotherClient.ListenForGameStart(response =>
+        {
+            isOtherInvoked = true;
+            Assert.NotNull(response.Map);
+        });
+    
+        //act
+        _sut.ListenForGameStart(response =>
+        {
+            isInvoked = true;
+            Assert.NotNull(response.Map);
+        });
+        
+        // after two players join lobby, StartGameClientEvent is available for use
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponse();
+        
+        await _sut.SendAsync(new StartGameClientEvent());
+        await WaitForResponse();
+    
+        //assert
+        Assert.True(isInvoked);
+        Assert.True(isOtherInvoked);
+    }
+    
+    #endregion
+
+    #region ListenForGameStartReady
+
+    [Fact]
+    public async Task ListenForGameStartReady_When_GameStateDoesNotAllowForGameStart_Then_NoResponseReceived()
+    {
+        //arrange
+        var isInvoked = false;
+        var isOtherInvoked = false;
+        
+        var anotherClient = InitializeClient();
+        anotherClient.ListenForGameStartReady(_ =>
+        {
+            isOtherInvoked = true;
+        });
+    
+        //act
+        _sut.ListenForGameStartReady(_ =>
+        {
+            isInvoked = true;
+        });
+        
+        // after one player joins lobby, StartGameClientEvent is not available for use
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponse();
+    
+        //assert
+        Assert.False(isInvoked);
+        Assert.False(isOtherInvoked);
+    }
+    
+    [Fact]
+    public async Task ListenForGameStartReady_When_GameStateAllowsGameToBeStarted_Then_CallbackInvoked()
+    {
+        //arrange
+        var isInvoked = false;
+        var isOtherInvoked = false;
+        
+        var anotherClient = InitializeClient();
+        anotherClient.ListenForGameStartReady(_ =>
+        {
+            isOtherInvoked = true;
+        });
+    
+        //act
+        _sut.ListenForGameStartReady(_ =>
+        {
+            isInvoked = true;
+        });
+        
+        // after two players join lobby, StartGameClientEvent is available for use
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponse();
+    
         //assert
         Assert.True(isInvoked);
         Assert.True(isOtherInvoked);
     }
 
+    #endregion
+
+    #region ListenForNewPlayerCreation
+    
     [Fact]
     public async Task ListenForNewPlayerCreation_When_JoinLobbyClientEventSent_Then_ReceiveNewPlayerForCaller()
     {
@@ -95,10 +197,14 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         //assert
         Assert.True(isInvoked);
     }
+    
+    #endregion
+
+    #region Helpers
 
     private static async Task WaitForResponse()
     {
-        await Task.Delay(5000);
+        await Task.Delay(500);
     }
 
     private ServerClient InitializeClient(bool createNew = true)
@@ -115,6 +221,8 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
             createNew);
     }
 
+    #endregion
+    
     public void Dispose()
     {
         _factory.Dispose();

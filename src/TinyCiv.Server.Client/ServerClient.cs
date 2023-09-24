@@ -74,6 +74,10 @@ public class ServerClient : IServerClient
         Listen(Constants.Server.SendMapChangeToAll, callback);
     }
 
+    /// <summary>
+    /// <see cref="callback"/> will be invoked when more than one player has joined
+    /// the lobby. 
+    /// </summary>
     public void ListenForGameStartReady(Action<GameStartReadyServerEvent> callback)
     {
         Listen(Constants.Server.SendGameStartReadyToAll, callback);

@@ -74,7 +74,7 @@ public class SessionService : ISessionService
         // Locking in case later we will support "leaving" from the session
         lock (_playerLocker)
         {
-            return _players.Count > Constants.Game.MinPlayerCount;
+            return _players.Count >= Constants.Game.MinPlayerCount;
         }
     }
 }

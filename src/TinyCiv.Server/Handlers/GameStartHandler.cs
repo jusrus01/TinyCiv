@@ -19,7 +19,7 @@ public class GameStartHandler : ClientHandler<StartGameClientEvent>
     }
 
     protected override bool IgnoreWhen(StartGameClientEvent @event) =>
-        _sessionService.IsStarted();
+        _sessionService.IsStarted() || !_sessionService.CanGameStart();
 
     protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, StartGameClientEvent @event)
     {
