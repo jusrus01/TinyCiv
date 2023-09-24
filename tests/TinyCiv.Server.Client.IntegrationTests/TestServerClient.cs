@@ -4,15 +4,15 @@ using TinyCiv.Shared.Events.Client;
 
 namespace TinyCiv.Server.Client.IntegrationTests;
 
-public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>
+public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, IDisposable
 {
     private readonly WebApplicationFactory<Program> _factory;
     
     private readonly ServerClient _sut;
     
-    public TestServerClient(WebApplicationFactory<Program> factory)
+    public TestServerClient()
     {
-        _factory = factory;
+        _factory = new WebApplicationFactory<Program>();
         _factory.CreateClient();
         
         _sut = InitializeClient();
@@ -101,7 +101,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>
         await Task.Delay(5000);
     }
 
-    private ServerClient InitializeClient(bool createNew = false)
+    private ServerClient InitializeClient(bool createNew = true)
     {
         var hostUrl = _factory.Server.BaseAddress.ToString();
         var handler = _factory.Server.CreateHandler();
@@ -113,5 +113,10 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>
                 options.HttpMessageHandlerFactory = _ => handler;
             },
             createNew);
+    }
+
+    public void Dispose()
+    {
+        _factory.Dispose();
     }
 }
