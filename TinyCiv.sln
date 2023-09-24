@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ACAFB2B5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCiv.Client", "src\TinyCiv.Client\TinyCiv.Client.csproj", "{7FDCDF54-D8A9-4C10-85CD-4A1040B20AA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCiv.Server.Client.IntegrationTests", "tests\TinyCiv.Server.Client.IntegrationTests\TinyCiv.Server.Client.IntegrationTests.csproj", "{DBB1892B-BDED-4001-860B-46A87A115333}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{7FDCDF54-D8A9-4C10-85CD-4A1040B20AA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FDCDF54-D8A9-4C10-85CD-4A1040B20AA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FDCDF54-D8A9-4C10-85CD-4A1040B20AA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBB1892B-BDED-4001-860B-46A87A115333}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBB1892B-BDED-4001-860B-46A87A115333}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBB1892B-BDED-4001-860B-46A87A115333}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBB1892B-BDED-4001-860B-46A87A115333}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -62,6 +68,7 @@ Global
 		{085206FC-38CE-4B3C-8CE3-E27433E4B490} = {4E2FED6F-9B17-4045-A8DB-26C70EB8DAF1}
 		{99C58954-4C7A-496C-87CF-0A3C6F1C1080} = {4E2FED6F-9B17-4045-A8DB-26C70EB8DAF1}
 		{7FDCDF54-D8A9-4C10-85CD-4A1040B20AA7} = {4E2FED6F-9B17-4045-A8DB-26C70EB8DAF1}
+		{DBB1892B-BDED-4001-860B-46A87A115333} = {ACAFB2B5-C9F3-4BDD-89B0-4326C5177BC7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C534836F-B273-4675-B7E6-E1CB11B27FE2}

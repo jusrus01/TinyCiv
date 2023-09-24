@@ -1,4 +1,4 @@
-﻿namespace TinyCiv.Shared.Events.Client;
+﻿// namespace TinyCiv.Shared.Events.Client;
 
 // Requires implementation
-public record PlayerDisconnectClientEvent(Guid PlayerId) : ClientEvent;
+// public record PlayerDisconnectClientEvent(Guid PlayerId) : ClientEvent;
