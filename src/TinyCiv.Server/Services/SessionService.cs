@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Game;
@@ -7,7 +8,7 @@ namespace TinyCiv.Server.Services;
 // Must be singleton
 public class SessionService : ISessionService
 {
-    private readonly object _newPlayerLocker;
+    private readonly object _playerLocker;
     private readonly List<Player> _players;
 
     private bool _isGameStarted = false;
@@ -15,12 +16,12 @@ public class SessionService : ISessionService
     public SessionService()
     {
         _players = new List<Player>();
-        _newPlayerLocker = new object();
+        _playerLocker = new object();
     }
 
     public Player? AddPlayer()
     {
-        lock (_newPlayerLocker)
+        lock (_playerLocker)
         {
             if (_players.Count >= Constants.Game.MaxPlayerCount)
             {
@@ -44,7 +45,8 @@ public class SessionService : ISessionService
         }
     }
 
-    public Player? GetPlayer(Guid playerId)
+    [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
+    public Player GetPlayer(Guid playerId)
     {
         return _players.Single(p => p.Id == playerId);
     }
@@ -56,7 +58,7 @@ public class SessionService : ISessionService
 
     public bool IsLobbyFull()
     {
-        lock (_newPlayerLocker)
+        lock (_playerLocker)
         {
             return _players.Count >= Constants.Game.MaxPlayerCount;
         }
@@ -65,5 +67,14 @@ public class SessionService : ISessionService
     public bool IsStarted()
     {
         return _isGameStarted;
+    }
+
+    public bool CanGameStart()
+    {
+        // Locking in case later we will support "leaving" from the session
+        lock (_playerLocker)
+        {
+            return _players.Count > Constants.Game.MinPlayerCount;
+        }
     }
 }

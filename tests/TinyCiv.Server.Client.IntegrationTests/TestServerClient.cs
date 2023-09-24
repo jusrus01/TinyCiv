@@ -47,7 +47,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         var isInvoked = false;
         var isOtherInvoked = false;
         
-        var anotherClient = InitializeClient(true);
+        var anotherClient = InitializeClient();
         anotherClient.ListenForGameStart(response =>
         {
             isOtherInvoked = true;

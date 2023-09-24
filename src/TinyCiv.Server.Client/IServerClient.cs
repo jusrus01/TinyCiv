@@ -12,4 +12,5 @@ public interface IServerClient
     void ListenForNewUnitCreation(Action<CreateUnitServerEvent> callback);
     void ListenForGameStart(Action<GameStartServerEvent> callback);
     void ListenForMapChange(Action<MapChangeServerEvent> callback);
+    void ListenForGameStartReady(Action<GameStartReadyServerEvent> callback);
 }

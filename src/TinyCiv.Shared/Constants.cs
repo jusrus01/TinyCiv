@@ -4,7 +4,8 @@ public static class Constants
 {
     public static class Game
     {
-        public const int MaxPlayerCount = 2;
+        public const int MaxPlayerCount = 4;
+        public const int MinPlayerCount = 2;
 
         public const int WidthSquareCount = 20;
         public const int HeightSquareCount = 20;
@@ -29,6 +30,7 @@ public static class Constants
         public const string SendCreatedUnit = nameof(SendCreatedUnit);
         public const string SendUnitStatusUpdate = nameof(SendUnitStatusUpdate);
 
+        public const string SendGameStartReadyToAll = nameof(SendGameStartReadyToAll);
         public const string SendGameStartToAll = nameof(SendGameStartToAll);
         public const string SendMapChangeToAll = nameof(SendMapChangeToAll);
     }

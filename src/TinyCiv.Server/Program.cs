@@ -14,6 +14,7 @@ builder.Services.AddSingleton<IMapService, MapService>();
 builder.Services.AddTransient<IClientHandler, UnitMoveHandler>();
 builder.Services.AddTransient<IClientHandler, UnitAddHandler>();
 builder.Services.AddTransient<IClientHandler, LobbyHandler>();
+builder.Services.AddTransient<IClientHandler, GameStartHandler>();
 
 builder.Services
     .AddSignalR()
