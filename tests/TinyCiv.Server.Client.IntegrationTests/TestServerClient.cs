@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Testing;
 using TinyCiv.Shared.Events.Client;
 
@@ -31,6 +32,14 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>
     
     public static IEnumerable<object[]> AvailableEvents_TestData()
     {
+        const int testedClientEventCount = 3;
+        var actualEventCount = Assembly.GetAssembly(typeof(ClientEvent))!.GetTypes()
+            .Count(type => typeof(ClientEvent).IsAssignableFrom(type) && !type.IsAbstract);
+        if (actualEventCount != testedClientEventCount)
+        {
+            throw new Exception($"Please add tests for new client event. Tested: {testedClientEventCount}, actual event count: {actualEventCount}");
+        }
+        
         yield return new object[] { new JoinLobbyClientEvent() };
         yield return new object[] { new CreateUnitClientEvent(Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), 0, 0) };
         yield return new object[] { new MoveUnitClientEvent(Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), 0, 0) };
