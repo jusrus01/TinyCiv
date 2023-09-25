@@ -35,7 +35,7 @@ namespace TinyCiv.Client.Code
         private int Columns;
 
         private bool isUnitSelected = false;
-        private int selectedUnitIndex;
+        private GameObject selectedUnit;
 
         public GameState(int rows, int columns)
         {
@@ -60,7 +60,7 @@ namespace TinyCiv.Client.Code
         {
             if (isUnitSelected)
             {
-                var unit = (Unit)GameObjects[selectedUnitIndex];
+                var unit = (Unit)selectedUnit;
                 UnselectUnit(unit);
                 await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
             }
@@ -72,18 +72,18 @@ namespace TinyCiv.Client.Code
 
             if (!isUnitSelected && GameObjects[gameObjectIndex].OwnerId == CurrentPlayer.Id)
             {
-                SelectUnit(gameObject, gameObjectIndex);
+                SelectUnit(gameObject);
             }
-            else if (isUnitSelected && gameObjectIndex == selectedUnitIndex)
+            else if (isUnitSelected && gameObject == selectedUnit)
             {
                 UnselectUnit(gameObject);
             }
         }
 
-        private void SelectUnit(GameObject gameObject, int gameObjectIndex)
+        private void SelectUnit(GameObject gameObject)
         {
             isUnitSelected = true;
-            selectedUnitIndex = gameObjectIndex;
+            selectedUnit = gameObject;
             gameObject.BorderThickness = new Thickness(2);
             UnitMenuVM.SetCurrentUnit(gameObject);
             onPropertyChanged?.Invoke();
@@ -123,6 +123,10 @@ namespace TinyCiv.Client.Code
             {
                 var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
                 GameObjects[gameObjectIndex] = gameObject;
+                if (isUnitSelected && selectedUnit.Id == gameObject.Id) 
+                {
+                    SelectUnit(gameObject);
+                }
             }
 
             AddClickEvents();
