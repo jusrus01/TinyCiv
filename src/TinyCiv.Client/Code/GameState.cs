@@ -20,7 +20,7 @@ using TinyCiv.Client.Code.Core;
 
 namespace TinyCiv.Client.Code
 {
-    public class GameGrid
+    public class GameState
     {
         public ObservableValue<List<Border>> SpriteList { get; } = new ObservableValue<List<Border>>();
         public Action onPropertyChanged;
@@ -33,7 +33,7 @@ namespace TinyCiv.Client.Code
         private bool isUnitSelected = false;
         private int selectedUnitIndex;
 
-        public GameGrid(int rows, int columns)
+        public GameState(int rows, int columns)
         {
             Rows = rows;
             Columns = columns;
@@ -52,21 +52,14 @@ namespace TinyCiv.Client.Code
             mapImages = list;
         }
 
-        private void DrawGameObjects()
-        {
-            for (int i = 0; i < GameObjects.Count; i++)
-            {
-                var obj = GameObjects[i];
-            }
-        }
-
         private async void Tile_Click(Position clickedPosition)
         {
             if (isUnitSelected)
             {
                 var unit = (Unit)GameObjects[selectedUnitIndex];
                 UnselectUnit(unit);
-                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.column, clickedPosition.row));
+                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
+                MessageBox.Show("Sent move event");
             }
         }
 
@@ -107,10 +100,25 @@ namespace TinyCiv.Client.Code
         private void OnMapChange(MapChangeServerEvent response)
         {
             var goFactory = new GameObjectFactory();
-            GameObjects = response.Map.Objects
-                //.Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
+            var ResponseGameObjects = response.Map.Objects
+                .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
                 .Select(serverGameObect => goFactory.Create(serverGameObect))
                 .ToList<GameObject>();
+
+            for(int row = 0; row < Rows; row++)
+            {
+                for(int column = 0; column < Columns; column++)
+                {
+                    var index = column * Columns + row;
+                    GameObjects[index] = goFactory.Create(new ServerGameObject { Type = GameObjectType.Empty, Position = new ServerPosition() { X = row, Y = column} });
+                }
+            }
+
+            foreach(var gameObject in ResponseGameObjects)
+            {
+                var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
+                GameObjects[gameObjectIndex] = gameObject;
+            }
 
             AddClickEvents();
             onPropertyChanged?.Invoke();
@@ -122,12 +130,12 @@ namespace TinyCiv.Client.Code
             {
                 if (gameObject.Type == GameObjectType.Empty)
                 {
-                    gameObject.LeftAction = () => { Tile_Click(gameObject.Position); };
-                    gameObject.RightAction = () => { Create_Unit(gameObject.Position); };
+                    gameObject.LeftAction = () => { Tile_Click(gameObject.Position); MessageBox.Show($"{gameObject.Position.row};{gameObject.Position.column}"); };
+                    gameObject.RightAction = () => { Create_Unit(gameObject.Position); MessageBox.Show($"{gameObject.Position.row};{gameObject.Position.column}"); };
                 }
                 else if (gameObject.Type == GameObjectType.Warrior)
                 {
-                    gameObject.LeftAction = () => { Unit_Click(gameObject); };
+                    gameObject.LeftAction = () => { Unit_Click(gameObject); MessageBox.Show($"{gameObject.Position.row};{gameObject.Position.column}"); };
                     gameObject.RightAction = () => { };
                 }
             }

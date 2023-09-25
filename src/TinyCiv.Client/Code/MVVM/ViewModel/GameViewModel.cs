@@ -15,7 +15,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 {
     public class GameViewModel : ObservableObject
     {
-        public GameGrid gameGrid { get; private set; }
+        public GameState gameGrid { get; private set; }
 
 
         public string[] MapList { 
@@ -41,7 +41,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 
         public void GameStart(GameStartServerEvent response)
         {
-            gameGrid = new GameGrid(Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
+            gameGrid = new GameState(Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
             gameGrid.onPropertyChanged = () => { OnPropertyChanged("GameObjectList"); };
 
             var goFactory = new GameObjectFactory();
