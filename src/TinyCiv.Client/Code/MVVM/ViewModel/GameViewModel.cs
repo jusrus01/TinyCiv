@@ -9,6 +9,7 @@ using TinyCiv.Shared.Game;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Server;
 using System.Windows.Controls.Primitives;
+using System.Collections.ObjectModel;
 
 namespace TinyCiv.Client.Code.MVVM.ViewModel
 {
@@ -16,9 +17,21 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
     {
         public GameGrid gameGrid { get; private set; }
 
+
+        public string[] MapList { 
+            get
+            {
+                if (gameGrid == null)
+                    return new string[0];
+                return gameGrid.mapImages.ToArray();
+                //return new string[] {Constants.Assets.GameTile, Constants.Assets.GameTile, Constants.Assets.GameTile, Constants.Assets.GameTile};
+            } 
+        }
+
         public void GameStart(GameStartServerEvent response)
         {
             gameGrid = new GameGrid(Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
+            gameGrid.onPropertyChanged = () => { OnPropertyChanged(); };
 
             gameGrid.GameObjects = response.Map.Objects
                 .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
@@ -26,7 +39,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
                 .ToList<GameObject>();
             gameGrid.Update();
 
-            OnPropertyChanged();
+            OnPropertyChanged("MapList");
         }
     }
 }

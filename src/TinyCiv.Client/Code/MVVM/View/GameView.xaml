@@ -7,15 +7,24 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="700">
     <Grid>
-        <UniformGrid x:Name="MapGrid" 
-                         Rows="20" 
+        <ItemsControl ItemsSource="{Binding MapList}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="20" 
                          Columns="20"
                          Height="600"
                          Width="600"
                          SnapsToDevicePixels="True"
-                         RenderOptions.BitmapScalingMode="HighQuality">
-            <ItemsControl ItemsSource="{Binding gameGrid.MapList.Value}"/>
-        </UniformGrid>
+                         RenderOptions.BitmapScalingMode="HighQuality"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Image Source="{Binding}"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
         <UniformGrid x:Name="UnitGrid" 
                          Rows="20" 
@@ -27,6 +36,5 @@
             <ItemsControl ItemsSource="{Binding gameGrid.SpriteList.Value}"/>
         </UniformGrid>
 
-        <TextBlock>AAAAAAA</TextBlock>
     </Grid>
 </UserControl>

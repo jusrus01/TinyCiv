@@ -15,13 +15,20 @@ using System;
 using System.Windows.Media.Imaging;
 using TinyCiv.Shared;
 using System.Windows.Threading;
+using System.Collections.ObjectModel;
+using TinyCiv.Client.Code.Core;
 
 namespace TinyCiv.Client.Code
 {
     public class GameGrid
     {
         public ObservableValue<List<Border>> SpriteList { get; } = new ObservableValue<List<Border>>();
-        public ObservableValue<List<Image>> MapList { get; } = new ObservableValue<List<Image>>();
+        public Action onPropertyChanged;
+
+        public List<string> mapImages = new List<string>();
+        //public UniformGrid MapList;
+        //public ObservableValue<List<Image>> MapList { get; } = new ObservableValue<List<Image>>();
+        //public ObservableValue<ObservableCollection<string>> MapList { get; } = new ObservableValue<ObservableCollection<string>>();
         public List<GameObject> GameObjects = new List<GameObject>();
         private int Rows;
         private int Columns;
@@ -39,18 +46,13 @@ namespace TinyCiv.Client.Code
 
         private void CreateMap()
         {
-            var list = Application.Current.Dispatcher.Invoke(() =>
+            var list = new List<string>();
+
+            for (int i = 0; i < Rows * Columns; i++) 
             {
-                List<Image> list = new List<Image>();
-                for (int i = 0; i < Rows * Columns; i++)
-                {
-                    Image image = new Image();
-                    image.Source = new BitmapImage(new Uri(Constants.Assets.GameTile, UriKind.Relative));
-                    list.Add(image);
-                }
-                return list;
-            });
-            MapList.Value= list;
+                list.Add("/assets/game_tile.png");
+            }
+            mapImages = list;
         }
 
         // Redraws the entire grid
@@ -58,6 +60,7 @@ namespace TinyCiv.Client.Code
         {
             CreateClickableTiles();
             DrawGameObjects();
+            onPropertyChanged?.Invoke();
         }
 
         private void CreateClickableTiles()
