@@ -13,7 +13,7 @@ namespace TinyCiv.Server.Handlers
     {
         private readonly IMapService _mapService;
 
-        public UnitMoveHandler(IMapService mapService)
+        public UnitMoveHandler(IMapService mapService, ILogger<UnitMoveHandler> logger) : base(logger)
         {
             _mapService = mapService;
         }

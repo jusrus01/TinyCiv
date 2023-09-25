@@ -1,12 +1,22 @@
+using Serilog;
 using TinyCiv.Server.Core.Handlers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Handlers;
 using TinyCiv.Server.Hubs;
 using TinyCiv.Server.Services;
-using TinyCiv.Shared;
+using Constants = TinyCiv.Shared.Constants;
 
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.Seq("http://localhost:5341")
+    .Enrich.FromLogContext()
+    .Enrich.WithClientIp()
+    .Enrich.WithCorrelationId()
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 builder.Services.AddSingleton<ISessionService, SessionService>();
 builder.Services.AddSingleton<IMapService, MapService>();
@@ -26,7 +36,9 @@ var app = builder.Build();
 // app.UseAuthorization();
 app.MapHub<ServerHub>(Constants.Server.HubRoute);
 
+Log.Logger.Information("Application up and running");
 app.Run();
+Log.Logger.Information("Application stopped");
 
 // Needed for integration tests, do not remove
 namespace TinyCiv.Server

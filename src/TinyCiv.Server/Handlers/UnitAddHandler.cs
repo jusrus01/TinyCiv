@@ -12,7 +12,7 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
 {
     private readonly IMapService _mapService;
 
-    public UnitAddHandler(IMapService mapService)
+    public UnitAddHandler(IMapService mapService, ILogger<UnitAddHandler> logger) : base(logger)
     {
         _mapService = mapService;
     }
