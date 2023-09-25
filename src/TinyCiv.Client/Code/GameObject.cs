@@ -3,17 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
 {
-    public abstract class GameObject
+    public class GameObject
     {
         public GameObjectType Type { get; }
         public Position Position { get; set; }
         public Guid OwnerId { get; }
         public Guid Id { get; }
         public TeamColor Color { get; }
+
+        public string ImageSource { get; set; }
+        public Thickness BorderThickness { get; set; }
+        public Action LeftAction { get; set; }
+        public Action RightAction { get; set; }
 
         public GameObject(ServerGameObject serverGameObject)
         {

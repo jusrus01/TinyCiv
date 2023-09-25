@@ -74,6 +74,15 @@ public class ServerClient : IServerClient
         Listen(Constants.Server.SendMapChangeToAll, callback);
     }
 
+    /// <summary>
+    /// <see cref="callback"/> will be invoked when more than one player has joined
+    /// the lobby. 
+    /// </summary>
+    public void ListenForGameStartReady(Action<GameStartReadyServerEvent> callback)
+    {
+        Listen(Constants.Server.SendGameStartReadyToAll, callback);
+    }
+
     private void Listen<T>(string methodName, Action<T> callback) where T : ServerEvent
     {
         _connection.On<string, string>(
@@ -116,6 +125,11 @@ public class ServerClient : IServerClient
         if (type == nameof(UnitStatusUpdateServerEvent))
         {
             return JsonSerializer.Deserialize<UnitStatusUpdateServerEvent>(content)!;
+        }
+
+        if (type == nameof(GameStartReadyServerEvent))
+        {
+            return JsonSerializer.Deserialize<GameStartReadyServerEvent>(content)!;
         }
 
         throw new NotSupportedException();
