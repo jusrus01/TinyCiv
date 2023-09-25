@@ -18,7 +18,7 @@ namespace TinyCiv.Client.Code.MVVM.View
     /// <summary>
     /// Interaction logic for UnitMenuView.xaml
     /// </summary>
-    public partial class UnitMenuView : Page
+    public partial class UnitMenuView : UserControl
     {
         public UnitMenuView()
         {

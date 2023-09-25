@@ -15,15 +15,23 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 {
     public class GameViewModel : ObservableObject
     {
-        public GameState gameGrid { get; private set; }
+        public GameState gameState { get; private set; }
+        public UnitMenuViewModel UnitMenuVM 
+        {
+            get { return gameState.UnitMenuVM; }
+            set 
+            { 
+                gameState.UnitMenuVM = value;
+            }
+        }
 
 
         public string[] MapList { 
             get
             {
-                if (gameGrid == null)
+                if (gameState == null)
                     return new string[0];
-                return gameGrid.mapImages.ToArray();
+                return gameState.mapImages.ToArray();
             } 
         }
 
@@ -31,26 +39,26 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         {
             get
             {
-                if (gameGrid == null)
+                if (gameState == null)
                 {
                     return new GameObject[0];
                 }
-                return gameGrid.GameObjects.ToArray();
+                return gameState.GameObjects.ToArray();
             }
         }
 
         public void GameStart(GameStartServerEvent response)
         {
-            gameGrid = new GameState(Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
-            gameGrid.onPropertyChanged = () => { OnPropertyChanged("GameObjectList"); };
+            gameState = new GameState(Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
+            gameState.onPropertyChanged = () => { OnPropertyChanged("GameObjectList"); };
 
             var goFactory = new GameObjectFactory();
 
-            gameGrid.GameObjects = response.Map.Objects
+            gameState.GameObjects = response.Map.Objects
                 //.Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
                 .Select(serverGameObect => goFactory.Create(serverGameObect))
                 .ToList<GameObject>();
-            gameGrid.AddClickEvents();
+            gameState.AddClickEvents();
 
             OnPropertyChanged("GameObjectList");
             OnPropertyChanged("MapList");

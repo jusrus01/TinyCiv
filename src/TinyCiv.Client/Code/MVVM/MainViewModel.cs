@@ -18,9 +18,11 @@ namespace TinyCiv.Client.Code.MVVM
     public class MainViewModel
     {
         public GameViewModel GameVM = new GameViewModel();
+        public UpperMenuViewModel UpperMenuVM = new UpperMenuViewModel();
+        public UnitMenuViewModel UnitMenuVM = new UnitMenuViewModel();
 
         public ObservableValue<object> Game { get; } = new ObservableValue<object>();
-        public ObservableValue<object> UpperMenu { get; } = new ObservableValue<object>(new UpperMenuViewModel());
+        public ObservableValue<object> UpperMenu { get; } = new ObservableValue<object>();
         public ObservableValue<object> LowerMenu { get; } = new ObservableValue<object>(new LobbyMenuViewModel());
 
         public ObservableValue<String> IsUnitStatVisible { get; } = new ObservableValue<string>("Hidden");
@@ -29,6 +31,8 @@ namespace TinyCiv.Client.Code.MVVM
         public MainViewModel()
         {
             Game.Value = GameVM;
+            UpperMenu.Value = UpperMenuVM;
+
 
             Thread playerConnectionThread = new Thread(() =>
             {
@@ -47,7 +51,7 @@ namespace TinyCiv.Client.Code.MVVM
             if (CurrentPlayer.Instance.player == null)
             {
                 CurrentPlayer.Instance.player = response.Created;
-                //viewModel.PlayerColor.Value = _currentPlayer.Color;
+                UpperMenuVM.PlayerColor.Value = CurrentPlayer.Color;
             }
             MessageBox.Show($"Player: {CurrentPlayer.Id} has joined the game! They are in the {CurrentPlayer.Color} team!");
 
@@ -60,8 +64,10 @@ namespace TinyCiv.Client.Code.MVVM
 
         private void OnGameStart(GameStartServerEvent response)
         {
+            LowerMenu.Value = UnitMenuVM;
             GameVM.GameStart(response);
-            //Game.Value = GameVM;
+            GameVM.UnitMenuVM = UnitMenuVM;
+
         }
 
     }

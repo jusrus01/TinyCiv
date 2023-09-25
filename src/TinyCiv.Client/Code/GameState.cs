@@ -17,6 +17,9 @@ using TinyCiv.Shared;
 using System.Windows.Threading;
 using System.Collections.ObjectModel;
 using TinyCiv.Client.Code.Core;
+using TinyCiv.Client.Code.MVVM.View;
+using TinyCiv.Client.Code.MVVM.ViewModel;
+
 
 namespace TinyCiv.Client.Code
 {
@@ -27,6 +30,7 @@ namespace TinyCiv.Client.Code
 
         public List<string> mapImages = new List<string>();
         public List<GameObject> GameObjects = new List<GameObject>();
+        public UnitMenuViewModel UnitMenuVM;
         private int Rows;
         private int Columns;
 
@@ -59,7 +63,6 @@ namespace TinyCiv.Client.Code
                 var unit = (Unit)GameObjects[selectedUnitIndex];
                 UnselectUnit(unit);
                 await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
-                MessageBox.Show("Sent move event");
             }
         }
 
@@ -82,6 +85,7 @@ namespace TinyCiv.Client.Code
             isUnitSelected = true;
             selectedUnitIndex = gameObjectIndex;
             gameObject.BorderThickness = new Thickness(2);
+            UnitMenuVM.SetCurrentUnit(gameObject);
             onPropertyChanged?.Invoke();
         }
 
@@ -89,6 +93,7 @@ namespace TinyCiv.Client.Code
         {
             isUnitSelected = false;
             gameObject.BorderThickness = new Thickness(0);
+            UnitMenuVM.UnselectUnit();
             onPropertyChanged?.Invoke();
         }
 
@@ -130,12 +135,12 @@ namespace TinyCiv.Client.Code
             {
                 if (gameObject.Type == GameObjectType.Empty)
                 {
-                    gameObject.LeftAction = () => { Tile_Click(gameObject.Position); MessageBox.Show($"{gameObject.Position.row};{gameObject.Position.column}"); };
-                    gameObject.RightAction = () => { Create_Unit(gameObject.Position); MessageBox.Show($"{gameObject.Position.row};{gameObject.Position.column}"); };
+                    gameObject.LeftAction = () => { Tile_Click(gameObject.Position); };
+                    gameObject.RightAction = () => { Create_Unit(gameObject.Position); };
                 }
                 else if (gameObject.Type == GameObjectType.Warrior)
                 {
-                    gameObject.LeftAction = () => { Unit_Click(gameObject); MessageBox.Show($"{gameObject.Position.row};{gameObject.Position.column}"); };
+                    gameObject.LeftAction = () => { Unit_Click(gameObject); };
                     gameObject.RightAction = () => { };
                 }
             }
