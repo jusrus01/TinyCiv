@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.SignalR;
+using Serilog.Core;
 using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Services;
-using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
+using Constants = TinyCiv.Shared.Constants;
 
 namespace TinyCiv.Server.Handlers;
 
@@ -12,7 +13,7 @@ public class GameStartHandler : ClientHandler<StartGameClientEvent>
     private readonly IMapService _mapService;
     private readonly ISessionService _sessionService;
 
-    public GameStartHandler(ISessionService sessionService, IMapService mapService)
+    public GameStartHandler(ISessionService sessionService, IMapService mapService, ILogger<GameStartHandler> logger) : base(logger)
     {
         _sessionService = sessionService;
         _mapService = mapService;

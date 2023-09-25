@@ -11,7 +11,7 @@ public class LobbyHandler : ClientHandler<JoinLobbyClientEvent>
 {
     private readonly ISessionService _sessionService;
 
-    public LobbyHandler(ISessionService sessionService)
+    public LobbyHandler(ISessionService sessionService, ILogger<LobbyHandler> logger) : base(logger)
     {
         _sessionService = sessionService;
     }
