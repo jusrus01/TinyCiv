@@ -9,60 +9,80 @@ using TinyCiv.Server.Client;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Game;
 using TinyCiv.Client.Code.MVVM;
-
+using TinyCiv.Shared.Events.Server;
+using System.Linq;
+using System;
+using System.Windows.Media.Imaging;
+using TinyCiv.Shared;
+using System.Windows.Threading;
 
 namespace TinyCiv.Client.Code
 {
     public class GameGrid
     {
-        public UniformGrid SpriteGrid { get; set; }
+        public ObservableValue<List<Border>> SpriteList { get; } = new ObservableValue<List<Border>>();
+        public ObservableValue<List<Image>> MapList { get; } = new ObservableValue<List<Image>>();
         public List<GameObject> GameObjects = new List<GameObject>();
-        public IServerClient Client;
-        public Player CurrentPlayer;
-        public MainViewModel ViewModel;
         private int Rows;
         private int Columns;
 
         private bool isUnitSelected = false;
         private int selectedUnitIndex;
 
-        public GameGrid(UniformGrid uniformGrid, int rows, int columns)
+        public GameGrid(int rows, int columns)
         {
-            SpriteGrid = uniformGrid;
             Rows = rows;
             Columns = columns;
+            ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
+            CreateMap();
+        }
+
+        private void CreateMap()
+        {
+            var list = Application.Current.Dispatcher.Invoke(() =>
+            {
+                List<Image> list = new List<Image>();
+                for (int i = 0; i < Rows * Columns; i++)
+                {
+                    Image image = new Image();
+                    image.Source = new BitmapImage(new Uri(Constants.Assets.GameTile, UriKind.Relative));
+                    list.Add(image);
+                }
+                return list;
+            });
+            MapList.Value= list;
         }
 
         // Redraws the entire grid
         public void Update()
         {
-            SpriteGrid.Children.Clear();
-
             CreateClickableTiles();
-
             DrawGameObjects();
         }
 
         private void CreateClickableTiles()
         {
+            var list = new List<Border>();
             for (int row = 0; row < Rows; row++)
             {
                 for (int col = 0; col < Columns; col++)
                 {
                     var position = new Position(row, col);
                     var border = CreateEmptyBorder(position);
-                    SpriteGrid.Children.Add(border);
+                    list.Add(border);
                 }
             }
+            SpriteList.Value = list;
         }
 
         private void DrawGameObjects()
         {
+            var list = SpriteList.Value;
             for (int i = 0; i < GameObjects.Count; i++)
             {
                 var gameObject = GameObjects[i];
                 var indexPosition = gameObject.Position;
-                var border = (Border)SpriteGrid.Children[indexPosition.row * Columns + indexPosition.column];
+                var border = list[indexPosition.row * Columns + indexPosition.column];
                 border.Tag = i;
                 border.MouseLeftButtonDown -= Tile_Click;
                 border.MouseRightButtonDown -= Create_Unit;
@@ -75,19 +95,24 @@ namespace TinyCiv.Client.Code
                     border.BorderThickness = new Thickness(2);
                 }
             }
+            SpriteList.Value = list;
         }
 
         private Border CreateEmptyBorder(Position position)
         {
-            var image = new Image();
-            var border = new Border
+            var border = Application.Current.Dispatcher.Invoke(() =>
             {
-                Background = Brushes.Transparent,
-                Tag = position
-            };
-            border.MouseLeftButtonDown += Tile_Click;
-            border.MouseRightButtonDown += Create_Unit;
-            border.Child = image;
+                var image = new Image();
+                var border = new Border
+                {
+                    Background = Brushes.Transparent,
+                    Tag = position
+                };
+                border.MouseLeftButtonDown += Tile_Click;
+                border.MouseRightButtonDown += Create_Unit;
+                border.Child = image;
+                return border;
+            });
             return border;
         }
 
@@ -100,7 +125,7 @@ namespace TinyCiv.Client.Code
             {
                 UnselectUnit();
                 var unit = (Unit)GameObjects[selectedUnitIndex];
-                await Client.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
+                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
             }
         }
 
@@ -113,8 +138,8 @@ namespace TinyCiv.Client.Code
             {
                 isUnitSelected = true;
                 selectedUnitIndex = gameObjectIndex;
-                ViewModel.UnitName.Value = typeof(Unit).ToString();
-                ViewModel.IsUnitStatVisible.Value = "Visible";
+                //ViewModel.UnitName.Value = typeof(Unit).ToString();
+                //ViewModel.IsUnitStatVisible.Value = "Visible";
                 Update();
             }
             else if (isUnitSelected && gameObjectIndex == selectedUnitIndex)
@@ -126,8 +151,8 @@ namespace TinyCiv.Client.Code
         private void UnselectUnit()
         {
             isUnitSelected = false;
-            ViewModel.UnitName.Value = "NULL";
-            ViewModel.IsUnitStatVisible.Value = "Hidden";
+            //ViewModel.UnitName.Value = "NULL";
+            //ViewModel.IsUnitStatVisible.Value = "Hidden";
             Update();
         }
 
@@ -136,7 +161,17 @@ namespace TinyCiv.Client.Code
             var border = (Border)sender;
             var clickedPosition = (Position)border.Tag;
 
-            await Client.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, clickedPosition.row, clickedPosition.column));
+            await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, clickedPosition.row, clickedPosition.column));
+        }
+
+        private void OnMapChange(MapChangeServerEvent response)
+        {
+            GameObjects = response.Map.Objects
+                .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
+                .Select(serverGameObect => new Warrior(serverGameObect))
+                .ToList<GameObject>();
+
+            Update();
         }
     }
 }

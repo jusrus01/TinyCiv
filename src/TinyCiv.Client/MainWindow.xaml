@@ -4,61 +4,38 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TinyCiv.Client"
+        xmlns:viewModel="clr-namespace:TinyCiv.Client.Code.MVVM"
         mc:Ignorable="d"
         
         Title="MainWindow" SizeToContent="Height" Width="900">
+
+    <Window.DataContext>
+        <viewModel:MainViewModel/>
+    </Window.DataContext>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width ="200"/>
         </Grid.ColumnDefinitions>
 
-        <Grid>
-            <UniformGrid x:Name="MapGrid" 
-                         Rows="20" 
-                         Columns="20"
-                         Height="600"
-                         Width="600"
-                         SnapsToDevicePixels="True"
-                         RenderOptions.BitmapScalingMode="HighQuality">
-                
-            </UniformGrid>
+        <ContentControl
+            Content="{Binding Game.Value}"/>
 
-            <UniformGrid x:Name="UnitGrid" 
-                         Rows="20" 
-                         Columns="20"
-                         Height="600"
-                         Width="600"
-                         SnapsToDevicePixels="True"
-                         RenderOptions.BitmapScalingMode="HighQuality">
-            </UniformGrid>
-        </Grid>
-               
-        
+
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="200"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Border BorderBrush="Black">
-                <StackPanel>
-                    <TextBlock>Gold:</TextBlock>
-                    <TextBlock>Units</TextBlock>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock>Your color:</TextBlock>
-                        <TextBlock Text="{Binding PlayerColor.Value}"></TextBlock>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
 
-            <Border Grid.Row="1">
-                <StackPanel Visibility="{Binding IsUnitStatVisible.Value}" Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock>Unit: </TextBlock>
-                        <TextBlock Text="{Binding UnitName.Value}"></TextBlock>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
+            <ContentControl
+                Grid.Row="0"
+                Content="{Binding UpperMenu.Value}"/>
+
+            <ContentControl
+                Grid.Row="1"
+                Content="{Binding LowerMenu.Value}"/>
         </Grid>
         
     </Grid>
