@@ -26,7 +26,34 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <UniformGrid x:Name="UnitGrid" 
+        <ItemsControl ItemsSource="{Binding GameObjectList}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="20" 
+                         Columns="20"
+                         Height="600"
+                         Width="600"
+                         SnapsToDevicePixels="True"
+                         RenderOptions.BitmapScalingMode="HighQuality"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderThickness="{Binding BorderThickness}" 
+                            BorderBrush="Aquamarine"
+                            MouseLeftButtonDown="gameObjectLeftDown"
+                            MouseRightButtonDown="gameObjectRightDown"
+                            Height="30"
+                            Width="30"
+                            Background="Transparent">
+                        <Image Source="{Binding ImageSource}"/>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!--<UniformGrid x:Name="UnitGrid" 
                          Rows="20" 
                          Columns="20"
                          Height="600"
@@ -34,7 +61,7 @@
                          SnapsToDevicePixels="True"
                          RenderOptions.BitmapScalingMode="HighQuality">
             <ItemsControl ItemsSource="{Binding gameGrid.SpriteList.Value}"/>
-        </UniformGrid>
+        </UniformGrid>-->
 
     </Grid>
 </UserControl>

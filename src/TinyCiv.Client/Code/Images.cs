@@ -8,24 +8,24 @@ namespace TinyCiv.Client.Code
 {
     public static class Images
     {
-        private static Dictionary<GameObjectType, ImageSource> playerRedSources = new()
+        private static Dictionary<GameObjectType, string> playerRedSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/warriorRed.png") }
+            { GameObjectType.Warrior, "/Assets/warriorRed.png" }
         };
 
-        private static Dictionary<GameObjectType, ImageSource> playerGreenSources = new()
+        private static Dictionary<GameObjectType, string> playerGreenSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/warriorGreen.png") }
+            { GameObjectType.Warrior, "/Assets/warriorGreen.png" }
         };
 
-        private static Dictionary<GameObjectType, ImageSource> playerYellowSources = new()
+        private static Dictionary<GameObjectType, string> playerYellowSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/warriorYellow.png") }
+            { GameObjectType.Warrior, "/Assets/warriorYellow.png" }
         };
 
-        private static Dictionary<GameObjectType, ImageSource> playerPurpleSources = new()
+        private static Dictionary<GameObjectType, string> playerPurpleSources = new()
         {
-            { GameObjectType.Warrior, LoadImage("Assets/warriorPurple.png") }
+            { GameObjectType.Warrior, "/Assets/warriorPurple.png" }
         };
 
         private static ImageSource LoadImage(string filePath)
@@ -33,7 +33,7 @@ namespace TinyCiv.Client.Code
             return new BitmapImage(new Uri(filePath, UriKind.Relative));
         }
 
-        public static ImageSource GetImage(TeamColor color, GameObjectType unitType)
+        public static string GetImage(TeamColor color, GameObjectType unitType)
         {
             if (unitType == GameObjectType.Empty)
                 return null;
@@ -48,7 +48,7 @@ namespace TinyCiv.Client.Code
             };
         }
 
-        public static ImageSource GetImage(GameObject gameObject)
+        public static string GetImage(GameObject gameObject)
         {
             return GetImage(gameObject.Color, gameObject.Type);
         }

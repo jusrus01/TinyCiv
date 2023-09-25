@@ -24,21 +24,35 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
                 if (gameGrid == null)
                     return new string[0];
                 return gameGrid.mapImages.ToArray();
-                //return new string[] {Constants.Assets.GameTile, Constants.Assets.GameTile, Constants.Assets.GameTile, Constants.Assets.GameTile};
             } 
+        }
+
+        public GameObject[] GameObjectList
+        {
+            get
+            {
+                if (gameGrid == null)
+                {
+                    return new GameObject[0];
+                }
+                return gameGrid.GameObjects.ToArray();
+            }
         }
 
         public void GameStart(GameStartServerEvent response)
         {
             gameGrid = new GameGrid(Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
-            gameGrid.onPropertyChanged = () => { OnPropertyChanged(); };
+            gameGrid.onPropertyChanged = () => { OnPropertyChanged("GameObjectList"); };
+
+            var goFactory = new GameObjectFactory();
 
             gameGrid.GameObjects = response.Map.Objects
-                .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
-                .Select(serverGameObect => new Warrior(serverGameObect))
+                //.Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
+                .Select(serverGameObect => goFactory.Create(serverGameObect))
                 .ToList<GameObject>();
-            gameGrid.Update();
+            gameGrid.AddClickEvents();
 
+            OnPropertyChanged("GameObjectList");
             OnPropertyChanged("MapList");
         }
     }

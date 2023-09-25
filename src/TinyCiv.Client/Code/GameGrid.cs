@@ -26,9 +26,6 @@ namespace TinyCiv.Client.Code
         public Action onPropertyChanged;
 
         public List<string> mapImages = new List<string>();
-        //public UniformGrid MapList;
-        //public ObservableValue<List<Image>> MapList { get; } = new ObservableValue<List<Image>>();
-        //public ObservableValue<ObservableCollection<string>> MapList { get; } = new ObservableValue<ObservableCollection<string>>();
         public List<GameObject> GameObjects = new List<GameObject>();
         private int Rows;
         private int Columns;
@@ -55,126 +52,85 @@ namespace TinyCiv.Client.Code
             mapImages = list;
         }
 
-        // Redraws the entire grid
-        public void Update()
-        {
-            CreateClickableTiles();
-            DrawGameObjects();
-            onPropertyChanged?.Invoke();
-        }
-
-        private void CreateClickableTiles()
-        {
-            var list = new List<Border>();
-            for (int row = 0; row < Rows; row++)
-            {
-                for (int col = 0; col < Columns; col++)
-                {
-                    var position = new Position(row, col);
-                    var border = CreateEmptyBorder(position);
-                    list.Add(border);
-                }
-            }
-            SpriteList.Value = list;
-        }
-
         private void DrawGameObjects()
         {
-            var list = SpriteList.Value;
             for (int i = 0; i < GameObjects.Count; i++)
             {
-                var gameObject = GameObjects[i];
-                var indexPosition = gameObject.Position;
-                var border = list[indexPosition.row * Columns + indexPosition.column];
-                border.Tag = i;
-                border.MouseLeftButtonDown -= Tile_Click;
-                border.MouseRightButtonDown -= Create_Unit;
-                border.MouseLeftButtonDown += Unit_Click;
-                var image = (Image)border.Child;
-                image.Source = Images.GetImage(gameObject);
-                if (isUnitSelected && selectedUnitIndex == i)
-                {
-                    border.BorderBrush = Brushes.Aquamarine;
-                    border.BorderThickness = new Thickness(2);
-                }
+                var obj = GameObjects[i];
             }
-            SpriteList.Value = list;
         }
 
-        private Border CreateEmptyBorder(Position position)
+        private async void Tile_Click(Position clickedPosition)
         {
-            var border = Application.Current.Dispatcher.Invoke(() =>
-            {
-                var image = new Image();
-                var border = new Border
-                {
-                    Background = Brushes.Transparent,
-                    Tag = position
-                };
-                border.MouseLeftButtonDown += Tile_Click;
-                border.MouseRightButtonDown += Create_Unit;
-                border.Child = image;
-                return border;
-            });
-            return border;
-        }
-
-        private async void Tile_Click(object sender, MouseButtonEventArgs e)
-        {
-            var border = (Border)sender;
-            var clickedPosition = (Position)border.Tag;
-
             if (isUnitSelected)
             {
-                UnselectUnit();
                 var unit = (Unit)GameObjects[selectedUnitIndex];
+                UnselectUnit(unit);
                 await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
             }
         }
 
-        private void Unit_Click(object sender, MouseButtonEventArgs e)
+        private void Unit_Click(GameObject gameObject)
         {
-            var border = (Border)sender;
-            var gameObjectIndex = (int)border.Tag;
+            var gameObjectIndex = gameObject.Position.row*Columns + gameObject.Position.column;
 
             if (!isUnitSelected && GameObjects[gameObjectIndex].OwnerId == CurrentPlayer.Id)
             {
-                isUnitSelected = true;
-                selectedUnitIndex = gameObjectIndex;
-                //ViewModel.UnitName.Value = typeof(Unit).ToString();
-                //ViewModel.IsUnitStatVisible.Value = "Visible";
-                Update();
+                SelectUnit(gameObject, gameObjectIndex);
             }
             else if (isUnitSelected && gameObjectIndex == selectedUnitIndex)
             {
-                UnselectUnit();
+                UnselectUnit(gameObject);
             }
         }
 
-        private void UnselectUnit()
+        private void SelectUnit(GameObject gameObject, int gameObjectIndex)
         {
-            isUnitSelected = false;
-            //ViewModel.UnitName.Value = "NULL";
-            //ViewModel.IsUnitStatVisible.Value = "Hidden";
-            Update();
+            isUnitSelected = true;
+            selectedUnitIndex = gameObjectIndex;
+            gameObject.Borderthickness = new Thickness(2);
+            onPropertyChanged?.Invoke();
         }
 
-        private async void Create_Unit(object sender, MouseButtonEventArgs e)
+        private void UnselectUnit(GameObject gameObject)
         {
-            var border = (Border)sender;
-            var clickedPosition = (Position)border.Tag;
+            isUnitSelected = false;
+            gameObject.Borderthickness = new Thickness(0);
+            onPropertyChanged?.Invoke();
+        }
 
+        private async void Create_Unit(Position clickedPosition)
+        {
             await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, clickedPosition.row, clickedPosition.column));
         }
 
         private void OnMapChange(MapChangeServerEvent response)
         {
+            var goFactory = new GameObjectFactory();
             GameObjects = response.Map.Objects
-                .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
-                .Select(serverGameObect => new Warrior(serverGameObect))
+                //.Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
+                .Select(serverGameObect => goFactory.Create(serverGameObect))
                 .ToList<GameObject>();
 
-            Update();
+            AddClickEvents();
+            onPropertyChanged?.Invoke();
+        }
+
+        public void AddClickEvents()
+        {
+            foreach(var gameObject in GameObjects)
+            {
+                if (gameObject.Type == GameObjectType.Empty)
+                {
+                    gameObject.LeftAction = () => { Tile_Click(gameObject.Position); };
+                    gameObject.RightAction = () => { Create_Unit(gameObject.Position); };
+                }
+                else if (gameObject.Type == GameObjectType.Warrior)
+                {
+                    gameObject.LeftAction = () => { Unit_Click(gameObject); };
+                    gameObject.RightAction = () => { };
+                }
+            }
         }
     }
 }

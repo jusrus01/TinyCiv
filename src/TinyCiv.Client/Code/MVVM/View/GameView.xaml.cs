@@ -24,5 +24,26 @@ namespace TinyCiv.Client.Code.MVVM.View
         {
             InitializeComponent();
         }
+
+        private void gameObjectLeftDown(object sender, MouseButtonEventArgs e)
+        {
+            var border = sender as Border;
+            if (border != null)
+            {
+                var gameObject = border.DataContext as GameObject;
+                gameObject?.LeftAction?.Invoke();
+            }
+        }
+
+        private void gameObjectRightDown(object sender, MouseButtonEventArgs e)
+        {
+            var border = sender as Border;
+            if (border != null)
+            {
+                var gameObject = border.DataContext as GameObject;
+                gameObject?.RightAction?.Invoke();
+            }
+        }
+
     }
 }
