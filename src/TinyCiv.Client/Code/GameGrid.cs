@@ -66,13 +66,13 @@ namespace TinyCiv.Client.Code
             {
                 var unit = (Unit)GameObjects[selectedUnitIndex];
                 UnselectUnit(unit);
-                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
+                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.column, clickedPosition.row));
             }
         }
 
         private void Unit_Click(GameObject gameObject)
         {
-            var gameObjectIndex = gameObject.Position.row*Columns + gameObject.Position.column;
+            var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
 
             if (!isUnitSelected && GameObjects[gameObjectIndex].OwnerId == CurrentPlayer.Id)
             {
@@ -88,14 +88,14 @@ namespace TinyCiv.Client.Code
         {
             isUnitSelected = true;
             selectedUnitIndex = gameObjectIndex;
-            gameObject.Borderthickness = new Thickness(2);
+            gameObject.BorderThickness = new Thickness(2);
             onPropertyChanged?.Invoke();
         }
 
         private void UnselectUnit(GameObject gameObject)
         {
             isUnitSelected = false;
-            gameObject.Borderthickness = new Thickness(0);
+            gameObject.BorderThickness = new Thickness(0);
             onPropertyChanged?.Invoke();
         }
 

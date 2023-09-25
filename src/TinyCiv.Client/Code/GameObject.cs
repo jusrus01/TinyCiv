@@ -18,7 +18,7 @@ namespace TinyCiv.Client.Code
         public TeamColor Color { get; }
 
         public string ImageSource { get; set; }
-        public Thickness Borderthickness { get; set; }
+        public Thickness BorderThickness { get; set; }
         public Action LeftAction { get; set; }
         public Action RightAction { get; set; }
 
