@@ -18,25 +18,22 @@ namespace TinyCiv.Server.Handlers
             _mapService = mapService;
         }
 
-        protected override Task OnHandleAsync(IClientProxy caller, IClientProxy all, MoveUnitClientEvent @event)
+        protected override Task OnHandleAsync(MoveUnitClientEvent @event)
         {
             async void unitMoveCallback(UnitMoveResponse response)
             {
                 switch (response)
                 {
                     case UnitMoveResponse.Started:
-                        await caller
-                            .SendEventAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId, true))
+                        await NotifyCallerAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId, true))
                             .ConfigureAwait(false);
                         break;
                     case UnitMoveResponse.Moved:
-                        await all
-                            .SendEventAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
+                        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
                             .ConfigureAwait(false);
                         break;
                     case UnitMoveResponse.Stopped:
-                        await caller
-                            .SendEventAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId, false))
+                        await NotifyCallerAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId, false))
                             .ConfigureAwait(false); 
                         break;
                 }
