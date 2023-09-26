@@ -73,7 +73,7 @@ public class SessionService : ISessionService
             var playerToRemove = _players.SingleOrDefault(player => player.ConnectionId == connectionId);
             if (playerToRemove == null)
             {
-                throw new InvalidOperationException("Player should be present");
+                return;
             }
 
             _players.Remove(playerToRemove);
