@@ -19,7 +19,7 @@ public class LobbyHandler : ClientHandler<JoinLobbyClientEvent>
     protected override bool IgnoreWhen(JoinLobbyClientEvent @event) =>
         _sessionService.IsStarted() || _sessionService.IsLobbyFull();
 
-    protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, JoinLobbyClientEvent @event)
+    protected override async Task OnHandleAsync(JoinLobbyClientEvent @event)
     {
         var newPlayer = _sessionService.AddPlayer();
         if (newPlayer == null)
@@ -27,15 +27,12 @@ public class LobbyHandler : ClientHandler<JoinLobbyClientEvent>
             return;
         }
 
-        await caller
-            .SendEventAsync(Constants.Server.SendCreatedPlayer, new JoinLobbyServerEvent(newPlayer))
-            .ConfigureAwait(false);
+        await NotifyCallerAsync(Constants.Server.SendCreatedPlayer, new JoinLobbyServerEvent(newPlayer)).ConfigureAwait(false);
 
         // Allow multiple calls to this, so that new players that join would also get this notification
         if (_sessionService.CanGameStart())
         {
-            await all
-                .SendEventAsync(Constants.Server.SendGameStartReadyToAll, new GameStartReadyServerEvent())
+            await NotifyAllAsync(Constants.Server.SendGameStartReadyToAll, new GameStartReadyServerEvent())
                 .ConfigureAwait(false);
         }
     } 

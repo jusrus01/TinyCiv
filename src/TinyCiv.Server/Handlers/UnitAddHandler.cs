@@ -17,7 +17,7 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
         _mapService = mapService;
     }
     
-    protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, CreateUnitClientEvent @event)
+    protected override async Task OnHandleAsync(CreateUnitClientEvent @event)
     {
         var unit = _mapService.CreateUnit(@event.PlayerId, new ServerPosition { X = @event.X, Y = @event.Y });
 
@@ -26,12 +26,10 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
             return;
         }
 
-        await caller
-            .SendEventAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(unit))
+        await NotifyCallerAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(unit))
             .ConfigureAwait(false);
 
-        await all
-            .SendEventAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
+        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
             .ConfigureAwait(false);
     }
 }

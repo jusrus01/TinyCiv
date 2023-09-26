@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.SignalR;
-using Serilog.Core;
 using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Client;
@@ -22,13 +21,11 @@ public class GameStartHandler : ClientHandler<StartGameClientEvent>
     protected override bool IgnoreWhen(StartGameClientEvent @event) =>
         _sessionService.IsStarted() || !_sessionService.CanGameStart();
 
-    protected override async Task OnHandleAsync(IClientProxy caller, IClientProxy all, StartGameClientEvent @event)
+    protected override Task OnHandleAsync(StartGameClientEvent @event)
     {
         _sessionService.StartGame();
         var map = _mapService.Initialize() ?? throw new InvalidOperationException("Something went wrong, unable to initialize map");
-    
-        await all
-            .SendEventAsync(Constants.Server.SendGameStartToAll, new GameStartServerEvent(map))
-            .ConfigureAwait(false);
+
+        return NotifyAllAsync(Constants.Server.SendGameStartToAll, new GameStartServerEvent(map));
     }
 }
