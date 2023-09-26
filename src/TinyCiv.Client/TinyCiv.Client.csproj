@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Remove="Assets\game_tile.png" />
+    <None Remove="Assets\gold.png" />
     <None Remove="Assets\sh2326_4_.png" />
     <None Remove="Assets\warrior.png" />
     <None Remove="Assets\warriorGreen.png" />
@@ -24,6 +25,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\game_tile.png" />
+    <Resource Include="Assets\gold.png" />
     <Resource Include="Assets\sh2326_4_.png" />
     <Resource Include="Assets\warrior.png" />
     <Resource Include="Assets\warriorGreen.png" />

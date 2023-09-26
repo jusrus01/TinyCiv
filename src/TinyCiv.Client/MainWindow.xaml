@@ -13,7 +13,7 @@
         <viewModel:MainViewModel/>
     </Window.DataContext>
 
-    <Grid>
+    <Grid Background="LightBlue">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width ="200"/>
@@ -23,20 +23,30 @@
             Content="{Binding Game.Value}"/>
 
 
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="200"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
+        <Border Grid.Column="1"
+                Margin="2"
+                Background="#f1f1f1"
+                BorderBrush="Black"
+                BorderThickness="1"
+                CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="200"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
 
-            <ContentControl
-                Grid.Row="0"
-                Content="{Binding UpperMenu.Value}"/>
+                <ContentControl
+                    Margin="5"
+                    Grid.Row="0"
+                    Content="{Binding UpperMenu.Value}"/>
 
-            <ContentControl
-                Grid.Row="1"
-                Content="{Binding LowerMenu.Value}"/>
-        </Grid>
+                <ContentControl
+                    Margin="5"
+                    Grid.Row="1"
+                    Content="{Binding LowerMenu.Value}"/>
+            </Grid>
+        </Border>
+
         
     </Grid>
 </Window>

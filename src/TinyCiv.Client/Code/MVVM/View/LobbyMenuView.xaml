@@ -8,7 +8,9 @@
       d:DesignHeight="450" d:DesignWidth="200">
 
     <Grid>
-        <Border Height="50">
+        
+        <Border Height="40"
+                Width="120">
             <Button Command="{Binding StartGame.Value}"
                     IsEnabled="{Binding IsLobbyReady.Value}">
                 Start
