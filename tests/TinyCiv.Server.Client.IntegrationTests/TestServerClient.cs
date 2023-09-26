@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Testing;
 using TinyCiv.Shared.Events.Client;
+using TinyCiv.Shared.Events.Client.Lobby;
 
 namespace TinyCiv.Server.Client.IntegrationTests;
 

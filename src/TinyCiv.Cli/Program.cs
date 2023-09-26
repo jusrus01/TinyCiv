@@ -5,6 +5,7 @@ using System.Text.Json;
 using TinyCiv.Example;
 using TinyCiv.Server.Client;
 using TinyCiv.Shared.Events.Client;
+using TinyCiv.Shared.Events.Client.Lobby;
 using TinyCiv.Shared.Events.Server;
 using TinyCiv.Shared.Game;
 

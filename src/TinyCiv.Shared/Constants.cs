@@ -30,7 +30,7 @@ public static class Constants
         public const string SendCreatedUnit = nameof(SendCreatedUnit);
         public const string SendUnitStatusUpdate = nameof(SendUnitStatusUpdate);
 
-        public const string SendGameStartReadyToAll = nameof(SendGameStartReadyToAll);
+        public const string SendLobbyStateToAll = nameof(SendLobbyStateToAll);
         public const string SendGameStartToAll = nameof(SendGameStartToAll);
         public const string SendMapChangeToAll = nameof(SendMapChangeToAll);
     }

@@ -1,3 +1,3 @@
-namespace TinyCiv.Shared.Events.Client;
+namespace TinyCiv.Shared.Events.Client.Lobby;
 
 public record JoinLobbyClientEvent : ClientEvent;

@@ -30,7 +30,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             playerConnectionThread.Start();
         }
 
-        private void OnGameStartReady(GameStartReadyServerEvent e)
+        private void OnGameStartReady(LobbyStateServerEvent e)
         {
             IsLobbyReady.Value = true;
         }

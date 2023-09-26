@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.SignalR;
 using TinyCiv.Server.Core.Handlers;
+using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Hubs;
@@ -13,16 +14,20 @@ public class ServerHub : Hub
 {
     private readonly IEnumerable<IClientHandler> _handlers;
     private readonly ILogger<ServerHub> _logger;
-    
-    public ServerHub(IEnumerable<IClientHandler> handlers, ILogger<ServerHub> logger)
+    private readonly IConnectionIdAccessor _accessor;
+
+    public ServerHub(IEnumerable<IClientHandler> handlers, IConnectionIdAccessor accessor, ILogger<ServerHub> logger)
     {
         _handlers = handlers;
         _logger = logger;
+        _accessor = accessor;
     }
     
     [HubMethodName(Constants.Server.ReceiveFromClient)]
     public async Task ReceiveFromClient(string eventContent, string eventType)
     {
+        _accessor.Init(Context);
+        
         _logger.LogInformation("Call to {method_name} received '{event}'", nameof(ReceiveFromClient), eventContent);
         
         // Potentially can be exported to factory pattern
