@@ -74,6 +74,11 @@ public class ServerClient : IServerClient
         Listen(Constants.Server.SendMapChangeToAll, callback);
     }
 
+    public void ListenForResourcesUpdate(Action<ResourcesUpdateServerEvent> callback)
+    {
+        Listen(Constants.Server.SendResourcesStatusUpdate, callback);
+    }
+
     /// <summary>
     /// <see cref="callback"/> will be invoked when more than one player has joined
     /// the lobby. 
@@ -130,6 +135,11 @@ public class ServerClient : IServerClient
         if (type == nameof(GameStartReadyServerEvent))
         {
             return JsonSerializer.Deserialize<GameStartReadyServerEvent>(content)!;
+        }
+
+        if (type == nameof(ResourcesUpdateServerEvent))
+        {
+            return JsonSerializer.Deserialize<ResourcesUpdateServerEvent>(content)!;
         }
 
         throw new NotSupportedException();

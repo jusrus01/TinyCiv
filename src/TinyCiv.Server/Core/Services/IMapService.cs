@@ -10,6 +10,8 @@ public interface IMapService
     ServerGameObject? GetUnit(Guid unitId);
     Task MoveUnitAsync(Guid unitId, ServerPosition position, Action<UnitMoveResponse> unitMoveCallback);
 
+    ServerGameObject? CreateBuilding(Guid PlayerId,  ServerPosition position);
+
     Map? Initialize();
     Map? GetMap();
 }

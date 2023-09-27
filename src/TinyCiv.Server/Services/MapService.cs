@@ -1,4 +1,5 @@
-﻿using TinyCiv.Server.Core.Services;
+﻿using System.Numerics;
+using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Entities;
 using TinyCiv.Server.Enums;
 using TinyCiv.Shared;
@@ -19,6 +20,64 @@ namespace TinyCiv.Server.Services
             _sessionService = sessionService;
             _mapChangeLocker = new object();
             _movingUnits = new List<MovingUnit>();
+        }
+
+        public ServerGameObject? CreateBuilding(Guid playerId, ServerPosition position)
+        {
+            if (_map == null)
+            {
+                return null;
+            }
+            
+            bool isTileOccupied = _map.Objects!
+                        .Where(o => o.Position! == position)
+                        .Where(o => o.Type == GameObjectType.Empty)
+                        .Any();
+            
+            var player = _sessionService.GetPlayer(playerId);
+
+
+            if (isTileOccupied || player == null)
+            {
+                return null;
+            }
+
+            // Check if town exists in range
+            int spaceFromTown = Constants.Game.BuildingSpaceFromTown;
+
+            for (int x = position.X - spaceFromTown; x < position.X + spaceFromTown; x++)
+            {
+                for (int y =  position.Y - spaceFromTown; y <  position.Y + spaceFromTown; y++)
+                {
+                    bool isTown = _map.Objects!
+                        .Where(o => o.Position!.X == x && o.Position.Y == y)
+                        .Where(o => o.Type == GameObjectType.City)
+                        .Any();
+
+                    if (isTown == false)
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            var building = new ServerGameObject
+            {
+                Id = Guid.NewGuid(),
+                OwnerPlayerId = playerId,
+                Position = position,
+                Type = GameObjectType.Building,
+                Color = player.Color
+            };
+
+            int tileIndex = _map.Objects!
+                .Select((o, i) => new { Value = o, Index = i })
+                .FirstOrDefault(o => o.Value.Position!.X == position.X && o.Value.Position.Y == position.Y)!
+                .Index;
+
+            _map.Objects![tileIndex] = building;
+
+            return building;
         }
 
         public ServerGameObject? CreateUnit(Guid playerId, ServerPosition position)

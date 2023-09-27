@@ -11,7 +11,9 @@ public static class Constants
         public const int HeightSquareCount = 20;
 
         public const int MovementSpeedMs = 1000;
-        
+
+        public const int BuildingSpaceFromTown = 2;
+
         // Temporary map stuff, need to clarify how to best do this
         public const string Map =
             ".....\n" +
@@ -29,6 +31,7 @@ public static class Constants
         public const string SendCreatedPlayer = nameof(SendCreatedPlayer);
         public const string SendCreatedUnit = nameof(SendCreatedUnit);
         public const string SendUnitStatusUpdate = nameof(SendUnitStatusUpdate);
+        public const string SendResourcesStatusUpdate = nameof(SendResourcesStatusUpdate);
 
         public const string SendGameStartReadyToAll = nameof(SendGameStartReadyToAll);
         public const string SendGameStartToAll = nameof(SendGameStartToAll);
