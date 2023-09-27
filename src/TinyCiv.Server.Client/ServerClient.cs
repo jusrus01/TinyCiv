@@ -78,7 +78,7 @@ public class ServerClient : IServerClient
     /// <see cref="callback"/> will be invoked when more than one player has joined
     /// the lobby. 
     /// </summary>
-    public void ListenForGameStartReady(Action<LobbyStateServerEvent> callback)
+    public void ListenForLobbyState(Action<LobbyStateServerEvent> callback)
     {
         Listen(Constants.Server.SendLobbyStateToAll, callback);
     }
