@@ -17,11 +17,11 @@ public class MapLoader : IMapLoader
 
     public List<ServerGameObject> Load(MapType type)
     {
-        var mapPath = $"{MapsDirectory}\\{type.ToString()}";
+        var mapPath = $"{MapsDirectory}/{type.ToString()}";
 
         if (!File.Exists(mapPath))
         {
-            _logger.LogError("Could not find map '{type}' in path '{path}'", type, mapPath);
+            _logger.LogError("Could not find map '{type}' in path '{path}', directory info: {dir}", type, mapPath, Directory.GetFiles(MapsDirectory));
             throw new InvalidOperationException();
         }
         
