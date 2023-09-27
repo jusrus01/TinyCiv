@@ -27,4 +27,13 @@
       <ProjectReference Include="..\..\src\TinyCiv.Server\TinyCiv.Server.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Resources\Test">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Watery">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

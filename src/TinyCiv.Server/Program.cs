@@ -24,6 +24,8 @@ builder.Services.AddSingleton<IMapService, MapService>();
 
 builder.Services.AddScoped<IConnectionIdAccessor, ConnectionIdAccessor>();
 
+builder.Services.AddTransient<IMapLoader, MapLoader>();
+
 builder.Services.AddTransient<IClientHandler, UnitMoveHandler>();
 builder.Services.AddTransient<IClientHandler, UnitAddHandler>();
 builder.Services.AddTransient<IClientHandler, JoinLobbyHandler>();
