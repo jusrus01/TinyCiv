@@ -24,7 +24,7 @@ public class GameStartHandler : ClientHandler<StartGameClientEvent>
     protected override Task OnHandleAsync(StartGameClientEvent @event)
     {
         _sessionService.StartGame();
-        var map = _mapService.Initialize() ?? throw new InvalidOperationException("Something went wrong, unable to initialize map");
+        var map = _mapService.Initialize(@event.MapType) ?? throw new InvalidOperationException("Something went wrong, unable to initialize map");
 
         return NotifyAllAsync(Constants.Server.SendGameStartToAll, new GameStartServerEvent(map));
     }

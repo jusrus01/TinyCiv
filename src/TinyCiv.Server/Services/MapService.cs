@@ -13,10 +13,12 @@ namespace TinyCiv.Server.Services
         private Map? _map;
         private readonly object _mapChangeLocker;
         private List<MovingUnit> _movingUnits;
+        private readonly IMapLoader _mapLoader;
 
-        public MapService(ISessionService sessionService)
+        public MapService(IMapLoader mapLoader, ISessionService sessionService)
         {
             _sessionService = sessionService;
+            _mapLoader = mapLoader;
             _mapChangeLocker = new object();
             _movingUnits = new List<MovingUnit>();
         }
@@ -202,7 +204,7 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        public Map? Initialize()
+        public Map? Initialize(MapType mapType)
         {
             lock (_mapChangeLocker)
             {
@@ -213,37 +215,11 @@ namespace TinyCiv.Server.Services
 
                 _map = new Map
                 {
-                    Objects = GenerateObjects()
+                    Objects = _mapLoader.Load(mapType)
                 };
 
                 return _map;
             }
-        }
-
-        [Obsolete("Temporary")]
-        private List<ServerGameObject> GenerateObjects()
-        {
-            var objects = new List<ServerGameObject>();
-
-            // TODO: read map from file or some other way
-            for (var y = 0; y < Constants.Game.HeightSquareCount; y++)
-            {
-                for (var x = 0; x < Constants.Game.WidthSquareCount; x++)
-                {
-                    objects.Add(new ServerGameObject
-                    {
-                        Id = Guid.NewGuid(),
-                        Position = new ServerPosition
-                        {
-                            X = x,
-                            Y = y
-                        },
-                        Type = GameObjectType.Empty
-                    });
-                }
-            }
-
-            return objects;
         }
 
         private bool IsValidPosition(ServerPosition position)
