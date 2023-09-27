@@ -24,4 +24,10 @@ public class PlayerResources
                 break;
         }
     }
+
+    public Resources GetResources()
+    {
+        // Questionable
+        return new Resources { Food = Food, Gold = Gold, Industry = Industry };
+    }
 }

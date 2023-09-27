@@ -70,10 +70,17 @@ async Task SampleIdAssignmentDemo()
         if (response.IsMoving)
         {
             movingUnits.Add(response.UnitId);
-        } else
+        }
+        else
         {
             movingUnits.Remove(response.UnitId);
         }
+    };
+
+    Action<ResourcesUpdateServerEvent> resourcesUpdateCallback = (response) =>
+    {
+        Console.WriteLine("Recource update");
+        Console.WriteLine($"Current resources: {response.Resources.Food}F, {response.Resources.Industry}I, {response.Resources.Gold}G");
     };
 
     client.ListenForNewPlayerCreation(joinCallback);
@@ -81,11 +88,16 @@ async Task SampleIdAssignmentDemo()
     client.ListenForGameStart(startCallback);
     client.ListenForMapChange(mapChangeCallback);
     client.ListenForUnitStatusUpdate(unitStatusUpdateCallback);
+    client.ListenForResourcesUpdate(resourcesUpdateCallback);
 
     // first player joins
     var p1 = client.SendAsync(new JoinLobbyClientEvent());
     // second player joins
     var p2 = client.SendAsync(new JoinLobbyClientEvent());
+
+    await Task.Delay(1000);
+
+    await client.SendAsync(new StartGameClientEvent());
 
     await Task.Delay(2000);
 
@@ -102,5 +114,7 @@ async Task SampleIdAssignmentDemo()
     await Task.Delay(500);
 
     await client.SendAsync(new MoveUnitClientEvent(gameObjects[1].Id, 6, 7));
-    await client.SendAsync(new MoveUnitClientEvent(gameObjects[0].Id, 6, 7)); // Should not work
+    await client.SendAsync(new MoveUnitClientEvent(gameObjects[0].Id, 6, 7)); // Should stop on collision with another unit
+
+    await client.SendAsync(new CreateBuildingClientEvent(playerList[1].Id, BuildingType.Farm, new ServerPosition { X = 15, Y = 15 }));
 }

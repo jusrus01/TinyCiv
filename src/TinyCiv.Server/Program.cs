@@ -4,6 +4,7 @@ using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Handlers;
 using TinyCiv.Server.Hubs;
 using TinyCiv.Server.Services;
+using TinyCiv.Shared.Events.Client;
 using Constants = TinyCiv.Shared.Constants;
 
 Log.Logger = new LoggerConfiguration()
@@ -26,6 +27,7 @@ builder.Services.AddTransient<IClientHandler, UnitMoveHandler>();
 builder.Services.AddTransient<IClientHandler, UnitAddHandler>();
 builder.Services.AddTransient<IClientHandler, LobbyHandler>();
 builder.Services.AddTransient<IClientHandler, GameStartHandler>();
+builder.Services.AddTransient<IClientHandler, CreateBuildingHandler>();
 
 builder.Services
     .AddSignalR()

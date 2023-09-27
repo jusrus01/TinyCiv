@@ -14,13 +14,23 @@ public class ResourceService : IResourceService
         _resources = new List<PlayerResources>();
     }
 
-    public void AddBuilding(Guid playerId, IBuilding building)
+    // Init player's resources
+
+    public void AddBuilding(Guid playerId, IBuilding building, Action<Resources> callback)
     {
         Task.Run(async () =>
         {
-            await Task.Delay(building.IntervalMs);
-            building.Trigger(playerId, this);
-            // How to send update from here?
+            while (true)
+            {
+                await Task.Delay(building.IntervalMs);
+                building.Trigger(playerId, this);
+
+                var playerResources = _resources
+                    .Where(r => r.PlayerId == playerId)
+                    .SingleOrDefault();
+
+                callback?.Invoke(playerResources!.GetResources());
+            }
         });
     }
 
