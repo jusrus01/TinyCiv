@@ -25,12 +25,12 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             Thread playerConnectionThread = new Thread(() =>
             {
                 ClientSingleton.Instance.WaitForInitialization();
-                ClientSingleton.Instance.serverClient.ListenForGameStartReady(OnGameStartReady);
+                ClientSingleton.Instance.serverClient.ListenForLobbyState(OnGameStartReady);
             });
             playerConnectionThread.Start();
         }
 
-        private void OnGameStartReady(GameStartReadyServerEvent e)
+        private void OnGameStartReady(LobbyStateServerEvent e)
         {
             IsLobbyReady.Value = true;
         }
