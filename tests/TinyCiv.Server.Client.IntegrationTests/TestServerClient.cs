@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Testing;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Client.Lobby;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Client.IntegrationTests;
 
@@ -103,6 +104,40 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await WaitForResponseAsync();
         
         await _sut.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync();
+    
+        //assert
+        Assert.True(isInvoked);
+        Assert.True(isOtherInvoked);
+    }
+    
+    [Fact]
+    public async Task ListenForGameStart_When_StartGameClientEventSent_AndWateryMapSelected_Then_MapReceivedAndGameStartedForAll()
+    {
+        //arrange
+        var isInvoked = false;
+        var isOtherInvoked = false;
+        
+        var anotherClient = InitializeClient();
+        anotherClient.ListenForGameStart(response =>
+        {
+            isOtherInvoked = true;
+            Assert.NotNull(response.Map);
+        });
+    
+        //act
+        _sut.ListenForGameStart(response =>
+        {
+            isInvoked = true;
+            Assert.NotNull(response.Map);
+        });
+        
+        // after two players join lobby, StartGameClientEvent is available for use
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+        
+        await _sut.SendAsync(new StartGameClientEvent(MapType.Watery));
         await WaitForResponseAsync();
     
         //assert
@@ -342,7 +377,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
     private static Task WaitForResponseAsync(int? delayMs = null)
     {
-        return Task.Delay(delayMs ?? 500);
+        return Task.Delay(delayMs ?? 600);
     }
 
     private ServerClient InitializeClient(bool createNew = true)
