@@ -7,8 +7,13 @@ public class ServerPosition
 
     public override bool Equals(object? obj)
     {
-        return base.Equals(obj);
+        if (obj is ServerPosition other)
+        {
+            return other.X == X && other.Y == Y;
+        }
+        return false;
     }
+
 
     public override int GetHashCode()
     {

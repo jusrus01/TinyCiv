@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Collections;
+using TinyCiv.Shared.Game;
+using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Services;
 
@@ -15,15 +17,15 @@ class AStar
         }
     }
 
-    public static List<Point> FindPath(bool[,] grid, Point start, Point end)
+    public static List<ServerPosition> FindPath(Map map, ServerPosition start, ServerPosition end)
     {
-        List<Point> path = new List<Point>();
-        HashSet<Point> closedSet = new HashSet<Point>();
-        PriorityQueue<Point, int> openSet = new PriorityQueue<Point, int>(new IntComparer());
-        Dictionary<Point, Point> cameFrom = new Dictionary<Point, Point>();
-        Dictionary<Point, int> gScore = new Dictionary<Point, int>();
-        Dictionary<Point, int> fScore = new Dictionary<Point, int>();
-        HashSet<Point> inOpenSet = new HashSet<Point>(); // Track elements in the openSet
+        List<ServerPosition> path = new();
+        HashSet<ServerPosition> closedSet = new();
+        PriorityQueue<ServerPosition, int> openSet = new PriorityQueue<ServerPosition, int>(new IntComparer());
+        Dictionary<ServerPosition, ServerPosition> cameFrom = new();
+        Dictionary<ServerPosition, int> gScore = new ();
+        Dictionary<ServerPosition, int> fScore = new();
+        HashSet<ServerPosition> inOpenSet = new(); // Track elements in the openSet
 
         openSet.Enqueue(start, 0);
         gScore[start] = 0;
@@ -32,7 +34,7 @@ class AStar
 
         while (openSet.Count > 0)
         {
-            Point current = openSet.Dequeue();
+            ServerPosition current = openSet.Dequeue();
             inOpenSet.Remove(current);
 
             if (current == end)
@@ -48,7 +50,7 @@ class AStar
 
             closedSet.Add(current);
 
-            foreach (var neighbor in GetNeighbors(current, grid))
+            foreach (var neighbor in GetNeighbors(current, map))
             {
                 if (closedSet.Contains(neighbor))
                     continue;
@@ -70,35 +72,42 @@ class AStar
             }
         }
 
-        return path; // No path found
+        return path;
     }
 
-    private static int HeuristicCostEstimate(Point start, Point end)
+    private static int HeuristicCostEstimate(ServerPosition start, ServerPosition end)
     {
         return Math.Abs(start.X - end.X) + Math.Abs(start.Y - end.Y); // Manhattan distance
     }
 
-    private static IEnumerable<Point> GetNeighbors(Point current, bool[,] grid)
+    private static IEnumerable<ServerPosition> GetNeighbors(ServerPosition current, Map map)
     {
-        int maxX = grid.GetLength(0);
-        int maxY = grid.GetLength(1);
+        int maxX = Constants.Game.WidthSquareCount;
+        int maxY = Constants.Game.HeightSquareCount;
 
         int x = current.X;
         int y = current.Y;
 
-        List<Point> neighbors = new List<Point>();
+        List<ServerPosition> neighbors = new List<ServerPosition>();
 
-        if (x > 0 && !grid[x - 1, y])
-            neighbors.Add(new Point(x - 1, y));
+        if (x > 0)
+            neighbors.Add(new ServerPosition { X = x - 1, Y = y });
 
-        if (x < maxX - 1 && !grid[x + 1, y])
-            neighbors.Add(new Point(x + 1, y));
+        if (x < maxX - 1)
+            neighbors.Add(new ServerPosition { X = x + 1, Y = y });
 
-        if (y > 0 && !grid[x, y - 1])
-            neighbors.Add(new Point(x, y - 1));
+        if (y > 0)
+            neighbors.Add(new ServerPosition { X = x, Y = y - 1 });
 
-        if (y < maxY - 1 && !grid[x, y + 1])
-            neighbors.Add(new Point(x, y + 1));
+        if (y < maxY - 1)
+            neighbors.Add(new ServerPosition { X = x, Y = y + 1 });
+
+        // Check if the neighbor positions are valid and not occupied by obstacles or other units
+        neighbors.RemoveAll(neighbor =>
+        {
+            var gameObject = map.Objects?.Find(obj => obj.Position == neighbor);
+            return gameObject?.Type != GameObjectType.Empty;
+        });
 
         return neighbors;
     }
