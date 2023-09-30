@@ -107,15 +107,6 @@ namespace TinyCiv.Server.Services
 
                     var nextTile = GetTileAtPosition(pathPos);
 
-                    // if the last move is unavailable, stop moving and don't recompute
-                    //if (pathPos == path[path.Count - 1] && IsTileOccupied(nextTile))
-                    //{
-                    //    StopUnitMovement(unitId, unitMoveCallback);
-                    //    return;
-                    //}
-
-                    await Task.Delay(Constants.Game.MovementSpeedMs);
-
                     if (IsTileOccupied(nextTile))
                     {
                         // Need to recompute the path because the current path is blocked
@@ -127,7 +118,9 @@ namespace TinyCiv.Server.Services
                             return;
                         }
                     }
-                  
+
+                    await Task.Delay(Constants.Game.MovementSpeedMs);
+
                     MoveUnit(unitId, pathPos);
 
                     unitMoveCallback?.Invoke(UnitMoveResponse.Moved);

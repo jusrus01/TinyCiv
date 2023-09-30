@@ -66,17 +66,23 @@ namespace TinyCiv.Client.Code
             }
         }
 
-        private void Unit_Click(GameObject gameObject)
+        private async void Unit_Click(GameObject slectedGameObject)
         {
-            var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
+            var gameObjectIndex = slectedGameObject.Position.column * Columns + slectedGameObject.Position.row;
 
             if (!isUnitSelected && GameObjects[gameObjectIndex].OwnerId == CurrentPlayer.Id)
             {
-                SelectUnit(gameObject);
-            }
-            else if (isUnitSelected && gameObject == selectedUnit)
+                SelectUnit(slectedGameObject);
+            } 
+            else if (isUnitSelected && GameObjects[gameObjectIndex].OwnerId != CurrentPlayer.Id)
             {
-                UnselectUnit(gameObject);
+                // move towards an enemy unit
+                UnselectUnit(selectedUnit);
+                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(selectedUnit.Id, slectedGameObject.Position.row, slectedGameObject.Position.column));
+            }
+            else if (isUnitSelected && slectedGameObject == selectedUnit)
+            {
+                UnselectUnit(slectedGameObject);
             }
         }
 

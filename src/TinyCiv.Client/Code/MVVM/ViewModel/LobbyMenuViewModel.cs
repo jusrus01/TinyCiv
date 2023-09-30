@@ -8,6 +8,7 @@ using System.Windows.Input;
 using TinyCiv.Client.Code.Core;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.MVVM.ViewModel
 {
@@ -15,7 +16,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
     {
         public ObservableValue<RelayCommand> StartGame { get; } = new ObservableValue<RelayCommand>(new RelayCommand( o => 
         {
-            ClientSingleton.Instance.serverClient.SendAsync(new StartGameClientEvent());
+            ClientSingleton.Instance.serverClient.SendAsync(new StartGameClientEvent(MapType.Watery));
         }));
 
         public ObservableValue<bool> IsLobbyReady { get; } = new ObservableValue<bool>(false);
