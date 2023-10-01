@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using TinyCiv.Server.Core.Services;
+﻿using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Entities;
 using TinyCiv.Server.Enums;
 using TinyCiv.Shared;
@@ -38,28 +37,11 @@ namespace TinyCiv.Server.Services
 
                 var player = _sessionService.GetPlayer(playerId);
 
-                if (isTileEmpty == false || player == null)
+                bool isTownInRange = IsTownInRange(position, Constants.Game.BuildingSpaceFromTown);
+
+                if (isTileEmpty == false || player == null || isTownInRange)
                 {
                     return null;
-                }
-
-                // Check if town exists in range
-                int spaceFromTown = Constants.Game.BuildingSpaceFromTown;
-
-                for (int x = position.X - spaceFromTown; x < position.X + spaceFromTown; x++)
-                {
-                    for (int y = position.Y - spaceFromTown; y < position.Y + spaceFromTown; y++)
-                    {
-                        bool isTown = _map.Objects!
-                            .Where(o => o.Position!.X == x && o.Position.Y == y)
-                            .Where(o => o.Type == GameObjectType.City)
-                            .Any();
-
-                        if (isTown)
-                        {
-                            return null;
-                        }
-                    }
                 }
 
                 var building = new ServerGameObject
@@ -80,6 +62,27 @@ namespace TinyCiv.Server.Services
 
                 return building;
             }
+        }
+
+        private bool IsTownInRange(ServerPosition position, int range)
+        {
+            for (int x = position.X - range; x < position.X + range; x++)
+            {
+                for (int y = position.Y - range; y < position.Y + range; y++)
+                {
+                    bool isTown = _map!.Objects!
+                        .Where(o => o.Position!.X == x && o.Position.Y == y)
+                        .Where(o => o.Type == GameObjectType.City)
+                        .Any();
+
+                    if (isTown)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public ServerGameObject? CreateUnit(Guid playerId, ServerPosition position)

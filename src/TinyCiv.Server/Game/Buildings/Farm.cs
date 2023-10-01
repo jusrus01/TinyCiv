@@ -6,13 +6,11 @@ namespace TinyCiv.Server.Game.Buildings;
 
 public class Farm : IBuilding
 {
-    public int IntervalMs { get; set; } = 5000;
+    public int IntervalMs { get; set; }
 
     public void Trigger(Guid playerId, IResourceService resourceService)
     {
-        // Kai kurie buildingai naudoja kitus resursus, pvz Farm naudoja 1 goldo kad padarytu 5 maisto
-        // Turi galimybe pasiupgradint laiko intervala (random sansas arba po kazkiek sugeneruotu resursu)
         resourceService.AddResources(playerId, ResourceType.Food, 2);
-        Console.WriteLine($"Generated 2 Food for player");
+        Console.WriteLine($"Building \"{GetType()}\" generated 2 Food for player: {playerId}");
     }
 }

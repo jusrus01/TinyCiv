@@ -27,6 +27,13 @@ public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
                 .ConfigureAwait(false);
         }
 
+        bool buildingExist = BuildingsMapper.Buildings.TryGetValue(@event.BuildingType, out var building);
+
+        if (buildingExist == false)
+        {
+            return Task.CompletedTask;
+        }
+
         var buildingTile = _mapService.CreateBuilding(@event.PlayerId, @event.Position);
 
         if (buildingTile == null)
@@ -34,9 +41,7 @@ public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
             return Task.CompletedTask;
         }
 
-        var building = BuildingsMapper.Buildings[@event.BuildingType];
-
-        _resourceService.AddBuilding(@event.PlayerId, building, resourceUpdateCallback);
+        _resourceService.AddBuilding(@event.PlayerId, building!, resourceUpdateCallback);
 
         return Task.CompletedTask;
     }
