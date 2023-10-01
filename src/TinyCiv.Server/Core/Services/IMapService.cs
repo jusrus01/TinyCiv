@@ -7,7 +7,7 @@ public interface IMapService
 {
     ServerGameObject? CreateUnit(Guid playerId, ServerPosition position);
     ServerGameObject? GetUnit(ServerPosition position);
-    ServerGameObject? GetUnit(Guid unitId);
+    ServerGameObject? GetUnit(Guid? unitId);
     Task MoveUnitAsync(Guid unitId, ServerPosition position, Action<UnitMoveResponse> unitMoveCallback);
 
     Map? Initialize(MapType mapType);

@@ -50,7 +50,7 @@ class AStar
 
             closedSet.Add(current);
 
-            foreach (var neighbor in GetNeighbors(current, map))
+            foreach (var neighbor in GetNeighbors(current, map, end))
             {
                 if (closedSet.Contains(neighbor))
                     continue;
@@ -80,7 +80,7 @@ class AStar
         return Math.Abs(start.X - end.X) + Math.Abs(start.Y - end.Y); // Manhattan distance
     }
 
-    private static IEnumerable<ServerPosition> GetNeighbors(ServerPosition current, Map map)
+    private static IEnumerable<ServerPosition> GetNeighbors(ServerPosition current, Map map, ServerPosition end)
     {
         int maxX = Constants.Game.WidthSquareCount;
         int maxY = Constants.Game.HeightSquareCount;
@@ -102,11 +102,14 @@ class AStar
         if (y < maxY - 1)
             neighbors.Add(new ServerPosition { X = x, Y = y + 1 });
 
+        var targetUnit = map.Objects?.Find(obj => obj.Position == end);
+
         // Check if the neighbor positions are valid and not occupied by obstacles or other units
         neighbors.RemoveAll(neighbor =>
         {
             var gameObject = map.Objects?.Find(obj => obj.Position == neighbor);
-            return gameObject?.Type != GameObjectType.Empty;
+
+            return gameObject != targetUnit && (gameObject?.Type != GameObjectType.Empty);
         });
 
         return neighbors;

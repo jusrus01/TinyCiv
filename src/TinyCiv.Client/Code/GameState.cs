@@ -76,7 +76,6 @@ namespace TinyCiv.Client.Code
             } 
             else if (isUnitSelected && GameObjects[gameObjectIndex].OwnerId != CurrentPlayer.Id)
             {
-                // move towards an enemy unit
                 UnselectUnit(selectedUnit);
                 await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(selectedUnit.Id, slectedGameObject.Position.row, slectedGameObject.Position.column));
             }
@@ -90,6 +89,7 @@ namespace TinyCiv.Client.Code
         {
             isUnitSelected = true;
             selectedUnit = gameObject;
+            gameObject.BorderBrush = Brushes.Aquamarine;
             gameObject.BorderThickness = new Thickness(2);
             UnitMenuVM.SetCurrentUnit(gameObject);
             onPropertyChanged?.Invoke();
@@ -101,6 +101,19 @@ namespace TinyCiv.Client.Code
             gameObject.BorderThickness = new Thickness(0);
             UnitMenuVM.UnselectUnit();
             onPropertyChanged?.Invoke();
+        }
+
+        private void ShowCombatState(GameObject gameObject)
+        {            
+            if (gameObject.OpponentId != null)
+            {
+                gameObject.BorderThickness = new Thickness(2);
+                gameObject.BorderBrush = Brushes.IndianRed;
+            } 
+            else
+            {
+                UnselectUnit(gameObject);
+            }
         }
 
         private async void Create_Unit(Position clickedPosition)
@@ -129,7 +142,8 @@ namespace TinyCiv.Client.Code
             {
                 var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
                 GameObjects[gameObjectIndex] = gameObject;
-                if (isUnitSelected && selectedUnit.Id == gameObject.Id) 
+                ShowCombatState(gameObject);                
+                if (isUnitSelected && selectedUnit.Id == gameObject.Id)
                 {
                     SelectUnit(gameObject);
                 }

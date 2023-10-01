@@ -107,6 +107,15 @@ namespace TinyCiv.Server.Services
 
                     var nextTile = GetTileAtPosition(pathPos);
 
+                    // units start a combat
+                    if (pathPos == path[path.Count - 1] && IsTileOccupied(nextTile))
+                    {
+                        unit.OpponentId = nextTile.Id;
+                        nextTile.OpponentId = unit.Id;
+                        unitMoveCallback?.Invoke(UnitMoveResponse.Moved);
+                        return;
+                    }
+
                     if (IsTileOccupied(nextTile))
                     {
                         // Need to recompute the path because the current path is blocked
@@ -119,7 +128,23 @@ namespace TinyCiv.Server.Services
                         }
                     }
 
-                    await Task.Delay(Constants.Game.MovementSpeedMs);
+                    if (pathPos == path[0])
+                    {
+                        var enemy = GetUnit(unit.OpponentId);
+                        unit.OpponentId = null;
+                        if (enemy != null)
+                        {
+                            enemy.OpponentId = null;
+                        }
+                        Console.WriteLine("RAN FROM A BATTLE");
+                        unitMoveCallback?.Invoke(UnitMoveResponse.Moved);
+                    }
+
+                    // unit runs from a combat
+                    if (pathPos != path[0])
+                    {                      
+                        await Task.Delay(Constants.Game.MovementSpeedMs);
+                    }                    
 
                     MoveUnit(unitId, pathPos);
 
@@ -148,7 +173,7 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        public ServerGameObject? GetUnit(Guid unitId)
+        public ServerGameObject? GetUnit(Guid? unitId)
         {
             lock (_mapChangeLocker)
             {
@@ -156,6 +181,12 @@ namespace TinyCiv.Server.Services
                 {
                     return null;
                 }
+
+                if (unitId == null)
+                {
+                    return null;
+                }
+
 
                 var unit = _map.Objects!.Single(o => o.Id == unitId);
 
@@ -213,7 +244,7 @@ namespace TinyCiv.Server.Services
                 return false;
             }
 
-            if (IsTileOccupied(targetUnit) && !IsAttackableTile(targetUnit))
+            if (IsObstacle(targetUnit))
             {
                 return false;
             }
@@ -232,11 +263,9 @@ namespace TinyCiv.Server.Services
             return obj.Type != GameObjectType.Empty;
         }
 
-        private bool IsAttackableTile(ServerGameObject o) => new[] {
-            GameObjectType.Warrior,
-            GameObjectType.Cavalry,
-            GameObjectType.Colonist,
-            GameObjectType.City
+        private bool IsObstacle(ServerGameObject o) => new[] {
+            GameObjectType.StaticMountain,
+            GameObjectType.StaticWater,
         }.Contains(o.Type);
 
         private void CancelExistingMovement(Guid unitId)
