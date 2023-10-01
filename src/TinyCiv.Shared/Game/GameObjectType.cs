@@ -12,5 +12,9 @@ public enum GameObjectType
     // STRUCTURES
     City,
     Building
+    
+    // STATIC STRUCTURES
+    StaticMountain,
+    StaticWater
 }
 

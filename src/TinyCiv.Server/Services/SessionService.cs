@@ -11,7 +11,7 @@ public class SessionService : ISessionService
     private readonly object _playerLocker;
     private readonly List<Player> _players;
 
-    private bool _isGameStarted = false;
+    private bool _isGameStarted;
 
     public SessionService()
     {
@@ -19,7 +19,7 @@ public class SessionService : ISessionService
         _playerLocker = new object();
     }
 
-    public Player? AddPlayer()
+    public Player? AddPlayer(string connectionId)
     {
         lock (_playerLocker)
         {
@@ -36,7 +36,8 @@ public class SessionService : ISessionService
             var player = new Player
             {
                 Id = Guid.NewGuid(),
-                Color = playerColor
+                Color = playerColor,
+                ConnectionId = connectionId
             };
 
             _players.Add(player);
@@ -48,7 +49,35 @@ public class SessionService : ISessionService
     [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
     public Player GetPlayer(Guid playerId)
     {
+        // Need this check, to control the context in which this is used
+        // after game is started there should be no changes happening to players e.g.
+        // no new ones should be added and none should be removed, otherwise we would
+        // need to lock _players collection
+        if (!_isGameStarted)
+        {
+            throw new InvalidOperationException();
+        }
+        
         return _players.Single(p => p.Id == playerId);
+    }
+
+    public void RemovePlayerByConnectionId(string connectionId)
+    {
+        if (_isGameStarted)
+        {
+            throw new InvalidOperationException("Cannot remove player after game has started");
+        }
+        
+        lock (_playerLocker)
+        {
+            var playerToRemove = _players.SingleOrDefault(player => player.ConnectionId == connectionId);
+            if (playerToRemove == null)
+            {
+                return;
+            }
+
+            _players.Remove(playerToRemove);
+        }
     }
 
     public void StartGame()
@@ -68,7 +97,7 @@ public class SessionService : ISessionService
     {
         return _isGameStarted;
     }
-
+    
     public bool CanGameStart()
     {
         // Locking in case later we will support "leaving" from the session

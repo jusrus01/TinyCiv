@@ -40,7 +40,7 @@ public abstract class ClientHandler<TEvent> : IClientHandler where TEvent : Clie
 
         if (IgnoreWhen(@event))
         {
-            _logger.LogWarning("{handler}.{method_name}: ignored", handlerName, HandleMethodName);
+            _logger.LogWarning("{handler}.{method_name}: ignored event data {@data}", handlerName, HandleMethodName, @event);
             return Task.CompletedTask;
         }
 

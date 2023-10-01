@@ -6,6 +6,6 @@ namespace TinyCiv.Shared.Events.Server;
 /// </summary>
 public abstract record ServerEvent
 {
-    public DateTime ExistenceStart => DateTime.UtcNow;
+    public DateTime ExistenceStart = DateTime.UtcNow;
     public string Type => GetType().Name;
 }

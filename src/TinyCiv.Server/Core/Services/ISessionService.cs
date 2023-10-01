@@ -4,8 +4,9 @@ namespace TinyCiv.Server.Core.Services;
 
 public interface ISessionService
 {    
-    Player? AddPlayer();
+    Player? AddPlayer(string connectionId);
     Player GetPlayer(Guid playerId);
+    void RemovePlayerByConnectionId(string connectionId);
 
     void StartGame();
     bool IsLobbyFull();

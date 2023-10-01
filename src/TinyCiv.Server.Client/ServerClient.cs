@@ -83,9 +83,9 @@ public class ServerClient : IServerClient
     /// <see cref="callback"/> will be invoked when more than one player has joined
     /// the lobby. 
     /// </summary>
-    public void ListenForGameStartReady(Action<GameStartReadyServerEvent> callback)
+    public void ListenForLobbyState(Action<LobbyStateServerEvent> callback)
     {
-        Listen(Constants.Server.SendGameStartReadyToAll, callback);
+        Listen(Constants.Server.SendLobbyStateToAll, callback);
     }
 
     private void Listen<T>(string methodName, Action<T> callback) where T : ServerEvent
@@ -132,9 +132,9 @@ public class ServerClient : IServerClient
             return JsonSerializer.Deserialize<UnitStatusUpdateServerEvent>(content)!;
         }
 
-        if (type == nameof(GameStartReadyServerEvent))
+        if (type == nameof(LobbyStateServerEvent))
         {
-            return JsonSerializer.Deserialize<GameStartReadyServerEvent>(content)!;
+            return JsonSerializer.Deserialize<LobbyStateServerEvent>(content)!;
         }
 
         if (type == nameof(ResourcesUpdateServerEvent))

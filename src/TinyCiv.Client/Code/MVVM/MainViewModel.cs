@@ -12,6 +12,7 @@ using System.Windows;
 using TinyCiv.Shared.Events.Server;
 using TinyCiv.Client.Code.Units;
 using System.Threading;
+using TinyCiv.Shared.Events.Client.Lobby;
 
 namespace TinyCiv.Client.Code.MVVM
 {

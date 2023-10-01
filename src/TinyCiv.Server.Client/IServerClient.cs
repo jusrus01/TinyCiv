@@ -14,4 +14,5 @@ public interface IServerClient
     void ListenForMapChange(Action<MapChangeServerEvent> callback);
     void ListenForGameStartReady(Action<GameStartReadyServerEvent> callback);
     void ListenForResourcesUpdate(Action<ResourcesUpdateServerEvent> callback);
+    void ListenForLobbyState(Action<LobbyStateServerEvent> callback);
 }

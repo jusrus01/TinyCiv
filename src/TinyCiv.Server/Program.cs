@@ -2,6 +2,7 @@ using Serilog;
 using TinyCiv.Server.Core.Handlers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Handlers;
+using TinyCiv.Server.Handlers.Lobby;
 using TinyCiv.Server.Hubs;
 using TinyCiv.Server.Services;
 using TinyCiv.Shared.Events.Client;
@@ -23,9 +24,14 @@ builder.Services.AddSingleton<IResourceService, ResourceService>();
 builder.Services.AddSingleton<ISessionService, SessionService>();
 builder.Services.AddSingleton<IMapService, MapService>();
 
+builder.Services.AddScoped<IConnectionIdAccessor, ConnectionIdAccessor>();
+
+builder.Services.AddTransient<IMapLoader, MapLoader>();
+
 builder.Services.AddTransient<IClientHandler, UnitMoveHandler>();
 builder.Services.AddTransient<IClientHandler, UnitAddHandler>();
-builder.Services.AddTransient<IClientHandler, LobbyHandler>();
+builder.Services.AddTransient<IClientHandler, JoinLobbyHandler>();
+builder.Services.AddTransient<IClientHandler, LeaveLobbyHandler>();
 builder.Services.AddTransient<IClientHandler, GameStartHandler>();
 builder.Services.AddTransient<IClientHandler, CreateBuildingHandler>();
 

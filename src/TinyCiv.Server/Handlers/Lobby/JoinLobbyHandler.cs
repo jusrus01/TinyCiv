@@ -1,19 +1,19 @@
-using Microsoft.AspNetCore.SignalR;
-using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
-using TinyCiv.Shared.Events.Client;
+using TinyCiv.Shared.Events.Client.Lobby;
 using TinyCiv.Shared.Events.Server;
 
-namespace TinyCiv.Server.Handlers;
+namespace TinyCiv.Server.Handlers.Lobby;
 
-public class LobbyHandler : ClientHandler<JoinLobbyClientEvent>
+public class JoinLobbyHandler : ClientHandler<JoinLobbyClientEvent>
 {
     private readonly ISessionService _sessionService;
+    private readonly IConnectionIdAccessor _accessor;
 
-    public LobbyHandler(ISessionService sessionService, ILogger<LobbyHandler> logger) : base(logger)
+    public JoinLobbyHandler(ISessionService sessionService, IConnectionIdAccessor accessor, ILogger<JoinLobbyHandler> logger) : base(logger)
     {
         _sessionService = sessionService;
+        _accessor = accessor;
     }
 
     protected override bool IgnoreWhen(JoinLobbyClientEvent @event) =>
@@ -21,7 +21,7 @@ public class LobbyHandler : ClientHandler<JoinLobbyClientEvent>
 
     protected override async Task OnHandleAsync(JoinLobbyClientEvent @event)
     {
-        var newPlayer = _sessionService.AddPlayer();
+        var newPlayer = _sessionService.AddPlayer(_accessor.ConnectionId);
         if (newPlayer == null)
         {
             return;
@@ -29,10 +29,10 @@ public class LobbyHandler : ClientHandler<JoinLobbyClientEvent>
 
         await NotifyCallerAsync(Constants.Server.SendCreatedPlayer, new JoinLobbyServerEvent(newPlayer)).ConfigureAwait(false);
 
-        // Allow multiple calls to this, so that new players that join would also get this notification
-        if (_sessionService.CanGameStart())
+        var canGameStart = _sessionService.CanGameStart();
+        if (canGameStart)
         {
-            await NotifyAllAsync(Constants.Server.SendGameStartReadyToAll, new GameStartReadyServerEvent())
+            await NotifyAllAsync(Constants.Server.SendLobbyStateToAll, new LobbyStateServerEvent(canGameStart))
                 .ConfigureAwait(false);
         }
     } 
