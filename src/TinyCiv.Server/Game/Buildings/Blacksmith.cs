@@ -1,13 +1,24 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
 using TinyCiv.Server.Core.Services;
+using TinyCiv.Shared;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings
 {
     public class Blacksmith : IBuilding
     {
-        public GameObjectType? TileType { get; }
+        public int Price { get; }
+        public BuildingType BuildingType { get; }
+        public GameObjectType TileType { get; }
         public int IntervalMs { get; set; }
+
+        public Blacksmith()
+        {
+            Price = Constants.Game.BlacksmithPrice;
+            BuildingType = BuildingType.Blacksmith;
+            TileType = GameObjectType.Empty;
+            IntervalMs = Constants.Game.BlacksmithInterval;
+        }
 
         public void Trigger(Guid playerId, IResourceService resourceService)
         {

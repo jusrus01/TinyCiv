@@ -5,7 +5,9 @@ namespace TinyCiv.Server.Core.Game.Buildings;
 
 public interface IBuilding
 {
-    GameObjectType? TileType { get; }
+    int Price { get; }
+    BuildingType BuildingType { get; }
+    GameObjectType TileType { get; }
     int IntervalMs { get; set; }
 
     void Trigger(Guid playerId, IResourceService resourceService);

@@ -30,31 +30,16 @@ async Task SampleIdAssignmentDemo()
         playerList.Add(response.Created);
     };
 
-    // NOT READY
-    // async Task StartGameLoop()
-    // {
-    //     // player (this instance)
-    //     await client.SendAsync(new AddNewUnitClientEvent(playerId1.Value, 1, 1));
-    // }
-
     Action<GameStartServerEvent> startCallback = (response) =>
     {
-        Console.WriteLine("Game started since two players already joined");
-        //Console.WriteLine($"Map to render: {JsonSerializer.Serialize(response)}");
-
+        Console.WriteLine("Game started");
         response.Map.Print();
-
-        // start some game loop, etc, probably best via delegate
-        // NOT READY
-        // StartGameLoop().GetAwaiter();
     };
 
     // NOT READY
     Action<MapChangeServerEvent> mapChangeCallback = (response) =>
     {
         Console.WriteLine("Map changed since something happened...");
-
-        //Console.WriteLine($"Map to render: {JsonSerializer.Serialize(response)}");
         response.Map.Print();
     };
 
@@ -114,7 +99,10 @@ async Task SampleIdAssignmentDemo()
     await Task.Delay(500);
 
     await client.SendAsync(new MoveUnitClientEvent(gameObjects[1].Id, 6, 7));
-    await client.SendAsync(new MoveUnitClientEvent(gameObjects[0].Id, 6, 7)); // Should not work
+    
+    await Task.Delay(100);
+
+    await client.SendAsync(new MoveUnitClientEvent(gameObjects[0].Id, 6, 7)); // Should move until collision
 
     await client.SendAsync(new CreateBuildingClientEvent(playerList[0].Id, BuildingType.Blacksmith, new ServerPosition { X = 15, Y = 15 }));
     
@@ -129,4 +117,7 @@ async Task SampleIdAssignmentDemo()
     await Task.Delay(1500); // Blacksmith trigger
 
     await Task.Delay(500);
+    
+    await client.SendAsync(new CreateBuildingClientEvent(playerList[0].Id, BuildingType.Mine, new ServerPosition { X = 14, Y = 15 }));
+    await client.SendAsync(new CreateBuildingClientEvent(playerList[0].Id, BuildingType.Farm, new ServerPosition { X = 14, Y = 14 }));
 }

@@ -1,4 +1,5 @@
 using TinyCiv.Server.Core.Services;
+using TinyCiv.Server.Entities;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Client.Lobby;
 using TinyCiv.Shared.Events.Server;
@@ -29,9 +30,11 @@ public class JoinLobbyHandler : ClientHandler<JoinLobbyClientEvent>
             return;
         }
 
-        _resourceService.InitializeResources(newPlayer.Id);
-
         await NotifyCallerAsync(Constants.Server.SendCreatedPlayer, new JoinLobbyServerEvent(newPlayer)).ConfigureAwait(false);
+        
+        var playerResources = _resourceService.InitializeResources(newPlayer.Id);
+        await NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, new ResourcesUpdateServerEvent(playerResources))
+            .ConfigureAwait(false);
 
         var canGameStart = _sessionService.CanGameStart();
         if (canGameStart)

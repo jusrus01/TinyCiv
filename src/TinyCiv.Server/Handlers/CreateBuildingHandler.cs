@@ -34,7 +34,20 @@ public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
             return;
         }
 
-        var buildingTile = _mapService.CreateBuilding(@event.PlayerId, @event.Position, building!.TileType);
+        bool canAfford = _resourceService.GetResources(@event.PlayerId).Industry >= building!.Price;
+
+        if (canAfford == false)
+        {
+            return;
+        }
+
+        _resourceService.AddResources(@event.PlayerId, ResourceType.Industry, -building.Price);
+        var playerResources = _resourceService.GetResources(@event.PlayerId);
+
+        await NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, new ResourcesUpdateServerEvent(playerResources))
+            .ConfigureAwait(false);
+
+        var buildingTile = _mapService.CreateBuilding(@event.PlayerId, @event.Position, building!);
 
         await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
             .ConfigureAwait(false);

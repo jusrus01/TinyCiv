@@ -11,23 +11,27 @@ public static class Extensions
         {
             for (int x = 0; x < Constants.Game.WidthSquareCount; x++)
             {
-                if (map.Objects!.Where(o => o.Position!.X == x && o.Position.Y == y).First().Type == GameObjectType.Warrior)
-                {
-                    Console.Write("W");
-                }
-                else if (map.Objects!.Where(o => o.Position!.X == x && o.Position.Y == y).First().Type == GameObjectType.City)
-                {
-                    Console.Write("X");
-                }
-                else if (map.Objects!.Where(o => o.Position!.X == x && o.Position.Y == y).First().Type == GameObjectType.Building)
-                {
-                    Console.Write("B");
-                }
-                else
+                var tile = map.Objects!
+                    .Where(o => o.Position!.X == x && o.Position.Y == y)
+                    .First();
+
+                if (tile.Type == GameObjectType.Empty)
                 {
                     Console.Write(".");
+                    continue;
                 }
+
+                string? enumName = Enum.GetName(tile.Type);
+
+                if (enumName == null)
+                {
+                    Console.Write("?");
+                    continue;
+                }
+
+                Console.Write(enumName.ToUpper()[0]);
             }
+
             Console.WriteLine();
         }
     }

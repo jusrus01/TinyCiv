@@ -1,13 +1,24 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
 using TinyCiv.Server.Core.Services;
+using TinyCiv.Shared;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings
 {
     public class Port : IBuilding
     {
-        public GameObjectType? TileType { get; }
+        public int Price { get; }
+        public BuildingType BuildingType { get; }
+        public GameObjectType TileType { get; }
         public int IntervalMs { get; set; }
+
+        public Port()
+        {
+            Price = Constants.Game.PortPrice;
+            BuildingType = BuildingType.Port;
+            TileType = GameObjectType.StaticWater;
+            IntervalMs = Constants.Game.PortInterval;
+        }
 
         public void Trigger(Guid playerId, IResourceService resourceService)
         {

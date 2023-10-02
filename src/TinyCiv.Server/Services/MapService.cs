@@ -1,4 +1,5 @@
-﻿using TinyCiv.Server.Core.Services;
+﻿using TinyCiv.Server.Core.Game.Buildings;
+using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Entities;
 using TinyCiv.Server.Enums;
 using TinyCiv.Shared;
@@ -23,7 +24,7 @@ namespace TinyCiv.Server.Services
             _movingUnits = new List<MovingUnit>();
         }
 
-        public ServerGameObject? CreateBuilding(Guid playerId, ServerPosition position, GameObjectType? tileType)
+        public ServerGameObject? CreateBuilding(Guid playerId, ServerPosition position, IBuilding building)
         {
             lock (_mapChangeLocker)
             {
@@ -34,26 +35,27 @@ namespace TinyCiv.Server.Services
 
                 bool isTileCorrect = _map.Objects!
                         .Where(o => o.Position! == position)
-                        .Where(o => o.Type == ((tileType != null) ? tileType : GameObjectType.Empty) ||
-                            o.Type == ((tileType != null) ? tileType : GameObjectType.StaticMountain))
+                        .Where(o => o.Type == building.TileType)
                         .Any();
 
                 var player = _sessionService.GetPlayer(playerId);
 
                 bool isTownInRange = IsTownInRange(position, Constants.Game.BuildingSpaceFromTown);
 
-                if (isTileCorrect = false || player == null || isTownInRange)
+                bool doesEnumExist = Enum.TryParse<GameObjectType>(Enum.GetName(building.BuildingType), out var gameObjectType);
+
+                if (isTileCorrect = false || player == null || isTownInRange || doesEnumExist == false)
                 {
                     return null;
                 }
 
-                var building = new ServerGameObject
+                var mapBuilding = new ServerGameObject
                 {
                     Id = Guid.NewGuid(),
                     OwnerPlayerId = playerId,
                     Position = position,
-                    Type = GameObjectType.Building,
-                    Color = player.Color
+                    Type = gameObjectType,
+                    Color = player!.Color
                 };
 
                 int tileIndex = _map.Objects!
@@ -61,9 +63,9 @@ namespace TinyCiv.Server.Services
                     .FirstOrDefault(o => o.Value.Position!.X == position.X && o.Value.Position.Y == position.Y)!
                     .Index;
 
-                _map.Objects![tileIndex] = building;
+                _map.Objects![tileIndex] = mapBuilding;
 
-                return building;
+                return mapBuilding;
             }
         }
 

@@ -21,6 +21,17 @@ public static class Constants
         public const int BankInterval = 3000;
         public const int BlacksmithInterval = 6000;
 
+        public const int FarmPrice = 50;
+        public const int MinePrice = 50;
+        public const int ShopPrice = 50;
+        public const int PortPrice = 50;
+        public const int BankPrice = 100;
+        public const int BlacksmithPrice = 100;
+
+        public const int StartingIndustry = 200;
+        public const int StartingFood = 100;
+        public const int StartingGold = 50;
+
         // Temporary map stuff, need to clarify how to best do this
         public const string Map =
             ".....\n" +
