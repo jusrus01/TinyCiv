@@ -5,6 +5,7 @@ using System.Text.Json;
 using TinyCiv.Example;
 using TinyCiv.Server.Client;
 using TinyCiv.Shared.Events.Client;
+using TinyCiv.Shared.Events.Client.Lobby;
 using TinyCiv.Shared.Events.Server;
 using TinyCiv.Shared.Game;
 
@@ -79,8 +80,7 @@ async Task SampleIdAssignmentDemo()
 
     Action<ResourcesUpdateServerEvent> resourcesUpdateCallback = (response) =>
     {
-        Console.WriteLine("Recource update");
-        Console.WriteLine($"Current resources: {response.Resources.Food}F, {response.Resources.Industry}I, {response.Resources.Gold}G");
+        Console.WriteLine($"New resource status - {response.Resources.Gold}G, {response.Resources.Industry}I, {response.Resources.Food}F");
     };
 
     client.ListenForNewPlayerCreation(joinCallback);
@@ -99,7 +99,7 @@ async Task SampleIdAssignmentDemo()
 
     await client.SendAsync(new StartGameClientEvent());
 
-    await Task.Delay(2000);
+    await Task.Delay(1000);
 
     // Spawning 3 units
     await client.SendAsync(new CreateUnitClientEvent(playerList[0].Id, 1, 1));
@@ -114,7 +114,19 @@ async Task SampleIdAssignmentDemo()
     await Task.Delay(500);
 
     await client.SendAsync(new MoveUnitClientEvent(gameObjects[1].Id, 6, 7));
-    await client.SendAsync(new MoveUnitClientEvent(gameObjects[0].Id, 6, 7)); // Should stop on collision with another unit
+    await client.SendAsync(new MoveUnitClientEvent(gameObjects[0].Id, 6, 7)); // Should not work
 
-    await client.SendAsync(new CreateBuildingClientEvent(playerList[1].Id, BuildingType.Farm, new ServerPosition { X = 15, Y = 15 }));
+    await client.SendAsync(new CreateBuildingClientEvent(playerList[0].Id, BuildingType.Blacksmith, new ServerPosition { X = 15, Y = 15 }));
+    
+    await Task.Delay(6000); // Blacksmith trigger
+
+    await Task.Delay(500);
+
+    await client.SendAsync(new CreateBuildingClientEvent(playerList[0].Id, BuildingType.Shop, new ServerPosition { X = 15, Y = 14 }));
+    
+    await Task.Delay(7000); // Mine trigger & blacksmith trigger
+
+    await Task.Delay(1500); // Blacksmith trigger
+
+    await Task.Delay(500);
 }

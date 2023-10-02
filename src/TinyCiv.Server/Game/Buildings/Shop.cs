@@ -1,5 +1,4 @@
-﻿using System.Data;
-using TinyCiv.Server.Core.Game.Buildings;
+﻿using TinyCiv.Server.Core.Game.Buildings;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Game;
 
@@ -7,6 +6,7 @@ namespace TinyCiv.Server.Game.Buildings
 {
     public class Shop : IBuilding
     {
+        public GameObjectType? TileType { get; }
         public int IntervalMs { get; set; }
 
         public void Trigger(Guid playerId, IResourceService resourceService)

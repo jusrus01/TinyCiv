@@ -6,6 +6,7 @@ namespace TinyCiv.Server.Game.Buildings;
 
 public class Farm : IBuilding
 {
+    public GameObjectType? TileType { get; }
     public int IntervalMs { get; set; }
 
     public void Trigger(Guid playerId, IResourceService resourceService)

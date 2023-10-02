@@ -14,6 +14,13 @@ public static class Constants
 
         public const int BuildingSpaceFromTown = 2;
 
+        public const int FarmInterval = 5000;
+        public const int MineInterval = 4500;
+        public const int ShopInterval = 7000;
+        public const int PortInterval = 4000;
+        public const int BankInterval = 3000;
+        public const int BlacksmithInterval = 6000;
+
         // Temporary map stuff, need to clarify how to best do this
         public const string Map =
             ".....\n" +

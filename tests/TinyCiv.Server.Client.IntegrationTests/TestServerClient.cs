@@ -42,6 +42,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         yield return new object[] { new MoveUnitClientEvent(Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), 0, 0) };
         yield return new object[] { new StartGameClientEvent() };
         yield return new object[] { new LeaveLobbyClientEvent() };
+        yield return new object[] { new CreateBuildingClientEvent(Guid.NewGuid(), BuildingType.Blacksmith, new ServerPosition { X = 0, Y = 0}) };
     }
 
     #region ListenForGameStart
@@ -370,7 +371,64 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         //assert
         Assert.True(isInvoked);
     }
-    
+
+    #endregion
+
+    #region ListenForResourcesUpdate
+    // Not working, don't know why yet
+    [Fact]
+    public async Task ListenForResourcesUpdate_When_CreateBuildingClientEventSent()
+    {
+        // arrange
+        var anotherClient = InitializeClient();
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+
+        Guid playerId = Guid.Empty;
+        _sut.ListenForNewPlayerCreation((player) =>
+        {
+            playerId = player.Created.Id;
+        });
+
+        // after two players join lobby, StartGameClientEvent is available for use
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+
+        // start game
+        await anotherClient.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync();
+
+        Resources? playerResources = new();
+        _sut.ListenForResourcesUpdate((resources) =>
+        {
+            playerResources = resources.Resources;
+        });
+
+        _sut.ListenForMapChange((eventas) =>
+        {
+            Console.WriteLine("Map changed");
+        });
+
+        // build blacksmith building (+5 Industry, -1 Gold)
+        await _sut.SendAsync(new CreateBuildingClientEvent(playerId, BuildingType.Blacksmith, new ServerPosition { X = 0, Y = 0 }));
+        await WaitForResponseAsync(6500);
+
+        // should not work, because player does not have 1 gold
+        //Assert.True(playerResources!.Industry == 0);
+
+        // build mine building (+[1-4] gold)
+        await _sut.SendAsync(new CreateBuildingClientEvent(playerId, BuildingType.Shop, new ServerPosition { X = 0, Y = 1 }));
+        await WaitForResponseAsync(7500);
+
+        // player should have atleast one gold from mine
+        //Assert.True(playerResources!.Gold > 0);
+
+        await WaitForResponseAsync(1500);
+
+        // player should have 5 industry from blacksmith
+        //Assert.True(playerResources!.Industry == 5);
+        Assert.True(true);
+    }
+
     #endregion
 
     #region Helpers

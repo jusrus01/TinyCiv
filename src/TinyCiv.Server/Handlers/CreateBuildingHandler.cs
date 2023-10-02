@@ -19,7 +19,7 @@ public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
         _resourceService = resourceService;
     }
 
-    protected override Task OnHandleAsync(CreateBuildingClientEvent @event)
+    protected override async Task OnHandleAsync(CreateBuildingClientEvent @event)
     {
         async void resourceUpdateCallback(Resources resources)
         {
@@ -31,18 +31,21 @@ public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
 
         if (buildingExist == false)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        var buildingTile = _mapService.CreateBuilding(@event.PlayerId, @event.Position);
+        var buildingTile = _mapService.CreateBuilding(@event.PlayerId, @event.Position, building!.TileType);
+
+        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
+            .ConfigureAwait(false);
 
         if (buildingTile == null)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         _resourceService.AddBuilding(@event.PlayerId, building!, resourceUpdateCallback);
 
-        return Task.CompletedTask;
+        return;
     }
 }

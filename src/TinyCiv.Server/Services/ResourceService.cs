@@ -14,7 +14,11 @@ public class ResourceService : IResourceService
         _resources = new List<PlayerResources>();
     }
 
-    // Init player's resources
+    public void InitializeResources(Guid playerId)
+    {
+        var resourceEntry = new PlayerResources() { PlayerId = playerId };
+        _resources.Add(resourceEntry);
+    }
 
     public void AddBuilding(Guid playerId, IBuilding building, Action<Resources> callback)
     {
@@ -27,7 +31,7 @@ public class ResourceService : IResourceService
 
                 var playerResources = _resources
                     .Where(r => r.PlayerId == playerId)
-                    .SingleOrDefault();
+                    .Single();
 
                 callback?.Invoke(playerResources!.GetResources());
             }
@@ -38,14 +42,16 @@ public class ResourceService : IResourceService
     {
         var resourceEntry = _resources
             .Where(r => r.PlayerId == PlayerId)
-            .SingleOrDefault();
-
-        if (resourceEntry == null)
-        {
-            resourceEntry = new PlayerResources() { PlayerId = PlayerId };
-            _resources.Add(resourceEntry);
-        }
+            .Single();
 
         resourceEntry.AddResource(resourceType, amount);
+    }
+
+    public Resources GetResources(Guid playerId)
+    {
+        return _resources
+            .Where(r => r.PlayerId == playerId)
+            .Single()
+            .GetResources();
     }
 }

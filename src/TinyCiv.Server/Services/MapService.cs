@@ -23,7 +23,7 @@ namespace TinyCiv.Server.Services
             _movingUnits = new List<MovingUnit>();
         }
 
-        public ServerGameObject? CreateBuilding(Guid playerId, ServerPosition position)
+        public ServerGameObject? CreateBuilding(Guid playerId, ServerPosition position, GameObjectType? tileType)
         {
             lock (_mapChangeLocker)
             {
@@ -32,16 +32,17 @@ namespace TinyCiv.Server.Services
                     return null;
                 }
 
-                bool isTileEmpty = _map.Objects!
-                            .Where(o => o.Position! == position)
-                            .Where(o => o.Type == GameObjectType.Empty)
-                            .Any();
+                bool isTileCorrect = _map.Objects!
+                        .Where(o => o.Position! == position)
+                        .Where(o => o.Type == ((tileType != null) ? tileType : GameObjectType.Empty) ||
+                            o.Type == ((tileType != null) ? tileType : GameObjectType.StaticMountain))
+                        .Any();
 
                 var player = _sessionService.GetPlayer(playerId);
 
                 bool isTownInRange = IsTownInRange(position, Constants.Game.BuildingSpaceFromTown);
 
-                if (isTileEmpty == false || player == null || isTownInRange)
+                if (isTileCorrect = false || player == null || isTownInRange)
                 {
                     return null;
                 }
