@@ -110,10 +110,6 @@ namespace TinyCiv.Client.Code
                 gameObject.BorderThickness = new Thickness(2);
                 gameObject.BorderBrush = Brushes.IndianRed;
             } 
-            else
-            {
-                UnselectUnit(gameObject);
-            }
         }
 
         private async void Create_Unit(Position clickedPosition)

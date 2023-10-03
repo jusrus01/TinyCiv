@@ -1,5 +1,4 @@
-﻿using System.Runtime.ConstrainedExecution;
-using TinyCiv.Server.Core.Services;
+﻿using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Entities;
 using TinyCiv.Server.Enums;
 using TinyCiv.Shared;
@@ -81,7 +80,7 @@ namespace TinyCiv.Server.Services
         {
             var unit = GetUnit(unitId);
 
-            if (!IsValidTargetPosition(targetPos))
+            if (!IsValidTargetPosition(unit, targetPos))
             {
                 return;
             }
@@ -98,6 +97,8 @@ namespace TinyCiv.Server.Services
 
             await Task.Run(async () =>
             {
+                DropAgro(unit, unitMoveCallback);
+
                 foreach (var pathPos in path)
                 {
                     if (cancellationToken.IsCancellationRequested)
@@ -107,12 +108,9 @@ namespace TinyCiv.Server.Services
 
                     var nextTile = GetTileAtPosition(pathPos);
 
-                    // units start a combat
-                    if (pathPos == path[path.Count - 1] && IsTileOccupied(nextTile))
+                    if (pathPos == path.Last() && IsTileOccupied(nextTile))
                     {
-                        unit.OpponentId = nextTile.Id;
-                        nextTile.OpponentId = unit.Id;
-                        unitMoveCallback?.Invoke(UnitMoveResponse.Moved);
+                        StartAgro(unit, nextTile, unitMoveCallback);
                         return;
                     }
 
@@ -128,31 +126,44 @@ namespace TinyCiv.Server.Services
                         }
                     }
 
-                    if (pathPos == path[0])
+                    // give a quicker first move
+                    if (pathPos != path[0])
                     {
-                        var enemy = GetUnit(unit.OpponentId);
-                        unit.OpponentId = null;
-                        if (enemy != null)
-                        {
-                            enemy.OpponentId = null;
-                        }
-                        Console.WriteLine("RAN FROM A BATTLE");
-                        unitMoveCallback?.Invoke(UnitMoveResponse.Moved);
+                        await Task.Delay(Constants.Game.MovementSpeedMs);
                     }
 
-                    // unit runs from a combat
-                    if (pathPos != path[0])
-                    {                      
-                        await Task.Delay(Constants.Game.MovementSpeedMs);
-                    }                    
-
-                    MoveUnit(unitId, pathPos);
-
-                    unitMoveCallback?.Invoke(UnitMoveResponse.Moved);
+                    MoveUnit(unitId, pathPos);         
+                    unitMoveCallback?.Invoke(UnitMoveResponse.Moved);                    
                 }
 
                 StopUnitMovement(unitId, unitMoveCallback);
             }, cancellationToken);
+        }
+
+        private void StartAgro(ServerGameObject unitAttacker, ServerGameObject unitUnderAttack, Action<UnitMoveResponse> unitMoveCallback)
+        {
+            if (unitAttacker.OwnerPlayerId == unitUnderAttack.OwnerPlayerId)
+            {
+                return;
+            }
+
+            unitAttacker.OpponentId = unitUnderAttack.Id;
+            if (unitUnderAttack.OpponentId == null)
+            {
+                unitUnderAttack.OpponentId = unitAttacker.Id;
+            }
+            unitMoveCallback?.Invoke(UnitMoveResponse.Moved);
+        }
+
+        private void DropAgro(ServerGameObject unit, Action<UnitMoveResponse> unitMoveCallback)
+        {
+            List<ServerGameObject> enemies = _map.Objects.FindAll(o => o.OpponentId == unit.Id);
+            unit.OpponentId = null;
+            if (enemies != null)
+            {
+                enemies.ForEach(e => e.OpponentId = null);
+            }
+            unitMoveCallback?.Invoke(UnitMoveResponse.Moved);
         }
 
         private bool AddMovingUnit(Guid unitId, ServerPosition position, CancellationTokenSource cancellationTokenSource)
@@ -235,16 +246,11 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        private bool IsValidTargetPosition(ServerPosition position)
+        private bool IsValidTargetPosition(ServerGameObject unit, ServerPosition position)
         {
             var targetUnit = GetUnit(position);
 
-            if (targetUnit == null)
-            {
-                return false;
-            }
-
-            if (IsObstacle(targetUnit))
+            if (targetUnit == null || IsObstacle(targetUnit) || unit.OwnerPlayerId == targetUnit.OwnerPlayerId)
             {
                 return false;
             }
