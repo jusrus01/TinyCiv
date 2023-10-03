@@ -1,6 +1,6 @@
 namespace TinyCiv.Shared.Game;
 
-public class ServerPosition
+public class ServerPosition : IEquatable<ServerPosition>
 {
     public int X { get; set; }
     public int Y { get; set; }
@@ -14,10 +14,18 @@ public class ServerPosition
         return false;
     }
 
+    public bool Equals(ServerPosition? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+        return other.X == X && other.Y == Y;
+    }
 
     public override int GetHashCode()
     {
-        return base.GetHashCode();
+        return X.GetHashCode() ^ Y.GetHashCode();
     }
 
     public static bool operator ==(ServerPosition left, ServerPosition right)
