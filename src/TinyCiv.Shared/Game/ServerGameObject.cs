@@ -8,4 +8,6 @@ public class ServerGameObject
     public Guid Id { get; init; }
     public TeamColor Color { get; init; }
     public Guid? OpponentId { get; set; }
+
+    public ServerUnitProperties? ServerUnitProperties { get; init; }
 }

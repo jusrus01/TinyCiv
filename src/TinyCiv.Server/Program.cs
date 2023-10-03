@@ -21,6 +21,7 @@ builder.Host.UseSerilog();
 
 builder.Services.AddSingleton<ISessionService, SessionService>();
 builder.Services.AddSingleton<IMapService, MapService>();
+builder.Services.AddSingleton<ICombatService, CombatService>();
 
 builder.Services.AddScoped<IConnectionIdAccessor, ConnectionIdAccessor>();
 
@@ -31,6 +32,7 @@ builder.Services.AddTransient<IClientHandler, UnitAddHandler>();
 builder.Services.AddTransient<IClientHandler, JoinLobbyHandler>();
 builder.Services.AddTransient<IClientHandler, LeaveLobbyHandler>();
 builder.Services.AddTransient<IClientHandler, GameStartHandler>();
+builder.Services.AddTransient<IClientHandler, UnitAttackHandler>();
 
 builder.Services
     .AddSignalR()

@@ -109,6 +109,11 @@ namespace TinyCiv.Client.Code
             {
                 gameObject.BorderThickness = new Thickness(2);
                 gameObject.BorderBrush = Brushes.IndianRed;
+                
+                ClientSingleton.Instance.serverClient
+                    .SendAsync(new AttackUnitClientEvent(gameObject.OpponentId.Value))
+                    .GetAwaiter()
+                    .GetResult();
             } 
         }
 
@@ -138,7 +143,7 @@ namespace TinyCiv.Client.Code
             {
                 var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
                 GameObjects[gameObjectIndex] = gameObject;
-                ShowCombatState(gameObject);                
+                ShowCombatState(gameObject);
                 if (isUnitSelected && selectedUnit.Id == gameObject.Id)
                 {
                     SelectUnit(gameObject);

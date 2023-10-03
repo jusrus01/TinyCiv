@@ -7,11 +7,11 @@ using TinyCiv.Shared.Events.Server;
 
 namespace TinyCiv.Server.Handlers;
 
-public abstract class ClientHandler<TEvent> : IClientHandler where TEvent : ClientEvent
+public abstract class ClientHandler<TEvent> : IClientHandler
 {
     private const string HandleMethodName = nameof(HandleAsync);
 
-    private readonly ILogger<IClientHandler> _logger;
+    protected readonly ILogger<IClientHandler> _logger;
 
     private IClientProxy? _caller;
     private IClientProxy? _all;

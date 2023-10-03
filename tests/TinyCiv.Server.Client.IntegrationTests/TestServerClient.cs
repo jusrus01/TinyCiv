@@ -29,7 +29,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
     
     public static IEnumerable<object[]> AvailableEvents_TestData()
     {
-        const int testedClientEventCount = 5;
+        const int testedClientEventCount = 6;
         var actualEventCount = Assembly.GetAssembly(typeof(ClientEvent))!.GetTypes()
             .Count(type => typeof(ClientEvent).IsAssignableFrom(type) && !type.IsAbstract);
         if (actualEventCount != testedClientEventCount)
@@ -42,6 +42,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         yield return new object[] { new MoveUnitClientEvent(Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), 0, 0) };
         yield return new object[] { new StartGameClientEvent() };
         yield return new object[] { new LeaveLobbyClientEvent() };
+        yield return new object[] { new AttackUnitClientEvent(Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7")) };
     }
 
     #region ListenForGameStart

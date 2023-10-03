@@ -55,7 +55,12 @@ namespace TinyCiv.Server.Services
                     OwnerPlayerId = playerId,
                     Position = position,
                     Type = GameObjectType.Warrior,
-                    Color = player.Color
+                    Color = player.Color,
+                    ServerUnitProperties = new ServerUnitProperties
+                    {
+                        Health = 100,
+                        AttackDamage = 10
+                    }
                 };
 
                 _map.Objects![index] = unit;
@@ -70,9 +75,40 @@ namespace TinyCiv.Server.Services
             {
                 var targetTile = _map.Objects!.Single(o => o.Position.Equals(target));
                 var unit = GetUnit(unitId);
+                if (unit == null)
+                {
+                    return false;
+                }
+                
                 targetTile.Position = unit.Position;
                 unit.Position = target;
                 return true;
+            }
+        }
+
+        public void ReplaceWithEmpty(Guid id)
+        {
+            lock (_mapChangeLocker)
+            {
+                var objectToReplace = _map?.Objects?.SingleOrDefault(obj => obj.Id == id);
+                if (objectToReplace == null)
+                {
+                    return;
+                }
+
+                var emptyGameObject = new ServerGameObject
+                {
+                    Id = Guid.NewGuid(),
+                    Position = new ServerPosition
+                    {
+                        X = objectToReplace.Position?.X ?? throw new Exception(),
+                        Y = objectToReplace.Position?.Y ?? throw new Exception()
+                    },
+                    Type = GameObjectType.Empty
+                };
+                
+                _map?.Objects?.Remove(objectToReplace);
+                _map?.Objects?.Add(emptyGameObject);
             }
         }
 
@@ -198,8 +234,7 @@ namespace TinyCiv.Server.Services
                     return null;
                 }
 
-
-                var unit = _map.Objects!.Single(o => o.Id == unitId);
+                var unit = _map.Objects!.SingleOrDefault(o => o.Id == unitId);
 
                 return unit;
             }
@@ -214,7 +249,7 @@ namespace TinyCiv.Server.Services
                     return null;
                 }
 
-                var unit = _map.Objects!.Single(o => o.Position!.X == position.X && o.Position!.Y == position.Y);
+                var unit = _map.Objects!.SingleOrDefault(o => o.Position!.X == position.X && o.Position!.Y == position.Y);
 
                 return unit;
             }
@@ -246,11 +281,11 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        private bool IsValidTargetPosition(ServerGameObject unit, ServerPosition position)
+        private bool IsValidTargetPosition(ServerGameObject? unit, ServerPosition position)
         {
             var targetUnit = GetUnit(position);
 
-            if (targetUnit == null || IsObstacle(targetUnit) || unit.OwnerPlayerId == targetUnit.OwnerPlayerId)
+            if (unit == null || targetUnit == null || IsObstacle(targetUnit) || unit.OwnerPlayerId == targetUnit.OwnerPlayerId)
             {
                 return false;
             }
