@@ -17,16 +17,26 @@ namespace TinyCiv.Client.Code
         {
             switch(sGameObject.Type) 
             {
-                case GameObjectType.Empty: 
-                    var go = new GameObject(sGameObject);
-                    go.ImageSource = "";
-                    return go;
                 case GameObjectType.Warrior:
                     var warrior = new Warrior(sGameObject);
                     warrior.ImageSource = Images.GetImage(warrior);
                     return warrior;
+                case GameObjectType.StaticWater:
+                    var water = new GameObject(sGameObject);
+                    water.ImageSource = Images.GetTileImage(water.Type);
+                    return water;
+                case GameObjectType.StaticMountain:
+                    var rock = new GameObject(sGameObject);
+                    rock.ImageSource = Images.GetTileImage(rock.Type);
+                    return rock;
+                case GameObjectType.Empty:
+                    var grass = new GameObject(sGameObject);
+                    grass.ImageSource = Images.GetTileImage(grass.Type);
+                    return grass;
                 default:
-                    return null;
+                    var go = new GameObject(sGameObject);
+                    go.ImageSource = "";
+                    return go;
             }
         }
     }

@@ -64,88 +64,106 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        private bool MoveUnit(Guid unitId, ServerPosition position)
+        private bool MoveUnit(Guid unitId, ServerPosition target)
         {
             lock (_mapChangeLocker)
             {
-                if (_map == null)
-                {
-                    return false;
-                }
-
-                var occupiedUnit = _map.Objects!.Single(o => o.Position!.X == position.X && o.Position.Y == position.Y);
-
-                if (occupiedUnit.Type != GameObjectType.Empty)
-                {
-                    return false;
-                }
-
+                var targetTile = _map.Objects!.Single(o => o.Position.Equals(target));
                 var unit = GetUnit(unitId);
-
-                if (unit == null)
-                {
-                    return false;
-                }
-
-                occupiedUnit.Position = unit.Position;
-                unit.Position = position;
+                targetTile.Position = unit.Position;
+                unit.Position = target;
                 return true;
             }
         }
 
-        public async Task MoveUnitAsync(Guid unitId, ServerPosition position, Action<UnitMoveResponse> unitMoveCallback)
+        public async Task MoveUnitAsync(Guid unitId, ServerPosition targetPos, Action<UnitMoveResponse> unitMoveCallback)
         {
             var unit = GetUnit(unitId);
 
-            if (unit == null || !IsValidPosition(position))
+            if (!IsValidTargetPosition(unit, targetPos))
             {
                 return;
             }
 
-            var movingUnitEntry = _movingUnits.SingleOrDefault(u => u.UnitId == unitId);
-
-            if (movingUnitEntry != null)
-            {
-                movingUnitEntry.CancellationTokenSource.Cancel();
-                RemoveMovingUnit(unitId);
-            }
+            CancelExistingMovement(unitId);
 
             unitMoveCallback?.Invoke(UnitMoveResponse.Started);
 
             var cancellationTokenSource = new CancellationTokenSource();
             var cancellationToken = cancellationTokenSource.Token;
-            AddMovingUnit(unitId, position, cancellationTokenSource);
+            AddMovingUnit(unitId, targetPos, cancellationTokenSource);
+
+            var path = AStar.FindPath(_map, unit.Position, targetPos);
 
             await Task.Run(async () =>
             {
-                while (unit.Position!.X != position.X || unit.Position.Y != position.Y)
+                DropAgro(unit, unitMoveCallback);
+
+                foreach (var pathPos in path)
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
                         return;
                     }
 
-                    await Task.Delay(Constants.Game.MovementSpeedMs);
+                    var nextTile = GetTileAtPosition(pathPos);
 
-                    int diffX = Math.Clamp(position.X - unit.Position.X, -1, 1);
-                    int diffY = Math.Clamp(position.Y - unit.Position.Y, -1, 1);
-                    var nextPosition = new ServerPosition { X = unit.Position.X + diffX, Y = unit.Position.Y + diffY };
-
-                    bool didUnitMove = MoveUnit(unitId, nextPosition);
-
-                    if (didUnitMove == false)
+                    if (pathPos == path.Last() && IsTileOccupied(nextTile))
                     {
-                        // Need pathfinding algorithm, because now unit stops moving when collided with another unit
-                        RemoveMovingUnit(unitId);
-                        unitMoveCallback?.Invoke(UnitMoveResponse.Stopped);
+                        StartAgro(unit, nextTile, unitMoveCallback);
                         return;
                     }
 
-                    unitMoveCallback?.Invoke(UnitMoveResponse.Moved);
+                    if (IsTileOccupied(nextTile))
+                    {
+                        // Need to recompute the path because the current path is blocked
+                        path = AStar.FindPath(_map, unit.Position, targetPos);
+                        if (path.Count == 0)
+                        {
+                            // No valid path found, stop moving
+                            StopUnitMovement(unitId, unitMoveCallback);
+                            return;
+                        }
+                    }
+
+                    // give a quicker first move
+                    if (pathPos != path[0])
+                    {
+                        await Task.Delay(Constants.Game.MovementSpeedMs);
+                    }
+
+                    MoveUnit(unitId, pathPos);         
+                    unitMoveCallback?.Invoke(UnitMoveResponse.Moved);                    
                 }
 
-                unitMoveCallback?.Invoke(UnitMoveResponse.Stopped);
+                StopUnitMovement(unitId, unitMoveCallback);
             }, cancellationToken);
+        }
+
+        private void StartAgro(ServerGameObject unitAttacker, ServerGameObject unitUnderAttack, Action<UnitMoveResponse> unitMoveCallback)
+        {
+            if (unitAttacker.OwnerPlayerId == unitUnderAttack.OwnerPlayerId)
+            {
+                return;
+            }
+
+            unitAttacker.OpponentId = unitUnderAttack.Id;
+            if (unitUnderAttack.OpponentId == null)
+            {
+                unitUnderAttack.OpponentId = unitAttacker.Id;
+            }
+            unitMoveCallback?.Invoke(UnitMoveResponse.Moved);
+        }
+
+        private void DropAgro(ServerGameObject unit, Action<UnitMoveResponse> unitMoveCallback)
+        {
+            List<ServerGameObject> enemies = _map.Objects.FindAll(o => o.OpponentId == unit.Id);
+            unit.OpponentId = null;
+            if (enemies != null)
+            {
+                enemies.ForEach(e => e.OpponentId = null);
+            }
+            unitMoveCallback?.Invoke(UnitMoveResponse.Moved);
         }
 
         private bool AddMovingUnit(Guid unitId, ServerPosition position, CancellationTokenSource cancellationTokenSource)
@@ -166,7 +184,7 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        public ServerGameObject? GetUnit(Guid unitId)
+        public ServerGameObject? GetUnit(Guid? unitId)
         {
             lock (_mapChangeLocker)
             {
@@ -174,6 +192,12 @@ namespace TinyCiv.Server.Services
                 {
                     return null;
                 }
+
+                if (unitId == null)
+                {
+                    return null;
+                }
+
 
                 var unit = _map.Objects!.Single(o => o.Id == unitId);
 
@@ -222,11 +246,11 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        private bool IsValidPosition(ServerPosition position)
+        private bool IsValidTargetPosition(ServerGameObject unit, ServerPosition position)
         {
-            var occupiedUnit = GetUnit(position);
+            var targetUnit = GetUnit(position);
 
-            if (occupiedUnit != null && occupiedUnit.Type != GameObjectType.Empty)
+            if (targetUnit == null || IsObstacle(targetUnit) || unit.OwnerPlayerId == targetUnit.OwnerPlayerId)
             {
                 return false;
             }
@@ -238,6 +262,37 @@ namespace TinyCiv.Server.Services
             }
 
             return true;
+        }
+
+        private bool IsTileOccupied(ServerGameObject obj)
+        {
+            return obj.Type != GameObjectType.Empty;
+        }
+
+        private bool IsObstacle(ServerGameObject o) => new[] {
+            GameObjectType.StaticMountain,
+            GameObjectType.StaticWater,
+        }.Contains(o.Type);
+
+        private void CancelExistingMovement(Guid unitId)
+        {
+            var movingUnitEntry = _movingUnits.SingleOrDefault(u => u.UnitId == unitId);
+            if (movingUnitEntry != null)
+            {
+                movingUnitEntry.CancellationTokenSource.Cancel();
+                RemoveMovingUnit(unitId);
+            }
+        }
+
+        private void StopUnitMovement(Guid unitId, Action<UnitMoveResponse> unitMoveCallback)
+        {
+            RemoveMovingUnit(unitId);
+            unitMoveCallback?.Invoke(UnitMoveResponse.Stopped);
+        }
+
+        private ServerGameObject GetTileAtPosition(ServerPosition position)
+        {
+            return _map.Objects!.Single(o => o.Position.Equals(position));
         }
     }
 }

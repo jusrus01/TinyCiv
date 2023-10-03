@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using TinyCiv.Shared.Game;
@@ -31,6 +32,17 @@ namespace TinyCiv.Client.Code
         private static ImageSource LoadImage(string filePath)
         {
             return new BitmapImage(new Uri(filePath, UriKind.Relative));
+        }
+
+        public static string GetTileImage(GameObjectType type)
+        {
+            return type switch
+            {
+                GameObjectType.StaticMountain => "/assets/rock_tile.png",
+                GameObjectType.StaticWater => "/assets/water_tile.png",
+                GameObjectType.Empty => "/assets/grass_tile.png",
+                _ => null
+            };
         }
 
         public static string GetImage(TeamColor color, GameObjectType unitType)

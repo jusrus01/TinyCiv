@@ -10,7 +10,7 @@ public static class Constants
         public const int WidthSquareCount = 20;
         public const int HeightSquareCount = 20;
 
-        public const int MovementSpeedMs = 1000;
+        public const int MovementSpeedMs = 500;
         
         // Temporary map stuff, need to clarify how to best do this
         public const string Map =

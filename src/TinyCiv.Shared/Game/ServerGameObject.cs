@@ -7,4 +7,5 @@ public class ServerGameObject
     public Guid OwnerPlayerId { get; init; }
     public Guid Id { get; init; }
     public TeamColor Color { get; init; }
+    public Guid? OpponentId { get; set; }
 }

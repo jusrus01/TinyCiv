@@ -41,7 +41,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border BorderThickness="{Binding BorderThickness}" 
-                            BorderBrush="Aquamarine"
+                            BorderBrush="{Binding BorderBrush}"
                             MouseLeftButtonDown="gameObjectLeftDown"
                             MouseRightButtonDown="gameObjectRightDown"
                             Height="30"

@@ -60,6 +60,11 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
                 .ToList<GameObject>();
             gameState.AddClickEvents();
 
+
+            gameState.mapImages = response.Map.Objects
+                .Select(mapImageObect => Images.GetTileImage(mapImageObect.Type))
+                .ToList();
+
             OnPropertyChanged("GameObjectList");
             OnPropertyChanged("MapList");
         }

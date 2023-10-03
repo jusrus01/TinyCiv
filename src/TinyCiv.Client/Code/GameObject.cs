@@ -16,9 +16,11 @@ namespace TinyCiv.Client.Code
         public Guid OwnerId { get; }
         public Guid Id { get; }
         public TeamColor Color { get; }
+        public Guid? OpponentId { get; }
 
         public string ImageSource { get; set; }
         public Thickness BorderThickness { get; set; }
+        public Brush BorderBrush { get; set; }
         public Action LeftAction { get; set; }
         public Action RightAction { get; set; }
 
@@ -29,6 +31,7 @@ namespace TinyCiv.Client.Code
             OwnerId = serverGameObject.OwnerPlayerId;
             Id = serverGameObject.Id;
             Color = serverGameObject.Color;
+            OpponentId = serverGameObject.OpponentId;
         }
     }
 }
