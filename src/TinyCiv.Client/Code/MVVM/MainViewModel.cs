@@ -34,7 +34,6 @@ namespace TinyCiv.Client.Code.MVVM
             Game.Value = GameVM;
             UpperMenu.Value = UpperMenuVM;
 
-
             Thread playerConnectionThread = new Thread(() =>
             {
                 ClientSingleton.Instance.WaitForInitialization();
@@ -42,9 +41,7 @@ namespace TinyCiv.Client.Code.MVVM
                 ClientSingleton.Instance.serverClient.ListenForGameStart(OnGameStart);
                 ClientSingleton.Instance.serverClient.SendAsync(new JoinLobbyClientEvent()).Wait();
             });
-            playerConnectionThread.Start();
-
-            
+            playerConnectionThread.Start();     
         }
 
         private void OnPlayerJoin(JoinLobbyServerEvent response)

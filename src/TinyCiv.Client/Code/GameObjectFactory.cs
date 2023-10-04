@@ -29,6 +29,10 @@ namespace TinyCiv.Client.Code
                     var cavalry = new Warrior(sGameObject);
                     cavalry.ImageSource = Images.GetImage(cavalry);
                     return cavalry;
+                case GameObjectType.Tarran:
+                    var tarran = new Warrior(sGameObject);
+                    tarran.ImageSource = Images.GetImage(tarran);
+                    return tarran;
                 case GameObjectType.City:
                     var city = new Warrior(sGameObject);
                     city.ImageSource = Images.GetImage(city);

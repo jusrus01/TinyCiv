@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using TinyCiv.Client.Code.Core;
-using TinyCiv.Client.Code.Units;
-using TinyCiv.Shared.Game;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Server;
-using System.Windows.Controls.Primitives;
-using System.Collections.ObjectModel;
 
 namespace TinyCiv.Client.Code.MVVM.ViewModel
 {
