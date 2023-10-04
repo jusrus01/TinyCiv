@@ -19,6 +19,8 @@ using System.Collections.ObjectModel;
 using TinyCiv.Client.Code.Core;
 using TinyCiv.Client.Code.MVVM.View;
 using TinyCiv.Client.Code.MVVM.ViewModel;
+using System.Data.Common;
+using System.Reflection;
 
 
 namespace TinyCiv.Client.Code
@@ -42,18 +44,6 @@ namespace TinyCiv.Client.Code
             Rows = rows;
             Columns = columns;
             ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
-            CreateMap();
-        }
-
-        private void CreateMap()
-        {
-            var list = new List<string>();
-
-            for (int i = 0; i < Rows * Columns; i++) 
-            {
-                list.Add("/assets/game_tile.png");
-            }
-            mapImages = list;
         }
 
         private async void Tile_Click(Position clickedPosition)
@@ -144,7 +134,6 @@ namespace TinyCiv.Client.Code
                     SelectUnit(gameObject);
                 }
             }
-
             AddClickEvents();
             onPropertyChanged?.Invoke();
         }

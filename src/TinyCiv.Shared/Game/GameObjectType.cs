@@ -11,9 +11,14 @@ public enum GameObjectType
 
     // STRUCTURES
     City,
-    
+    Bank,
+    Blacksmith,
+    Farm,
+    Mine,
+    Port,
+    Market,
+
     // STATIC STRUCTURES
     StaticMountain,
     StaticWater
 }
-
