@@ -29,7 +29,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
     
     public static IEnumerable<object[]> AvailableEvents_TestData()
     {
-        const int testedClientEventCount = 5;
+        const int testedClientEventCount = 6;
         var actualEventCount = Assembly.GetAssembly(typeof(ClientEvent))!.GetTypes()
             .Count(type => typeof(ClientEvent).IsAssignableFrom(type) && !type.IsAbstract);
         if (actualEventCount != testedClientEventCount)
