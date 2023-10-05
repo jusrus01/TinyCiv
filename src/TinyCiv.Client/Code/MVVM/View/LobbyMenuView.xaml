@@ -9,7 +9,7 @@
 
     <Grid>
         <Border Height="50">
-            <Button Command="{Binding StartGame.Value}"
+            <Button Command="{Binding StartGame}"
                     IsEnabled="{Binding IsLobbyReady.Value}">
                 Start
             </Button>

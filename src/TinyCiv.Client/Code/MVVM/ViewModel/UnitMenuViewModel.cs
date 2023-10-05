@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Windows;
-using TinyCiv.Client.Code.Core;
-using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.MVVM.ViewModel
@@ -21,12 +18,10 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         {
             IsUnitsListVisible.Value = true;
             IsBuildingsListVisible.Value = false;
-            MessageBox.Show("showing units!");
         }
 
         private void ShowBuildings()
         {
-            MessageBox.Show("showing buildings!");
             IsBuildingsListVisible.Value = true;
             IsUnitsListVisible.Value = false;
         }
