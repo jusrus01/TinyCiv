@@ -5,6 +5,7 @@ using TinyCiv.Server.Handlers;
 using TinyCiv.Server.Handlers.Lobby;
 using TinyCiv.Server.Hubs;
 using TinyCiv.Server.Services;
+using TinyCiv.Shared.Events.Client;
 using Constants = TinyCiv.Shared.Constants;
 
 Log.Logger = new LoggerConfiguration()
@@ -19,6 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog();
 
+builder.Services.AddSingleton<IResourceService, ResourceService>();
 builder.Services.AddSingleton<ISessionService, SessionService>();
 builder.Services.AddSingleton<IMapService, MapService>();
 builder.Services.AddSingleton<ICombatService, CombatService>();
@@ -33,6 +35,7 @@ builder.Services.AddTransient<IClientHandler, JoinLobbyHandler>();
 builder.Services.AddTransient<IClientHandler, LeaveLobbyHandler>();
 builder.Services.AddTransient<IClientHandler, GameStartHandler>();
 builder.Services.AddTransient<IClientHandler, UnitAttackHandler>();
+builder.Services.AddTransient<IClientHandler, CreateBuildingHandler>();
 
 builder.Services
     .AddSignalR()

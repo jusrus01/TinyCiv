@@ -21,6 +21,46 @@ namespace TinyCiv.Client.Code
                     var warrior = new Warrior(sGameObject);
                     warrior.ImageSource = Images.GetImage(warrior);
                     return warrior;
+                case GameObjectType.Colonist:
+                    var colonist = new Warrior(sGameObject);
+                    colonist.ImageSource = Images.GetImage(colonist);
+                    return colonist;
+                case GameObjectType.Cavalry:
+                    var cavalry = new Warrior(sGameObject);
+                    cavalry.ImageSource = Images.GetImage(cavalry);
+                    return cavalry;
+                case GameObjectType.Tarran:
+                    var tarran = new Warrior(sGameObject);
+                    tarran.ImageSource = Images.GetImage(tarran);
+                    return tarran;
+                case GameObjectType.City:
+                    var city = new Warrior(sGameObject);
+                    city.ImageSource = Images.GetImage(city);
+                    return city;
+                case GameObjectType.Farm:
+                    var farm = new Warrior(sGameObject);
+                    farm.ImageSource = Images.GetImage(farm);
+                    return farm;
+                case GameObjectType.Mine:
+                    var mine = new Warrior(sGameObject);
+                    mine.ImageSource = Images.GetImage(mine);
+                    return mine;
+                case GameObjectType.Blacksmith:
+                    var blacksmith = new Warrior(sGameObject);
+                    blacksmith.ImageSource = Images.GetImage(blacksmith);
+                    return blacksmith;
+                case GameObjectType.Shop:
+                    var market = new Warrior(sGameObject);
+                    market.ImageSource = Images.GetImage(market);
+                    return market;
+                case GameObjectType.Bank:
+                    var bank = new Warrior(sGameObject);
+                    bank.ImageSource = Images.GetImage(bank);
+                    return bank;
+                case GameObjectType.Port:
+                    var port = new Warrior(sGameObject);
+                    port.ImageSource = Images.GetImage(port);
+                    return port;
                 case GameObjectType.StaticWater:
                     var water = new GameObject(sGameObject);
                     water.ImageSource = Images.GetTileImage(water.Type);

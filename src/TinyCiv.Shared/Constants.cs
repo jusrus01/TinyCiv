@@ -11,7 +11,27 @@ public static class Constants
         public const int HeightSquareCount = 20;
 
         public const int MovementSpeedMs = 500;
-        
+
+        public const int BuildingSpaceFromTown = 2;
+
+        public const int FarmInterval = 5000;
+        public const int MineInterval = 4500;
+        public const int ShopInterval = 7000;
+        public const int PortInterval = 4000;
+        public const int BankInterval = 3000;
+        public const int BlacksmithInterval = 6000;
+
+        public const int FarmPrice = 50;
+        public const int MinePrice = 50;
+        public const int ShopPrice = 50;
+        public const int PortPrice = 50;
+        public const int BankPrice = 100;
+        public const int BlacksmithPrice = 100;
+
+        public const int StartingIndustry = 200;
+        public const int StartingFood = 100;
+        public const int StartingGold = 50;
+
         // Temporary map stuff, need to clarify how to best do this
         public const string Map =
             ".....\n" +
@@ -29,6 +49,7 @@ public static class Constants
         public const string SendCreatedPlayer = nameof(SendCreatedPlayer);
         public const string SendCreatedUnit = nameof(SendCreatedUnit);
         public const string SendUnitStatusUpdate = nameof(SendUnitStatusUpdate);
+        public const string SendResourcesStatusUpdate = nameof(SendResourcesStatusUpdate);
 
         public const string SendLobbyStateToAll = nameof(SendLobbyStateToAll);
         public const string SendGameStartToAll = nameof(SendGameStartToAll);
