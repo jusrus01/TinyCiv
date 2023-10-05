@@ -49,7 +49,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
                     new BuildingModel("+2 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Farm),
                     new BuildingModel("+2 production", "50 prod.", CurrentPlayer.Color, GameObjectType.Mine),
                     new BuildingModel("+5 production, -1 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Blacksmith),
-                    new BuildingModel("+2 gold", "50 prod.", CurrentPlayer.Color, GameObjectType.Market),
+                    new BuildingModel("+2 gold", "50 prod.", CurrentPlayer.Color, GameObjectType.Shop),
                     new BuildingModel("+5 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Bank),
                     new BuildingModel("+2 production, +1 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Port),
                 };
