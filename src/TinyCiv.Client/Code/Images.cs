@@ -19,7 +19,7 @@ namespace TinyCiv.Client.Code
             { GameObjectType.Farm, "/Assets/farmRed.png" },
             { GameObjectType.Mine, "/Assets/mineRed.png" },
             { GameObjectType.Blacksmith, "/Assets/blacksmithRed.png" },
-            { GameObjectType.Market, "/Assets/marketRed.png" },
+            { GameObjectType.Shop, "/Assets/marketRed.png" },
             { GameObjectType.Bank, "/Assets/bankRed.png" },
             { GameObjectType.Port, "/Assets/portRed.png" },
         };
@@ -34,7 +34,7 @@ namespace TinyCiv.Client.Code
             { GameObjectType.Farm, "/Assets/farmGreen.png" },
             { GameObjectType.Mine, "/Assets/mineGreen.png" },
             { GameObjectType.Blacksmith, "/Assets/blacksmithGreen.png" },
-            { GameObjectType.Market, "/Assets/marketGreen.png" },
+            { GameObjectType.Shop, "/Assets/marketGreen.png" },
             { GameObjectType.Bank, "/Assets/bankGreen.png" },
             { GameObjectType.Port, "/Assets/portGreen.png" },
         };
@@ -49,7 +49,7 @@ namespace TinyCiv.Client.Code
             { GameObjectType.Farm, "/Assets/farmYellow.png" },
             { GameObjectType.Mine, "/Assets/mineYellow.png" },
             { GameObjectType.Blacksmith, "/Assets/blacksmithYellow.png" },
-            { GameObjectType.Market, "/Assets/marketYellow.png" },
+            { GameObjectType.Shop, "/Assets/marketYellow.png" },
             { GameObjectType.Bank, "/Assets/bankYellow.png" },
             { GameObjectType.Port, "/Assets/portYellow.png" },
         };
@@ -64,7 +64,7 @@ namespace TinyCiv.Client.Code
             { GameObjectType.Farm, "/Assets/farmPurple.png" },
             { GameObjectType.Mine, "/Assets/minePurple.png" },
             { GameObjectType.Blacksmith, "/Assets/blacksmithPurple.png" },
-            { GameObjectType.Market, "/Assets/marketPurple.png" },
+            { GameObjectType.Shop, "/Assets/marketPurple.png" },
             { GameObjectType.Bank, "/Assets/bankPurple.png" },
             { GameObjectType.Port, "/Assets/portPurple.png" },
         };
