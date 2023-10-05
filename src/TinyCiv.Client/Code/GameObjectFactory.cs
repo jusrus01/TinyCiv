@@ -49,7 +49,7 @@ namespace TinyCiv.Client.Code
                     var blacksmith = new Warrior(sGameObject);
                     blacksmith.ImageSource = Images.GetImage(blacksmith);
                     return blacksmith;
-                case GameObjectType.Market:
+                case GameObjectType.Shop:
                     var market = new Warrior(sGameObject);
                     market.ImageSource = Images.GetImage(market);
                     return market;
