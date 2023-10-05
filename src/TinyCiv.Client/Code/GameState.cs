@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using TinyCiv.Shared;
 using System.Windows.Threading;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using TinyCiv.Client.Code.Core;
 using TinyCiv.Client.Code.MVVM.View;
 using TinyCiv.Client.Code.MVVM.ViewModel;
@@ -109,11 +110,8 @@ namespace TinyCiv.Client.Code
             {
                 gameObject.BorderThickness = new Thickness(2);
                 gameObject.BorderBrush = Brushes.IndianRed;
-                
-                ClientSingleton.Instance.serverClient
-                    .SendAsync(new AttackUnitClientEvent(gameObject.OpponentId.Value))
-                    .GetAwaiter()
-                    .GetResult();
+
+                Task.Run(() => ClientSingleton.Instance.serverClient.SendAsync(new AttackUnitClientEvent(gameObject.OpponentId.Value)));
             } 
         }
 

@@ -59,7 +59,7 @@ namespace TinyCiv.Server.Services
                     ServerUnitProperties = new ServerUnitProperties
                     {
                         Health = 100,
-                        AttackDamage = 10
+                        AttackDamage = 40
                     }
                 };
 
@@ -257,9 +257,10 @@ namespace TinyCiv.Server.Services
 
         public Map? GetMap()
         {
-            lock (_mapChangeLocker)
+            lock (_mapChangeLocker)//might be because updates come to quick, and then we are not able to process anything more :)
             {
                 return _map;
+                // return _map.Objects.Where(i => i.Type != GameObjectType.Empty)
             }
         }
 
