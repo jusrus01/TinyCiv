@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TinyCiv.Client.Code.MVVM.View"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="700">
+             d:DesignHeight="600" d:DesignWidth="600">
     <Grid>
         <ItemsControl ItemsSource="{Binding MapList}">
             <ItemsControl.ItemsPanel>
@@ -41,7 +41,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border BorderThickness="{Binding BorderThickness}" 
-                            BorderBrush="Aquamarine"
+                            BorderBrush="{Binding BorderBrush}"
                             MouseLeftButtonDown="gameObjectLeftDown"
                             MouseRightButtonDown="gameObjectRightDown"
                             Height="30"

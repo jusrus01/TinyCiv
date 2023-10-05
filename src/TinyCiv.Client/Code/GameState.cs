@@ -1,23 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using System.Windows.Media;
 using TinyCiv.Client.Code.Units;
-using TinyCiv.Server.Client;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Game;
 using TinyCiv.Client.Code.MVVM;
 using TinyCiv.Shared.Events.Server;
 using System.Linq;
 using System;
-using System.Windows.Media.Imaging;
-using TinyCiv.Shared;
-using System.Windows.Threading;
-using System.Collections.ObjectModel;
-using TinyCiv.Client.Code.Core;
-using TinyCiv.Client.Code.MVVM.View;
 using TinyCiv.Client.Code.MVVM.ViewModel;
 
 
@@ -42,18 +33,6 @@ namespace TinyCiv.Client.Code
             Rows = rows;
             Columns = columns;
             ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
-            CreateMap();
-        }
-
-        private void CreateMap()
-        {
-            var list = new List<string>();
-
-            for (int i = 0; i < Rows * Columns; i++) 
-            {
-                list.Add("/assets/game_tile.png");
-            }
-            mapImages = list;
         }
 
         private async void Tile_Click(Position clickedPosition)
@@ -66,17 +45,22 @@ namespace TinyCiv.Client.Code
             }
         }
 
-        private void Unit_Click(GameObject gameObject)
+        private async void Unit_Click(GameObject slectedGameObject)
         {
-            var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
+            var gameObjectIndex = slectedGameObject.Position.column * Columns + slectedGameObject.Position.row;
 
             if (!isUnitSelected && GameObjects[gameObjectIndex].OwnerId == CurrentPlayer.Id)
             {
-                SelectUnit(gameObject);
-            }
-            else if (isUnitSelected && gameObject == selectedUnit)
+                SelectUnit(slectedGameObject);
+            } 
+            else if (isUnitSelected && GameObjects[gameObjectIndex].OwnerId != CurrentPlayer.Id)
             {
-                UnselectUnit(gameObject);
+                UnselectUnit(selectedUnit);
+                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(selectedUnit.Id, slectedGameObject.Position.row, slectedGameObject.Position.column));
+            }
+            else if (isUnitSelected && slectedGameObject == selectedUnit)
+            {
+                UnselectUnit(slectedGameObject);
             }
         }
 
@@ -84,6 +68,7 @@ namespace TinyCiv.Client.Code
         {
             isUnitSelected = true;
             selectedUnit = gameObject;
+            gameObject.BorderBrush = Brushes.Aquamarine;
             gameObject.BorderThickness = new Thickness(2);
             UnitMenuVM.SetCurrentUnit(gameObject);
             onPropertyChanged?.Invoke();
@@ -95,6 +80,15 @@ namespace TinyCiv.Client.Code
             gameObject.BorderThickness = new Thickness(0);
             UnitMenuVM.UnselectUnit();
             onPropertyChanged?.Invoke();
+        }
+
+        private void ShowCombatState(GameObject gameObject)
+        {            
+            if (gameObject.OpponentId != null)
+            {
+                gameObject.BorderThickness = new Thickness(2);
+                gameObject.BorderBrush = Brushes.IndianRed;
+            } 
         }
 
         private async void Create_Unit(Position clickedPosition)
@@ -123,12 +117,12 @@ namespace TinyCiv.Client.Code
             {
                 var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
                 GameObjects[gameObjectIndex] = gameObject;
-                if (isUnitSelected && selectedUnit.Id == gameObject.Id) 
+                ShowCombatState(gameObject);                
+                if (isUnitSelected && selectedUnit.Id == gameObject.Id)
                 {
                     SelectUnit(gameObject);
                 }
             }
-
             AddClickEvents();
             onPropertyChanged?.Invoke();
         }

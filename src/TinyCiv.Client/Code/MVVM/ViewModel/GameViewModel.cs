@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TinyCiv.Client.Code.Core;
-using TinyCiv.Client.Code.Units;
-using TinyCiv.Shared.Game;
+﻿using System.Linq;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Server;
-using System.Windows.Controls.Primitives;
-using System.Collections.ObjectModel;
 
 namespace TinyCiv.Client.Code.MVVM.ViewModel
 {
@@ -59,6 +50,11 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
                 .Select(serverGameObect => goFactory.Create(serverGameObect))
                 .ToList<GameObject>();
             gameState.AddClickEvents();
+
+
+            gameState.mapImages = response.Map.Objects
+                .Select(mapImageObect => Images.GetTileImage(mapImageObect.Type))
+                .ToList();
 
             OnPropertyChanged("GameObjectList");
             OnPropertyChanged("MapList");

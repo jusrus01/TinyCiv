@@ -8,6 +8,7 @@ public enum GameObjectType
     Warrior,
     Cavalry,
     Colonist,
+    Tarran,
 
     // STRUCTURES
     City,
@@ -22,4 +23,3 @@ public enum GameObjectType
     StaticMountain,
     StaticWater
 }
-

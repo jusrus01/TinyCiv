@@ -9,13 +9,56 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Assets\game_tile.png" />
+    <None Remove="Assets\bankGreen.png" />
+    <None Remove="Assets\bankPurple.png" />
+    <None Remove="Assets\bankRed.png" />
+    <None Remove="Assets\bankYellow.png" />
+    <None Remove="Assets\blacksmithGreen.png" />
+    <None Remove="Assets\blacksmithPurple.png" />
+    <None Remove="Assets\blacksmithRed.png" />
+    <None Remove="Assets\blacksmithYellow.png" />
+    <None Remove="Assets\cavalryGreen.png" />
+    <None Remove="Assets\cavalryPurple.png" />
+    <None Remove="Assets\cavalryRed.png" />
+    <None Remove="Assets\cavalryYellow.png" />
+    <None Remove="Assets\cityGreen.png" />
+    <None Remove="Assets\cityPurple.png" />
+    <None Remove="Assets\cityRed.png" />
+    <None Remove="Assets\cityYellow.png" />
+    <None Remove="Assets\colonistGreen.png" />
+    <None Remove="Assets\colonistPurple.png" />
+    <None Remove="Assets\colonistRed.png" />
+    <None Remove="Assets\colonistYellow.png" />
+    <None Remove="Assets\farmGreen.png" />
+    <None Remove="Assets\farmPurple.png" />
+    <None Remove="Assets\farmRed.png" />
+    <None Remove="Assets\farmYellow.png" />
+    <None Remove="Assets\grass_tile.png" />
+    <None Remove="Assets\marketGreen.png" />
+    <None Remove="Assets\marketPurple.png" />
+    <None Remove="Assets\marketRed.png" />
+    <None Remove="Assets\marketYellow.png" />
+    <None Remove="Assets\mineGreen.png" />
+    <None Remove="Assets\minePurple.png" />
+    <None Remove="Assets\mineRed.png" />
+    <None Remove="Assets\mineYellow.png" />
+    <None Remove="Assets\portGreen.png" />
+    <None Remove="Assets\portPurple.png" />
+    <None Remove="Assets\portRed.png" />
+    <None Remove="Assets\portYellow.png" />
+    <None Remove="Assets\redCity.png" />
+    <None Remove="Assets\rock_tile.png" />
     <None Remove="Assets\sh2326_4_.png" />
+    <None Remove="Assets\tarranGreen.png" />
+    <None Remove="Assets\tarranPurple.png" />
+    <None Remove="Assets\tarranRed.png" />
+    <None Remove="Assets\tarranYellow.png" />
     <None Remove="Assets\warrior.png" />
     <None Remove="Assets\warriorGreen.png" />
     <None Remove="Assets\warriorPurple.png" />
     <None Remove="Assets\warriorRed.png" />
     <None Remove="Assets\warriorYellow.png" />
+    <None Remove="Assets\water_tile.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,13 +66,54 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\game_tile.png" />
-    <Resource Include="Assets\sh2326_4_.png" />
-    <Resource Include="Assets\warrior.png" />
+    <Resource Include="Assets\bankGreen.png" />
+    <Resource Include="Assets\bankPurple.png" />
+    <Resource Include="Assets\bankRed.png" />
+    <Resource Include="Assets\bankYellow.png" />
+    <Resource Include="Assets\blacksmithGreen.png" />
+    <Resource Include="Assets\blacksmithPurple.png" />
+    <Resource Include="Assets\blacksmithRed.png" />
+    <Resource Include="Assets\blacksmithYellow.png" />
+    <Resource Include="Assets\cavalryGreen.png" />
+    <Resource Include="Assets\cavalryPurple.png" />
+    <Resource Include="Assets\cavalryRed.png" />
+    <Resource Include="Assets\cavalryYellow.png" />
+    <Resource Include="Assets\cityGreen.png" />
+    <Resource Include="Assets\cityPurple.png" />
+    <Resource Include="Assets\cityRed.png" />
+    <Resource Include="Assets\cityYellow.png" />
+    <Resource Include="Assets\colonistGreen.png" />
+    <Resource Include="Assets\colonistPurple.png" />
+    <Resource Include="Assets\colonistRed.png" />
+    <Resource Include="Assets\colonistYellow.png" />
+    <Resource Include="Assets\farmGreen.png" />
+    <Resource Include="Assets\farmPurple.png" />
+    <Resource Include="Assets\farmRed.png" />
+    <Resource Include="Assets\farmYellow.png" />
+    <Resource Include="Assets\grass_tile.png" />
+    <Resource Include="Assets\marketGreen.png" />
+    <Resource Include="Assets\marketPurple.png" />
+    <Resource Include="Assets\marketRed.png" />
+    <Resource Include="Assets\marketYellow.png" />
+    <Resource Include="Assets\mineGreen.png" />
+    <Resource Include="Assets\minePurple.png" />
+    <Resource Include="Assets\mineRed.png" />
+    <Resource Include="Assets\mineYellow.png" />
+    <Resource Include="Assets\portGreen.png" />
+    <Resource Include="Assets\portPurple.png" />
+    <Resource Include="Assets\portRed.png" />
+    <Resource Include="Assets\portYellow.png" />
+    <Resource Include="Assets\redCity.png" />
+    <Resource Include="Assets\rock_tile.png" />
+    <Resource Include="Assets\tarranGreen.png" />
+    <Resource Include="Assets\tarranPurple.png" />
+    <Resource Include="Assets\tarranRed.png" />
+    <Resource Include="Assets\tarranYellow.png" />
     <Resource Include="Assets\warriorGreen.png" />
     <Resource Include="Assets\warriorPurple.png" />
     <Resource Include="Assets\warriorRed.png" />
     <Resource Include="Assets\warriorYellow.png" />
+    <Resource Include="Assets\water_tile.png" />
   </ItemGroup>
 
 </Project>
