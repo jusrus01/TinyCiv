@@ -1,26 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using System.Windows.Media;
 using TinyCiv.Client.Code.Units;
-using TinyCiv.Server.Client;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Game;
 using TinyCiv.Client.Code.MVVM;
 using TinyCiv.Shared.Events.Server;
 using System.Linq;
 using System;
-using System.Windows.Media.Imaging;
-using TinyCiv.Shared;
-using System.Windows.Threading;
-using System.Collections.ObjectModel;
-using TinyCiv.Client.Code.Core;
-using TinyCiv.Client.Code.MVVM.View;
 using TinyCiv.Client.Code.MVVM.ViewModel;
-using System.Data.Common;
-using System.Reflection;
 
 
 namespace TinyCiv.Client.Code

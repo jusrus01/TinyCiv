@@ -19,9 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B9023FAD-1AF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ACAFB2B5-C9F3-4BDD-89B0-4326C5177BC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCiv.Client", "src\TinyCiv.Client\TinyCiv.Client.csproj", "{7FDCDF54-D8A9-4C10-85CD-4A1040B20AA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyCiv.Client", "src\TinyCiv.Client\TinyCiv.Client.csproj", "{7FDCDF54-D8A9-4C10-85CD-4A1040B20AA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCiv.Server.Client.IntegrationTests", "tests\TinyCiv.Server.Client.IntegrationTests\TinyCiv.Server.Client.IntegrationTests.csproj", "{DBB1892B-BDED-4001-860B-46A87A115333}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyCiv.Server.Client.IntegrationTests", "tests\TinyCiv.Server.Client.IntegrationTests\TinyCiv.Server.Client.IntegrationTests.csproj", "{DBB1892B-BDED-4001-860B-46A87A115333}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
