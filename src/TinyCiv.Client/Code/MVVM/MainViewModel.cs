@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TinyCiv.Client.Code.Core;
 using TinyCiv.Shared.Game;
 using TinyCiv.Client.Code.MVVM.ViewModel;
 using TinyCiv.Server.Client;
@@ -13,6 +12,7 @@ using TinyCiv.Shared.Events.Server;
 using TinyCiv.Client.Code.Units;
 using System.Threading;
 using System.ComponentModel;
+using TinyCiv.Shared.Events.Client.Lobby;
 
 namespace TinyCiv.Client.Code.MVVM
 {
@@ -55,12 +55,10 @@ namespace TinyCiv.Client.Code.MVVM
                 CurrentPlayer.Instance.player = response.Created;
                 UpperMenuVM.PlayerColor.Value = CurrentPlayer.Color;
             }
-            MessageBox.Show($"Player: {CurrentPlayer.Id} has joined the game! They are in the {CurrentPlayer.Color} team!");
 
             // If the party is full
             if (CurrentPlayer.Instance.player == null)
             {
-                MessageBox.Show("The game party is full! Try again later.");
             }
         }
 

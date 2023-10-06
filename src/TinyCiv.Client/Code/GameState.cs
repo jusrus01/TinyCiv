@@ -10,7 +10,7 @@ using TinyCiv.Shared.Events.Server;
 using System.Linq;
 using System;
 using TinyCiv.Client.Code.MVVM.ViewModel;
-
+using TinyCiv.Client.Code.Factories;
 
 namespace TinyCiv.Client.Code
 {
@@ -27,6 +27,14 @@ namespace TinyCiv.Client.Code
 
         private bool isUnitSelected = false;
         private GameObject selectedUnit;
+
+        private Dictionary<TeamColor, AbstractGameObjectFactory> TeamFactories = new Dictionary<TeamColor, AbstractGameObjectFactory>
+        {
+            {TeamColor.Red,    new RedGameObjectFactory() },
+            {TeamColor.Green,  new GreenGameObjectFactory() },
+            {TeamColor.Purple, new PurpleGameObjectFactory() },
+            {TeamColor.Yellow, new YellowGameObjectFactory() }
+        };
 
         public GameState(int rows, int columns)
         {
@@ -98,10 +106,9 @@ namespace TinyCiv.Client.Code
 
         private void OnMapChange(MapChangeServerEvent response)
         {
-            var goFactory = new GameObjectFactory();
             var ResponseGameObjects = response.Map.Objects
                 .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
-                .Select(serverGameObect => goFactory.Create(serverGameObect))
+                .Select(serverGameObect => TeamFactories[serverGameObect.Color].CreateGameObject(serverGameObect))
                 .ToList<GameObject>();
 
             for(int row = 0; row < Rows; row++)
@@ -109,7 +116,12 @@ namespace TinyCiv.Client.Code
                 for(int column = 0; column < Columns; column++)
                 {
                     var index = column * Columns + row;
-                    GameObjects[index] = goFactory.Create(new ServerGameObject { Type = GameObjectType.Empty, Position = new ServerPosition() { X = row, Y = column} });
+                    var serverGameObject = new ServerGameObject
+                    {
+                        Type = GameObjectType.Empty,
+                        Position = new ServerPosition() { X = row, Y = column }
+                    };
+                    GameObjects[index] = TeamFactories[TeamColor.Red].CreateGameObject(serverGameObject);
                 }
             }
 
