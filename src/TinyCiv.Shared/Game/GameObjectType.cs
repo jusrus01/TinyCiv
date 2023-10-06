@@ -8,6 +8,7 @@ public enum GameObjectType
     Warrior,
     Cavalry,
     Colonist,
+    Tarran,
 
     // STRUCTURES
     City,
@@ -16,8 +17,8 @@ public enum GameObjectType
     Farm,
     Mine,
     Port,
-    Market,
-
+    Shop,
+    
     // STATIC STRUCTURES
     StaticMountain,
     StaticWater

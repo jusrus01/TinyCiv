@@ -43,8 +43,8 @@ namespace TinyCiv.Client.Code
                 UnselectUnit(unit);
                 await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
             }
-            else if (UnitMenuVM.SelectedUnit.Value != null) {
-
+            else if (UnitMenuVM.SelectedPurchaseUnit.Value != null) {
+                UnitMenuVM.ExecuteUnitBuy(clickedPosition);
             }
         }
 

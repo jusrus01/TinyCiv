@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
+using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.MVVM.ViewModel
@@ -10,12 +11,12 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
     {
         public ObservableValue<bool> IsUnitsListVisible { get; } = new ObservableValue<bool>(true);
         public ObservableValue<bool> IsBuildingsListVisible { get; } = new ObservableValue<bool>(false);
-        public ObservableValue<UnitModel> SelectedUnit { get; } = new ObservableValue<UnitModel>(null);
+        public ObservableValue<UnitModel> SelectedPurchaseUnit { get; } = new ObservableValue<UnitModel>(null);
         public ObservableValue<String> UnitName { get; } = new ObservableValue<string>("EMPTY");
-
         public RelayCommand ShowUnitsCommand => new RelayCommand(execute => ShowUnits());
         public RelayCommand ShowBuildingsCommand => new RelayCommand(execute => ShowBuildings());
-        public RelayCommand BuyGameObjectCommand => new RelayCommand(BuyGameObject, CanBuyUnit);
+        public RelayCommand SelectUnitToBuyCommand => new RelayCommand(SelectUnitToBuy, CanBuyUnit);
+
 
         private void ShowUnits()
         {
@@ -29,21 +30,29 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             IsUnitsListVisible.Value = false;
         }
 
-        private void BuyGameObject(object parameter)
+        private void SelectUnitToBuy(object parameter)
         {
             if (parameter is UnitModel unit)
             {
-                SelectedUnit.Value = unit;
+                SelectedPurchaseUnit.Value = unit;
                 MessageBox.Show(unit.ImagePath);
                 Mouse.OverrideCursor = Cursors.Hand;
             }
+        }
+
+        public async void ExecuteUnitBuy(Position position)
+        {
+            MessageBox.Show("executing unit purchase");
+            await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, position.row, position.column));
+            SelectedPurchaseUnit.Value = null;
+            Mouse.OverrideCursor= Cursors.Arrow;
         }
 
         private bool CanBuyUnit(object parameter)
         {
             if (parameter is UnitModel unit)
             {
-                if (SelectedUnit.Value != null)
+                if (SelectedPurchaseUnit.Value != null)
                 {
                     return false;
                 }
@@ -74,7 +83,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
                     new BuildingModel("+2 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Farm),
                     new BuildingModel("+2 production", "50 prod.", CurrentPlayer.Color, GameObjectType.Mine),
                     new BuildingModel("+5 production, -1 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Blacksmith),
-                    new BuildingModel("+2 gold", "50 prod.", CurrentPlayer.Color, GameObjectType.Market),
+                    new BuildingModel("+2 gold", "50 prod.", CurrentPlayer.Color, GameObjectType.Shop),
                     new BuildingModel("+5 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Bank),
                     new BuildingModel("+2 production, +1 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Port),
                 };
