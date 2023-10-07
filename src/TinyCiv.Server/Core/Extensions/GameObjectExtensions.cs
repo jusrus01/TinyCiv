@@ -6,6 +6,6 @@ public static class GameObjectExtensions
 {
     public static bool IsInteractable(this ServerGameObject obj)
     {
-        return obj.Type == GameObjectType.Warrior;
+        return obj.Type is GameObjectType.Warrior or GameObjectType.Cavalry or GameObjectType.Colonist or GameObjectType.Tarran;
     }
 }

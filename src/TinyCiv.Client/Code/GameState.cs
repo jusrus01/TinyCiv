@@ -85,13 +85,8 @@ namespace TinyCiv.Client.Code
 
         private void ShowCombatState(GameObject gameObject)
         {            
-            if (gameObject.OpponentId != null)
-            {
-                gameObject.BorderThickness = new Thickness(2);
-                gameObject.BorderBrush = Brushes.IndianRed;
-
-                Task.Run(() => ClientSingleton.Instance.serverClient.SendAsync(new AttackUnitClientEvent(gameObject.Id, gameObject.OpponentId.Value)));
-            } 
+           gameObject.BorderThickness = new Thickness(2);
+           gameObject.BorderBrush = Brushes.IndianRed;
         }
 
         private async void Create_Unit(Position clickedPosition)
@@ -120,7 +115,13 @@ namespace TinyCiv.Client.Code
             {
                 var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
                 GameObjects[gameObjectIndex] = gameObject;
-                ShowCombatState(gameObject);
+
+                if (gameObject.OpponentId != null)
+                {
+                    ShowCombatState(gameObject);
+                    Task.Run(() => ClientSingleton.Instance.serverClient.SendAsync(new AttackUnitClientEvent(gameObject.Id, gameObject.OpponentId.Value)));
+                }
+                
                 if (isUnitSelected && selectedUnit.Id == gameObject.Id)
                 {
                     SelectUnit(gameObject);

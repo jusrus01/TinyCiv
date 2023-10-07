@@ -17,27 +17,28 @@ public class InteractableObjectService : IInteractableObjectService
             throw new InvalidOperationException();
         }
 
-        if (obj.Type != GameObjectType.Warrior)
-        {
-            throw new NotSupportedException("Only warriors are supported at the moment.");
-        }
-
         if (_objects.ContainsKey(obj.Id))
         {
             return _objects[obj.Id];
         }
-
-        // TODO: export to constant
-        var interactableGeneric = new InteractableGeneric
-        {
-            AttackDamage = 40,
-            Health = 100,
-            AttackRateInMilliseconds = 2000
-        };
         
-        _objects.TryAdd(obj.Id, interactableGeneric);
+        var interactable = ResolveInteractable(obj.Type);
+        
+        _objects.TryAdd(obj.Id, interactable);
 
-        return interactableGeneric;
+        return interactable;
+    }
+
+    private static IInteractableObject ResolveInteractable(GameObjectType objType)
+    {
+        return objType switch
+        {
+            GameObjectType.Warrior => new InteractableWarrior(),
+            GameObjectType.Colonist => new InteractableColonist(),
+            GameObjectType.Cavalry => new InteractableCavalry(),
+            GameObjectType.Tarran => new InteractableTarran(),
+            _ => throw new NotSupportedException()
+        };
     }
 
     public IInteractableObject? Get(Guid id)
