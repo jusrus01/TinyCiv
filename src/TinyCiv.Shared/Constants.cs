@@ -48,6 +48,7 @@ public static class Constants
 
         public const string SendCreatedPlayer = nameof(SendCreatedPlayer);
         public const string SendCreatedUnit = nameof(SendCreatedUnit);
+        public const string SendInteractableObject = nameof(SendInteractableObject);
         public const string SendUnitStatusUpdate = nameof(SendUnitStatusUpdate);
         public const string SendResourcesStatusUpdate = nameof(SendResourcesStatusUpdate);
 

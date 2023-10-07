@@ -122,12 +122,7 @@ namespace TinyCiv.Server.Services
                     OwnerPlayerId = playerId,
                     Position = position,
                     Type = GameObjectType.Warrior,
-                    Color = player.Color,
-                    ServerUnitProperties = new ServerUnitProperties
-                    {
-                        Health = 100,
-                        AttackDamage = 40
-                    }
+                    Color = player.Color
                 };
 
                 _map.Objects![index] = unit;
@@ -163,6 +158,15 @@ namespace TinyCiv.Server.Services
                     return;
                 }
 
+                if (objectToReplace.OpponentId != null)
+                {
+                    var attacker = GetUnit(objectToReplace.OpponentId);
+                    if (attacker != null)
+                    {
+                        attacker.OpponentId = null;
+                    }
+                }
+                
                 var emptyGameObject = new ServerGameObject
                 {
                     Id = Guid.NewGuid(),

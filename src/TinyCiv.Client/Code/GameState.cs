@@ -90,7 +90,7 @@ namespace TinyCiv.Client.Code
                 gameObject.BorderThickness = new Thickness(2);
                 gameObject.BorderBrush = Brushes.IndianRed;
 
-                Task.Run(() => ClientSingleton.Instance.serverClient.SendAsync(new AttackUnitClientEvent(gameObject.OpponentId.Value)));
+                Task.Run(() => ClientSingleton.Instance.serverClient.SendAsync(new AttackUnitClientEvent(gameObject.Id, gameObject.OpponentId.Value)));
             } 
         }
 

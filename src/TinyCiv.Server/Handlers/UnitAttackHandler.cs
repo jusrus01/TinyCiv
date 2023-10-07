@@ -1,3 +1,4 @@
+using TinyCiv.Server.Core.Game.InteractableObjects;
 using TinyCiv.Server.Core.Handlers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
@@ -28,9 +29,13 @@ public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
     
     protected override Task OnHandleAsync(AttackUnitClientEvent @event)
     {
-        return _combatService.InitiateCombatAsync(@event.OpponentId, CombatNotifier);
+        Task.Run(() => _combatService.InitiateCombatAsync(@event.AttackerId, @event.OpponentId, MapChangeNotifier, InteractableObjectStateChangeNotifier));
+        return Task.CompletedTask;
         
-        Task CombatNotifier(Map updatedMap) =>
+        Task MapChangeNotifier(Map updatedMap) =>
             NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(updatedMap));
+        
+        Task InteractableObjectStateChangeNotifier(IInteractableObject interactableObject) =>
+            NotifyAllAsync(Constants.Server.SendInteractableObject, new CreateInteractableObjectServerEvent(@event.OpponentId, interactableObject.Health, interactableObject.AttackDamage));
     }
 }

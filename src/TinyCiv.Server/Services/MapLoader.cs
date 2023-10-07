@@ -27,7 +27,7 @@ public class MapLoader : IMapLoader
         
         var mapContent = File.ReadAllLines(mapPath);
         EnsureValid(mapContent);
-        return GenerateObjects(mapContent);;
+        return GenerateObjects(mapContent);
     }
 
     private List<ServerGameObject> GenerateObjects(string[] mapContent)
