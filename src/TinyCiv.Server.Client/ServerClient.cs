@@ -88,6 +88,11 @@ public class ServerClient : IServerClient
         Listen(Constants.Server.SendLobbyStateToAll, callback);
     }
 
+    public void ListenForInteractableObjectChanges(Action<InteractableObjectServerEvent> callback)
+    {
+        Listen(Constants.Server.SendInteractableObject, callback);
+    }
+
     private void Listen<T>(string methodName, Action<T> callback) where T : ServerEvent
     {
         _connection.On<string, string>(
@@ -140,6 +145,11 @@ public class ServerClient : IServerClient
         if (type == nameof(ResourcesUpdateServerEvent))
         {
             return JsonSerializer.Deserialize<ResourcesUpdateServerEvent>(content)!;
+        }
+
+        if (type == nameof(InteractableObjectServerEvent))
+        {
+            return JsonSerializer.Deserialize<InteractableObjectServerEvent>(content)!;
         }
 
         throw new NotSupportedException();

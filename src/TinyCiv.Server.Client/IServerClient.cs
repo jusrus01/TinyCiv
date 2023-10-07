@@ -3,7 +3,6 @@ using TinyCiv.Shared.Events.Server;
 
 namespace TinyCiv.Server.Client;
 
-// todo: add some stuff that will handler yther hadihasiudhiusahdiusahiudsaiudhiusahdiusahdiuashiudasiudhsaiudfhiuwas\edfuyiaewrhfgiuyaewrhiugfseihu8rguijyhlerasghiuyvesiu
 public interface IServerClient
 {
     Task SendAsync<T>(T @event, CancellationToken token = default) where T : ClientEvent;
@@ -15,4 +14,5 @@ public interface IServerClient
     void ListenForMapChange(Action<MapChangeServerEvent> callback);
     void ListenForResourcesUpdate(Action<ResourcesUpdateServerEvent> callback);
     void ListenForLobbyState(Action<LobbyStateServerEvent> callback);
+    void ListenForInteractableObjectChanges(Action<InteractableObjectServerEvent> callback);
 }
