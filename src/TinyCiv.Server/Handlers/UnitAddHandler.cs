@@ -20,7 +20,7 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
     
     protected override async Task OnHandleAsync(CreateUnitClientEvent @event)
     {
-        var unit = _mapService.CreateUnit(@event.PlayerId, new ServerPosition { X = @event.X, Y = @event.Y });
+        var unit = _mapService.CreateUnit(@event.PlayerId, new ServerPosition { X = @event.X, Y = @event.Y }, @event.UnitType);
         if (unit == null)
         {
             return;

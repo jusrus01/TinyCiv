@@ -1,4 +1,5 @@
-﻿using TinyCiv.Server.Core.Game.Buildings;
+﻿using TinyCiv.Server.Core.Extensions;
+using TinyCiv.Server.Core.Game.Buildings;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Entities;
 using TinyCiv.Server.Enums;
@@ -90,7 +91,7 @@ namespace TinyCiv.Server.Services
             return false;
         }
 
-        public ServerGameObject? CreateUnit(Guid playerId, ServerPosition position)
+        public ServerGameObject? CreateUnit(Guid playerId, ServerPosition position, GameObjectType type)
         {
             var player = _sessionService.GetPlayer(playerId);
 
@@ -121,7 +122,7 @@ namespace TinyCiv.Server.Services
                     Id = Guid.NewGuid(),
                     OwnerPlayerId = playerId,
                     Position = position,
-                    Type = GameObjectType.Warrior,
+                    Type = type,
                     Color = player.Color
                 };
 
