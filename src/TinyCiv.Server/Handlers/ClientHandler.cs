@@ -2,9 +2,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
 using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Handlers;
-using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
-using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Handlers;
 
@@ -12,7 +10,7 @@ public abstract class ClientHandler<TEvent> : IClientHandler
 {
     private const string HandleMethodName = nameof(HandleAsync);
 
-    protected readonly ILogger<IClientHandler> _logger;
+    private readonly ILogger<IClientHandler> _logger;
 
     private IClientProxy? _caller;
     private IClientProxy? _all;
@@ -68,12 +66,6 @@ public abstract class ClientHandler<TEvent> : IClientHandler
     {
         ArgumentNullException.ThrowIfNull(_all);
         _logger.LogInformation("{handler} is sending event {event_type} to all", GetType().Name, serverEvent.Type);
-
-        if (serverEvent is MapChangeServerEvent x)
-        {
-            // _logger.LogInformation("{handler} is sending event {event_type} to all {mapstuff}", GetType().Name, serverEvent.Type, x.Map.Objects.Where(o => o.Type != GameObjectType.Empty));
-        }
-        
         return InternalNotifyAsync(_all, methodName, serverEvent);
     }
 
