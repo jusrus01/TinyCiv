@@ -31,7 +31,7 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
         {
             var interactable = _interactableObjectService.Initialize(unit);
             
-            interactableNotifierTask = NotifyAllAsync(Constants.Server.SendInteractableObject,
+            interactableNotifierTask = NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll,
                 new InteractableObjectServerEvent(unit.Id, interactable.Health, interactable.AttackDamage));
         }
         

@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Testing;
+using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Client.Lobby;
 using TinyCiv.Shared.Game;
@@ -432,6 +433,132 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
     #endregion
 
+    #region ListenForInteractableObjectChanges
+
+    [Fact]
+    public async Task ListenForInteractableObjectChanges_WhenUnitDead_Then_ChangedStateReceived()
+    {
+        //arrange
+        var anotherClient = InitializeClient();
+
+        Guid? playerId2 = null;
+        anotherClient.ListenForNewPlayerCreation(resp =>
+        {
+            playerId2 = resp.Created.Id;
+        });
+        
+        Guid? playerId1 = null;
+        _sut.ListenForNewPlayerCreation(resp =>
+        {
+            playerId1 = resp.Created.Id;
+        });
+
+        ServerGameObject? player1GameObject = null;
+        _sut.ListenForNewUnitCreation(resp =>
+        {
+            player1GameObject = resp.CreatedUnit;
+        });
+
+        ServerGameObject? player2GameObject = null;
+        anotherClient.ListenForNewUnitCreation(resp =>
+        {
+            player2GameObject = resp.CreatedUnit;
+        });
+        
+        var isPlayer1Dead = false;
+        var isPlayer2Dead = false;
+        _sut.ListenForInteractableObjectChanges(resp =>
+        {
+            if (resp.Health <= 0)
+            {
+                isPlayer1Dead = true;
+            }
+        });
+        anotherClient.ListenForInteractableObjectChanges(resp =>
+        {
+            if (resp.Health <= 0)
+            {
+                isPlayer2Dead = true;
+            }
+        });
+        
+        // after two players join lobby, StartGameClientEvent is available for use
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+        
+        await _sut.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync();
+        
+        //act
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId1!.Value, 1, 4, GameObjectType.Colonist));
+        await anotherClient.SendAsync(new CreateUnitClientEvent(playerId2!.Value, 1, 2, GameObjectType.Warrior));
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new MoveUnitClientEvent(player1GameObject!.Id, 1, 2));
+        await WaitForResponseAsync(5000);
+        
+        await anotherClient.SendAsync(new AttackUnitClientEvent(player2GameObject!.Id, player1GameObject!.Id));
+        await WaitForResponseAsync(5000);
+        
+        //assert
+        Assert.True(isPlayer1Dead || isPlayer2Dead);
+    }
+    
+    public static IEnumerable<object[]> ListenForInteractableObjectChanges_TestData()
+    {
+        yield return new object[] { GameObjectType.Warrior, Constants.Game.Interactable.Warrior.Damage, Constants.Game.Interactable.Warrior.InitialHealth };
+        yield return new object[] { GameObjectType.Colonist, Constants.Game.Interactable.Colonist.Damage, Constants.Game.Interactable.Colonist.InitialHealth };
+        yield return new object[] { GameObjectType.Cavalry, Constants.Game.Interactable.Cavalry.Damage, Constants.Game.Interactable.Cavalry.InitialHealth };
+        yield return new object[] { GameObjectType.Tarran, Constants.Game.Interactable.Tarran.Damage, Constants.Game.Interactable.Tarran.InitialHealth };
+        yield return new object[] { GameObjectType.City, null, null };
+        yield return new object[] { GameObjectType.Empty, null, null };
+        yield return new object[] { GameObjectType.Mine, null, null };
+        yield return new object[] { GameObjectType.StaticMountain, null, null };
+    }
+
+    
+    [Theory, MemberData(nameof(ListenForInteractableObjectChanges_TestData))]
+    public async Task ListenForInteractableObjectChanges_WhenUnitCreated_Then_ChangedStateReceivedWithInitialValues(GameObjectType type, int? expectedAttackDamage, int? expectedInitialHealth)
+    {
+        //arrange
+        var anotherClient = InitializeClient();
+
+        Guid? playerId = null;
+        _sut.ListenForNewPlayerCreation(resp =>
+        {
+            playerId = resp.Created.Id;
+        });
+
+
+        int? receivedAttackDamage = null;
+        int? receivedInitialHealth = null;
+        
+        _sut.ListenForInteractableObjectChanges(resp =>
+        {
+            receivedAttackDamage = resp.AttackDamage;
+            receivedInitialHealth = resp.Health;
+        });
+        
+        // after two players join lobby, StartGameClientEvent is available for use
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+        
+        await _sut.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync();
+        
+        //act
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 1, 1, type));
+        await WaitForResponseAsync();
+        
+        //assert
+        Assert.Equal(expectedAttackDamage, receivedAttackDamage);
+        Assert.Equal(expectedInitialHealth, receivedInitialHealth);
+    }
+    
+    #endregion
+    
     #region Helpers
 
     private static Task WaitForResponseAsync(int? delayMs = null)

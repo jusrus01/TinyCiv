@@ -90,7 +90,7 @@ public class ServerClient : IServerClient
 
     public void ListenForInteractableObjectChanges(Action<InteractableObjectServerEvent> callback)
     {
-        Listen(Constants.Server.SendInteractableObject, callback);
+        Listen(Constants.Server.SendInteractableObjectChangesToAll, callback);
     }
 
     private void Listen<T>(string methodName, Action<T> callback) where T : ServerEvent

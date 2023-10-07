@@ -80,6 +80,8 @@ public class CombatService : ICombatService
                         _mapService.ReplaceWithEmpty(opponentId);
                     }
 
+                    // TODO: consider not relying on map service,
+                    // or at least get "agro" state from map service
                     var isAttacking = attacker.OpponentId != null;
                     if (!isAttacking)
                     {
