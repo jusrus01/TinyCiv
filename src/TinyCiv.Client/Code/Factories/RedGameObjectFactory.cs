@@ -46,31 +46,31 @@ namespace TinyCiv.Client.Code.Factories
                     tarran.ImageSource = sources[serverGameObject.Type];
                     return tarran;
                 case GameObjectType.City:
-                    var city = new Warrior(serverGameObject);
+                    var city = new GameObject(serverGameObject);
                     city.ImageSource = sources[serverGameObject.Type];
                     return city;
                 case GameObjectType.Farm:
-                    var farm = new Warrior(serverGameObject);
+                    var farm = new GameObject(serverGameObject);
                     farm.ImageSource = sources[serverGameObject.Type];
                     return farm;
                 case GameObjectType.Mine:
-                    var mine = new Warrior(serverGameObject);   
+                    var mine = new GameObject(serverGameObject);   
                     mine.ImageSource = sources[serverGameObject.Type];
                     return mine;
                 case GameObjectType.Blacksmith: 
-                    var blacksmith = new Warrior(serverGameObject);
+                    var blacksmith = new GameObject(serverGameObject);
                     blacksmith.ImageSource = sources[serverGameObject.Type];
                     return blacksmith;
                 case GameObjectType.Shop:
-                    var market = new Warrior(serverGameObject);
+                    var market = new GameObject(serverGameObject);
                     market.ImageSource = sources[serverGameObject.Type];
                     return market;
                 case GameObjectType.Bank:
-                    var bank = new Warrior(serverGameObject);
+                    var bank = new GameObject(serverGameObject);
                     bank.ImageSource = sources[serverGameObject.Type];
                     return bank;
                 case GameObjectType.Port:
-                    var port = new Warrior(serverGameObject);
+                    var port = new GameObject(serverGameObject);
                     port.ImageSource = sources[serverGameObject.Type];
                     return port;
                 default:
