@@ -6,9 +6,12 @@ namespace TinyCiv.Server.Core.Services;
 
 public interface IMapService
 {
-    ServerGameObject? CreateUnit(Guid playerId, ServerPosition position);
+    ServerGameObject? CreateUnit(Guid playerId, ServerPosition position, GameObjectType type);
     ServerGameObject? GetUnit(ServerPosition position);
     ServerGameObject? GetUnit(Guid? unitId);
+
+    void ReplaceWithEmpty(Guid id);
+    
     Task MoveUnitAsync(Guid unitId, ServerPosition position, Action<UnitMoveResponse> unitMoveCallback);
     ServerGameObject? CreateBuilding(Guid PlayerId,  ServerPosition position, IBuilding building);
 
