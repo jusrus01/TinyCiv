@@ -52,16 +52,6 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-
-        <!--<UniformGrid x:Name="UnitGrid" 
-                         Rows="20" 
-                         Columns="20"
-                         Height="600"
-                         Width="600"
-                         SnapsToDevicePixels="True"
-                         RenderOptions.BitmapScalingMode="HighQuality">
-            <ItemsControl ItemsSource="{Binding gameGrid.SpriteList.Value}"/>
-        </UniformGrid>-->
-
+        
     </Grid>
 </UserControl>
