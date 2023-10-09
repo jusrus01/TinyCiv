@@ -5,7 +5,6 @@ namespace TinyCiv.Client.Code.units
 {
     public class Colonist : Unit
     {    
-        public override int Health => 10;
         public override int MaxHealth => Shared.Constants.Game.Interactable.Colonist.InitialHealth;
         public override int Damage => Shared.Constants.Game.Interactable.Colonist.Damage;
         public override int Speed => 2;
@@ -15,6 +14,7 @@ namespace TinyCiv.Client.Code.units
 
         public Colonist(ServerGameObject serverGameObject) : base(serverGameObject)
         {
+            Health = MaxHealth;
         }
     }
 }

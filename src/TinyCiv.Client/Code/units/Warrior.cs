@@ -4,7 +4,6 @@ namespace TinyCiv.Client.Code.Units
 {
     public class Warrior : Unit
     {
-        public override int Health => 40;
         public override int MaxHealth => Shared.Constants.Game.Interactable.Warrior.InitialHealth;
         public override int Damage => Shared.Constants.Game.Interactable.Warrior.Damage;
         public override int Speed => 2;
@@ -14,6 +13,7 @@ namespace TinyCiv.Client.Code.Units
 
         public Warrior(ServerGameObject serverGameObject) : base(serverGameObject)
         {
+            Health = MaxHealth;
         }
 
         
