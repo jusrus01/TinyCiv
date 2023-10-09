@@ -6,6 +6,7 @@ namespace TinyCiv.Client.Code.units
     public class Tarran : Unit
     {
         public override int Health => 60;
+        public override int MaxHealth => 60;
         public override int Damage => 10;
         public override int Speed => 1;
         public override int ProductionPrice => 50;

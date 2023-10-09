@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows;
 
 namespace TinyCiv.Client.Code.MVVM.View
 {
@@ -11,6 +12,12 @@ namespace TinyCiv.Client.Code.MVVM.View
         public GameView()
         {
             InitializeComponent();
+
+            itemsControl.ItemTemplateSelector = new GameObjectTemplateSelector
+            {
+                UnitTemplate = (DataTemplate)Resources["UnitTemplate"],
+                GameObjectTemplate = (DataTemplate)Resources["GameObjectTemplate"],
+            };
         }
 
         private void gameObjectLeftDown(object sender, MouseButtonEventArgs e)
