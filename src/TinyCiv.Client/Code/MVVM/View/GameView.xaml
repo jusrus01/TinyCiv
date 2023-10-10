@@ -38,9 +38,11 @@
                     <Image Source="{Binding ImageSource}"/>
 
                     <ProgressBar Height="3"
-                             Value="{Binding Health, Mode=OneWay}"
-                             Maximum="{Binding MaxHealth}"
-                             VerticalAlignment="Bottom">
+                                 Value="{Binding Health, Mode=OneWay}"
+                                 Maximum="{Binding MaxHealth}"
+                                 VerticalAlignment="Bottom"
+                                 Margin="3,2"
+                                 Opacity="0.8">
                     </ProgressBar>
                 </Grid>
             </Border>
