@@ -329,10 +329,9 @@ namespace TinyCiv.Server.Services
 
         public Map? GetMap()
         {
-            lock (_mapChangeLocker)//might be because updates come to quick, and then we are not able to process anything more :)
+            lock (_mapChangeLocker)
             {
                 return _map;
-                // return _map.Objects.Where(i => i.Type != GameObjectType.Empty)
             }
         }
 
