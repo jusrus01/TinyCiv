@@ -4,7 +4,8 @@ namespace TinyCiv.Client.Code.Units;
 
 public abstract class Unit : GameObject
 {
-    public abstract int Health { get; }
+    public int Health { get; set; }
+    public abstract int MaxHealth { get; }
     public abstract int Damage { get; }
     public abstract int Speed { get; }
     public abstract int ProductionPrice { get; }

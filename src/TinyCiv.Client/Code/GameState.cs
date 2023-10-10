@@ -17,6 +17,8 @@ namespace TinyCiv.Client.Code
 {
     public class GameState
     {
+        public Dictionary<Guid, int> HealthValues; // : ))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+
         public ObservableValue<List<Border>> SpriteList { get; } = new ObservableValue<List<Border>>();
         public Action onPropertyChanged;
 
@@ -39,9 +41,11 @@ namespace TinyCiv.Client.Code
 
         public GameState(int rows, int columns)
         {
+            HealthValues = new Dictionary<Guid, int>();
             Rows = rows;
             Columns = columns;
             ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
+            ClientSingleton.Instance.serverClient.ListenForInteractableObjectChanges(OnInteractableChange);
         }
 
         private async void Tile_Click(Position clickedPosition)
@@ -102,6 +106,26 @@ namespace TinyCiv.Client.Code
             await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, clickedPosition.row, clickedPosition.column));
         }
 
+        private void OnInteractableChange(InteractableObjectServerEvent response)
+        {
+            for(int i = 0; i < GameObjects.Count; i++)
+            {
+                var gameObject = GameObjects[i];
+                if (gameObject.Id == response.ObjectId) 
+                {
+                    var unit = (Unit)GameObjects[i];
+                    if (unit != null)
+                    {
+                        unit.Health = response.Health;
+                        
+                        HealthValues[response.ObjectId] = response.Health;
+                        onPropertyChanged?.Invoke();
+                        return;
+                    }
+                }
+            }
+        }
+
         private void OnMapChange(MapChangeServerEvent response)
         {
             var ResponseGameObjects = response.Map.Objects
@@ -137,6 +161,11 @@ namespace TinyCiv.Client.Code
                 if (isUnitSelected && selectedUnit.Id == gameObject.Id)
                 {
                     SelectUnit(gameObject);
+                }
+
+                if (HealthValues.ContainsKey(gameObject.Id))
+                {
+                    ((Unit)gameObject).Health = HealthValues[gameObject.Id];
                 }
             }
             AddClickEvents();
