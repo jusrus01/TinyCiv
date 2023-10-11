@@ -20,7 +20,7 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
     
     protected override async Task OnHandleAsync(CreateUnitClientEvent @event)
     {
-        if (!_mapService.IsCityOwner(@event.PlayerId))
+        if (!_mapService.IsTownOwner(@event.PlayerId))
         {
             return;
         }

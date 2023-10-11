@@ -1,4 +1,5 @@
-﻿using TinyCiv.Server.Core.Game.Buildings;
+﻿using TinyCiv.Server.Core.Extensions;
+using TinyCiv.Server.Core.Game.Buildings;
 using TinyCiv.Server.Enums;
 using TinyCiv.Shared.Game;
 
@@ -10,12 +11,12 @@ public interface IMapService
     ServerGameObject? GetUnit(ServerPosition position);
     ServerGameObject? GetUnit(Guid? unitId);
 
-    bool PlaceCity(Guid playerId);
-    bool IsCityOwner(Guid playerId);
+    bool PlaceTown(Guid playerId);
+    bool IsTownOwner(Guid playerId);
+    bool IsInRange(ServerPosition position, int range, GameObjectType type);
 
     void ReplaceWithEmpty(Guid id);
-    bool IsTileFree(ServerPosition position);
-    
+
     Task MoveUnitAsync(Guid unitId, ServerPosition position, Action<UnitMoveResponse> unitMoveCallback);
     ServerGameObject? CreateBuilding(Guid PlayerId,  ServerPosition position, IBuilding building);
 

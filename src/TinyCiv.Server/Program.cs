@@ -38,7 +38,7 @@ builder.Services.AddTransient<IClientHandler, LeaveLobbyHandler>();
 builder.Services.AddTransient<IClientHandler, GameStartHandler>();
 builder.Services.AddTransient<IClientHandler, UnitAttackHandler>();
 builder.Services.AddTransient<IClientHandler, CreateBuildingHandler>();
-builder.Services.AddTransient<IClientHandler, PlaceCityHandler>();
+builder.Services.AddTransient<IClientHandler, PlaceTownHandler>();
 
 builder.Services
     .AddSignalR()

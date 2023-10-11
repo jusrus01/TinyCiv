@@ -34,7 +34,7 @@ public class GameStartHandler : ClientHandler<StartGameClientEvent>
             int y = random.Next(0, Constants.Game.HeightSquareCount);
             var position = new ServerPosition { X = x, Y = y };
 
-            while (!_mapService.IsTileFree(position))
+            while (_mapService.IsInRange(position, Constants.Game.TownSpaceFromTown, GameObjectType.Colonist))
             {
                 x = random.Next(0, Constants.Game.WidthSquareCount);
                 y = random.Next(0, Constants.Game.HeightSquareCount);

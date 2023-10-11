@@ -6,23 +6,23 @@ using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Handlers;
 
-public class PlaceCityHandler : ClientHandler<PlaceCityClientEvent>
+public class PlaceTownHandler : ClientHandler<PlaceTownClientEvent>
 {
     private readonly IMapService _mapService;
 
-    public PlaceCityHandler(ILogger<IClientHandler> logger, IMapService mapService) : base(logger)
+    public PlaceTownHandler(ILogger<IClientHandler> logger, IMapService mapService) : base(logger)
     {
         _mapService = mapService;
     }
 
-    protected override async Task OnHandleAsync(PlaceCityClientEvent @event)
+    protected override async Task OnHandleAsync(PlaceTownClientEvent @event)
     {
-        if (_mapService.IsCityOwner(@event.PlayerId))
+        if (_mapService.IsTownOwner(@event.PlayerId))
         {
             return;
         }
 
-        bool result = _mapService.PlaceCity(@event.PlayerId);
+        bool result = _mapService.PlaceTown(@event.PlayerId);
 
         if (result == false)
         {

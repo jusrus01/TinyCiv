@@ -27,7 +27,7 @@ public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
                 .ConfigureAwait(false);
         }
 
-        if (!_mapService.IsCityOwner(@event.PlayerId))
+        if (!_mapService.IsTownOwner(@event.PlayerId))
         {
             return;
         }
