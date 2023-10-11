@@ -12,6 +12,7 @@ public static class Constants
             {
                 public const int InitialHealth = 40;
                 public const int Damage = 20;
+                public const int TarranDamageReductionMultiplier = 2;
             }
 
             public static class Colonist
@@ -24,12 +25,14 @@ public static class Constants
             {
                 public const int InitialHealth = 60;
                 public const int Damage = 30;
+                public const int LifeStealPercentage = 5;
             }
 
             public static class Tarran
             {
                 public const int InitialHealth = 60;
                 public const int Damage = 10;
+                public const int BuildingAttackMultiplier = 5;
             }
         }
         
