@@ -11,12 +11,13 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
     {
         public ObservableValue<bool> IsUnitsListVisible { get; } = new ObservableValue<bool>(true);
         public ObservableValue<bool> IsBuildingsListVisible { get; } = new ObservableValue<bool>(false);
-        public ObservableValue<UnitModel> SelectedPurchaseUnit { get; } = new ObservableValue<UnitModel>(null);
+        public ObservableValue<UnitModel> SelectedBuyUnit { get; } = new ObservableValue<UnitModel>(null);
+        public ObservableValue<BuildingModel> SelectedBuyBuilding { get; } = new ObservableValue<BuildingModel>(null);
         public ObservableValue<String> UnitName { get; } = new ObservableValue<string>("EMPTY");
         public RelayCommand ShowUnitsCommand => new RelayCommand(execute => ShowUnits());
         public RelayCommand ShowBuildingsCommand => new RelayCommand(execute => ShowBuildings());
-        public RelayCommand SelectUnitToBuyCommand => new RelayCommand(SelectUnitToBuy, CanBuyUnit);
-
+        public RelayCommand SelectUnitToBuyCommand => new RelayCommand(SelectUnitToBuy, CanBuy);
+        public RelayCommand SelectBuildingToBuyCommand => new RelayCommand(SelectBuildingToBuy, CanBuy);
 
         private void ShowUnits()
         {
@@ -34,30 +35,47 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         {
             if (parameter is UnitModel unit)
             {
-                SelectedPurchaseUnit.Value = unit;
-                MessageBox.Show(unit.ImagePath);
+                SelectedBuyUnit.Value = unit;
                 Mouse.OverrideCursor = Cursors.Hand;
             }
         }
 
         public async void ExecuteUnitBuy(Position position)
         {
-            MessageBox.Show("executing unit purchase");
             await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, position.row, position.column));
-            SelectedPurchaseUnit.Value = null;
+            SelectedBuyUnit.Value = null;
             Mouse.OverrideCursor= Cursors.Arrow;
         }
 
-        private bool CanBuyUnit(object parameter)
+        private bool CanBuy(object parameter)
         {
-            if (parameter is UnitModel unit)
+            if (parameter is UnitModel || parameter is BuildingModel)
             {
-                if (SelectedPurchaseUnit.Value != null)
+                if (SelectedBuyUnit.Value != null && SelectedBuyBuilding.Value != null)
                 {
                     return false;
                 }
             }
             return true;
+        }
+
+        private void SelectBuildingToBuy(object parameter)
+        {
+            if (parameter is BuildingModel building)
+            {
+                SelectedBuyBuilding.Value = building;
+                Mouse.OverrideCursor = Cursors.Hand;
+            }
+        }
+
+        // NO COMMAND HANDLER ON THE BUILD BUTTON
+        public async void ExecuteBuildingBuy(Position position)
+        {
+            ServerPosition serverPos = new ServerPosition { X = position.row, Y = position.column };
+            BuildingType parsedType = (BuildingType)Enum.Parse(typeof(BuildingType), SelectedBuyBuilding.Value.Type.ToString());
+            await ClientSingleton.Instance.serverClient.SendAsync(new CreateBuildingClientEvent(CurrentPlayer.Id, parsedType, serverPos));
+            SelectedBuyUnit.Value = null;
+            Mouse.OverrideCursor = Cursors.Arrow;
         }
 
         public List<UnitModel> UnitList {
