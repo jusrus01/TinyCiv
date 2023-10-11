@@ -9,9 +9,13 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
+    <UserControl.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding EscapeKeyCommand}" />
+    </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
         
@@ -26,6 +30,7 @@
             <Button Grid.Column="1" Content="Buildings" Command="{Binding ShowBuildingsCommand}" />
         </Grid>
 
+        <!-- Units tab -->
         <StackPanel Grid.Row="1" Visibility="{Binding IsUnitsListVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
             <ItemsControl ItemsSource="{Binding UnitList}">
                 <ItemsControl.ItemTemplate>
@@ -84,6 +89,7 @@
             </ItemsControl>
         </StackPanel>
 
+        <!-- Buildings tab -->
         <StackPanel Grid.Row="1" Visibility="{Binding IsBuildingsListVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
             <ItemsControl ItemsSource="{Binding BuildingList}">
                 <ItemsControl.ItemTemplate>
@@ -132,12 +138,8 @@
             </ItemsControl>
         </StackPanel>
 
-        <!--<StackPanel Orientation="Vertical" >
-            <StackPanel Orientation="Horizontal">
-                <TextBlock>Unit:</TextBlock>
-                <TextBlock Text="{Binding UnitName.Value}"></TextBlock>
-            </StackPanel>
-        </StackPanel>-->
+        <TextBlock Grid.Row="2" Text="Press Esc button to cancel" TextWrapping="Wrap" FontWeight="Bold" Margin="5" FontSize="10"
+                   Visibility="{Binding IsUnderPurchase.Value, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
     </Grid>
 </UserControl>

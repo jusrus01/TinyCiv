@@ -11,6 +11,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
     {
         public ObservableValue<bool> IsUnitsListVisible { get; } = new ObservableValue<bool>(true);
         public ObservableValue<bool> IsBuildingsListVisible { get; } = new ObservableValue<bool>(false);
+        public ObservableValue<bool> IsUnderPurchase { get; } = new ObservableValue<bool>(false);
         public ObservableValue<UnitModel> SelectedBuyUnit { get; } = new ObservableValue<UnitModel>(null);
         public ObservableValue<BuildingModel> SelectedBuyBuilding { get; } = new ObservableValue<BuildingModel>(null);
         public ObservableValue<String> UnitName { get; } = new ObservableValue<string>("EMPTY");
@@ -18,6 +19,24 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         public RelayCommand ShowBuildingsCommand => new RelayCommand(execute => ShowBuildings());
         public RelayCommand SelectUnitToBuyCommand => new RelayCommand(SelectUnitToBuy, CanBuy);
         public RelayCommand SelectBuildingToBuyCommand => new RelayCommand(SelectBuildingToBuy, CanBuy);
+        public RelayCommand EscapeKeyCommand => new RelayCommand(HandleEscapeKey, CanCancelPurchase);
+
+        private void HandleEscapeKey(object obj)
+        {
+            SelectedBuyUnit.Value = null;
+            SelectedBuyBuilding.Value = null;
+            IsUnderPurchase.Value = false;
+            Mouse.OverrideCursor = Cursors.Arrow;
+        }
+
+        private bool CanCancelPurchase(object parameter)
+        {
+            if (SelectedBuyUnit.Value != null || SelectedBuyBuilding.Value != null)
+            {
+                return true;
+            }
+            return false;
+        }
 
         private void ShowUnits()
         {
@@ -36,6 +55,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             if (parameter is UnitModel unit)
             {
                 SelectedBuyUnit.Value = unit;
+                IsUnderPurchase.Value = true;
                 Mouse.OverrideCursor = Cursors.Hand;
             }
         }
@@ -64,6 +84,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             if (parameter is BuildingModel building)
             {
                 SelectedBuyBuilding.Value = building;
+                IsUnderPurchase.Value = true;
                 Mouse.OverrideCursor = Cursors.Hand;
             }
         }
