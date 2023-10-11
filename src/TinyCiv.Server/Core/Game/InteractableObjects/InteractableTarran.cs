@@ -4,7 +4,23 @@ namespace TinyCiv.Server.Core.Game.InteractableObjects;
 
 public class InteractableTarran : IInteractableObject
 {
+    public int AttackDamage => Constants.Game.Interactable.Tarran.Damage;
+    public int AttackRateInMilliseconds => Constants.Game.Interactable.AttackIntervalInMilliseconds;
+    public bool IsAbleToCounterAttack => false;
+    public bool IsBuilding => false;
+    
     public int Health { get; set; } = Constants.Game.Interactable.Tarran.InitialHealth;
-    public int AttackDamage { get; set; } = Constants.Game.Interactable.Tarran.Damage;
-    public int AttackRateInMilliseconds { get; set; } = Constants.Game.Interactable.AttackIntervalInMilliseconds;
+    public Guid GameObjectReferenceId { get; init; }
+
+    public void DoDamage(IInteractableObject interactable)
+    {
+        if (interactable.IsBuilding)
+        {
+            interactable.Health -= AttackDamage * Constants.Game.Interactable.Tarran.BuildingAttackMultiplier;
+        }
+        else
+        {
+            interactable.Health -= AttackDamage;
+        }
+    }
 }

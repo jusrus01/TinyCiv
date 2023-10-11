@@ -22,21 +22,21 @@ public class InteractableObjectService : IInteractableObjectService
             return _objects[obj.Id];
         }
         
-        var interactable = ResolveInteractable(obj.Type);
+        var interactable = ResolveInteractable(obj);
         
         _objects.TryAdd(obj.Id, interactable);
 
         return interactable;
     }
 
-    private static IInteractableObject ResolveInteractable(GameObjectType objType)
+    private static IInteractableObject ResolveInteractable(ServerGameObject obj)
     {
-        return objType switch
+        return obj.Type switch
         {
-            GameObjectType.Warrior => new InteractableWarrior(),
-            GameObjectType.Colonist => new InteractableColonist(),
-            GameObjectType.Cavalry => new InteractableCavalry(),
-            GameObjectType.Tarran => new InteractableTarran(),
+            GameObjectType.Warrior => new InteractableWarrior { GameObjectReferenceId = obj.Id },
+            GameObjectType.Colonist => new InteractableColonist { GameObjectReferenceId = obj.Id },
+            GameObjectType.Cavalry => new InteractableCavalry { GameObjectReferenceId = obj.Id },
+            GameObjectType.Tarran => new InteractableTarran { GameObjectReferenceId = obj.Id },
             _ => throw new NotSupportedException()
         };
     }
