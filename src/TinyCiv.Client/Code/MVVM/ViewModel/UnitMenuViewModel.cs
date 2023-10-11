@@ -65,6 +65,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value.Type));
             SelectedBuyUnit.Value = null;
             Mouse.OverrideCursor= Cursors.Arrow;
+            IsUnderPurchase.Value = false;
         }
 
         private bool CanBuy(object parameter)
@@ -97,6 +98,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             await ClientSingleton.Instance.serverClient.SendAsync(new CreateBuildingClientEvent(CurrentPlayer.Id, parsedType, serverPos));
             SelectedBuyBuilding.Value = null;
             Mouse.OverrideCursor = Cursors.Arrow;
+            IsUnderPurchase.Value = false;
         }
 
         public List<UnitModel> UnitList {
