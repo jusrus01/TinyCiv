@@ -5,8 +5,8 @@ namespace TinyCiv.Client.Code.units
 {
     public class Tarran : Unit
     {
-        public override int Health => 60;
-        public override int Damage => 10;
+        public override int MaxHealth => Shared.Constants.Game.Interactable.Tarran.InitialHealth;
+        public override int Damage => Shared.Constants.Game.Interactable.Tarran.Damage;
         public override int Speed => 1;
         public override int ProductionPrice => 50;
         public override int ExpReward => 50;
@@ -14,6 +14,7 @@ namespace TinyCiv.Client.Code.units
 
         public Tarran(ServerGameObject serverGameObject) : base(serverGameObject)
         {
+            Health = MaxHealth;
         }
     }
 }

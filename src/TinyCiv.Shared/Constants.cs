@@ -4,6 +4,35 @@ public static class Constants
 {
     public static class Game
     {
+        public static class Interactable
+        {
+            public const int AttackIntervalInMilliseconds = 2000;
+            
+            public static class Warrior
+            {
+                public const int InitialHealth = 40;
+                public const int Damage = 20;
+            }
+
+            public static class Colonist
+            {
+                public const int InitialHealth = 10;
+                public const int Damage = 0;
+            }
+
+            public static class Cavalry
+            {
+                public const int InitialHealth = 60;
+                public const int Damage = 30;
+            }
+
+            public static class Tarran
+            {
+                public const int InitialHealth = 60;
+                public const int Damage = 10;
+            }
+        }
+        
         public const int MaxPlayerCount = 4;
         public const int MinPlayerCount = 2;
 
@@ -51,6 +80,7 @@ public static class Constants
         public const string SendUnitStatusUpdate = nameof(SendUnitStatusUpdate);
         public const string SendResourcesStatusUpdate = nameof(SendResourcesStatusUpdate);
 
+        public const string SendInteractableObjectChangesToAll = nameof(SendInteractableObjectChangesToAll);
         public const string SendLobbyStateToAll = nameof(SendLobbyStateToAll);
         public const string SendGameStartToAll = nameof(SendGameStartToAll);
         public const string SendMapChangeToAll = nameof(SendMapChangeToAll);

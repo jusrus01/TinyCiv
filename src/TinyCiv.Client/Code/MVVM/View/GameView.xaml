@@ -4,8 +4,51 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TinyCiv.Client.Code.MVVM.View"
+             xmlns:gameObjects="clr-namespace:TinyCiv.Client.Code.Units"
+             xmlns:gameObject="clr-namespace:TinyCiv.Client.Code"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="600">
+
+    <UserControl.Resources>
+        <!-- GAME OBJECT TEMPLATE !-->
+        <DataTemplate x:Key="GameObjectTemplate">
+            <Border BorderThickness="{Binding BorderThickness}" 
+                BorderBrush="{Binding BorderBrush}"
+                MouseLeftButtonDown="gameObjectLeftDown"
+                MouseRightButtonDown="gameObjectRightDown"
+                Height="30"
+                Width="30"
+                Background="Transparent">
+                <Grid>
+                    <Image Source="{Binding ImageSource}"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <!-- UNIT TEMPLATE !-->
+        <DataTemplate x:Key="UnitTemplate">
+            <Border BorderThickness="{Binding BorderThickness}" 
+                BorderBrush="{Binding BorderBrush}"
+                MouseLeftButtonDown="gameObjectLeftDown"
+                MouseRightButtonDown="gameObjectRightDown"
+                Height="30"
+                Width="30"
+                Background="Transparent">
+                <Grid>
+                    <Image Source="{Binding ImageSource}"/>
+
+                    <ProgressBar Height="3"
+                                 Value="{Binding Health, Mode=OneWay}"
+                                 Maximum="{Binding MaxHealth}"
+                                 VerticalAlignment="Bottom"
+                                 Margin="3,2"
+                                 Opacity="0.8">
+                    </ProgressBar>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+    
     <Grid>
         <ItemsControl ItemsSource="{Binding MapList}">
             <ItemsControl.ItemsPanel>
@@ -26,7 +69,9 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
-        <ItemsControl ItemsSource="{Binding GameObjectList}">
+        <ItemsControl x:Name="itemsControl"
+                      ItemsSource="{Binding GameObjectList}"
+                      ItemTemplateSelector="{StaticResource GameObjectTemplateSelector}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Rows="20" 
@@ -37,31 +82,7 @@
                          RenderOptions.BitmapScalingMode="HighQuality"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border BorderThickness="{Binding BorderThickness}" 
-                            BorderBrush="{Binding BorderBrush}"
-                            MouseLeftButtonDown="gameObjectLeftDown"
-                            MouseRightButtonDown="gameObjectRightDown"
-                            Height="30"
-                            Width="30"
-                            Background="Transparent">
-                        <Image Source="{Binding ImageSource}"/>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
         </ItemsControl>
-
-        <!--<UniformGrid x:Name="UnitGrid" 
-                         Rows="20" 
-                         Columns="20"
-                         Height="600"
-                         Width="600"
-                         SnapsToDevicePixels="True"
-                         RenderOptions.BitmapScalingMode="HighQuality">
-            <ItemsControl ItemsSource="{Binding gameGrid.SpriteList.Value}"/>
-        </UniformGrid>-->
-
+        
     </Grid>
 </UserControl>

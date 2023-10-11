@@ -2,12 +2,11 @@ using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
 using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Handlers;
-using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
 
 namespace TinyCiv.Server.Handlers;
 
-public abstract class ClientHandler<TEvent> : IClientHandler where TEvent : ClientEvent
+public abstract class ClientHandler<TEvent> : IClientHandler
 {
     private const string HandleMethodName = nameof(HandleAsync);
 

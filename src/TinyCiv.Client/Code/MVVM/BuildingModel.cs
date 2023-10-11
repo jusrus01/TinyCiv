@@ -1,4 +1,5 @@
-﻿using TinyCiv.Shared.Game;
+﻿using TinyCiv.Client.Code.Factories;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.MVVM;
 
@@ -18,6 +19,6 @@ public class BuildingModel
         Color = color;
         Type = type;
         Name = type.ToString();
-        ImagePath = Images.GetImage(Color, Type);
+        ImagePath = AbstractGameObjectFactory.getGameObjectImage(color, type);
     }
 }

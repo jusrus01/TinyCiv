@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:TinyCiv.Client"
              xmlns:view="clr-namespace:TinyCiv.Client.Code.MVVM.View"
              xmlns:viewModel="clr-namespace:TinyCiv.Client.Code.MVVM.ViewModel"
+             xmlns:mvvm="clr-namespace:TinyCiv.Client.Code.MVVM"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -24,6 +25,7 @@
                 <view:GameView/>
             </DataTemplate>
 
+            <mvvm:GameObjectTemplateSelector x:Key="GameObjectTemplateSelector"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

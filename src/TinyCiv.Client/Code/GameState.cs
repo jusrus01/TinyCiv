@@ -9,13 +9,16 @@ using TinyCiv.Client.Code.MVVM;
 using TinyCiv.Shared.Events.Server;
 using System.Linq;
 using System;
+using System.Threading.Tasks;
 using TinyCiv.Client.Code.MVVM.ViewModel;
-
+using TinyCiv.Client.Code.Factories;
 
 namespace TinyCiv.Client.Code
 {
     public class GameState
     {
+        public Dictionary<Guid, int> HealthValues; // : ))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+
         public ObservableValue<List<Border>> SpriteList { get; } = new ObservableValue<List<Border>>();
         public Action onPropertyChanged;
 
@@ -28,11 +31,21 @@ namespace TinyCiv.Client.Code
         private bool isUnitSelected = false;
         private GameObject selectedUnit;
 
+        private Dictionary<TeamColor, AbstractGameObjectFactory> TeamFactories = new Dictionary<TeamColor, AbstractGameObjectFactory>
+        {
+            {TeamColor.Red,    new RedGameObjectFactory() },
+            {TeamColor.Green,  new GreenGameObjectFactory() },
+            {TeamColor.Purple, new PurpleGameObjectFactory() },
+            {TeamColor.Yellow, new YellowGameObjectFactory() }
+        };
+
         public GameState(int rows, int columns)
         {
+            HealthValues = new Dictionary<Guid, int>();
             Rows = rows;
             Columns = columns;
             ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
+            ClientSingleton.Instance.serverClient.ListenForInteractableObjectChanges(OnInteractableChange);
         }
 
         private async void Tile_Click(Position clickedPosition)
@@ -92,11 +105,8 @@ namespace TinyCiv.Client.Code
 
         private void ShowCombatState(GameObject gameObject)
         {            
-            if (gameObject.OpponentId != null)
-            {
-                gameObject.BorderThickness = new Thickness(2);
-                gameObject.BorderBrush = Brushes.IndianRed;
-            } 
+           gameObject.BorderThickness = new Thickness(2);
+           gameObject.BorderBrush = Brushes.IndianRed;
         }
 
         private async void Create_Unit(Position clickedPosition)
@@ -104,12 +114,31 @@ namespace TinyCiv.Client.Code
             await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, clickedPosition.row, clickedPosition.column));
         }
 
+        private void OnInteractableChange(InteractableObjectServerEvent response)
+        {
+            for(int i = 0; i < GameObjects.Count; i++)
+            {
+                var gameObject = GameObjects[i];
+                if (gameObject.Id == response.ObjectId) 
+                {
+                    var unit = (Unit)GameObjects[i];
+                    if (unit != null)
+                    {
+                        unit.Health = response.Health;
+                        
+                        HealthValues[response.ObjectId] = response.Health;
+                        onPropertyChanged?.Invoke();
+                        return;
+                    }
+                }
+            }
+        }
+
         private void OnMapChange(MapChangeServerEvent response)
         {
-            var goFactory = new GameObjectFactory();
             var ResponseGameObjects = response.Map.Objects
                 .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
-                .Select(serverGameObect => goFactory.Create(serverGameObect))
+                .Select(serverGameObect => TeamFactories[serverGameObect.Color].CreateGameObject(serverGameObect))
                 .ToList<GameObject>();
 
             for(int row = 0; row < Rows; row++)
@@ -117,7 +146,12 @@ namespace TinyCiv.Client.Code
                 for(int column = 0; column < Columns; column++)
                 {
                     var index = column * Columns + row;
-                    GameObjects[index] = goFactory.Create(new ServerGameObject { Type = GameObjectType.Empty, Position = new ServerPosition() { X = row, Y = column} });
+                    var serverGameObject = new ServerGameObject
+                    {
+                        Type = GameObjectType.Empty,
+                        Position = new ServerPosition() { X = row, Y = column }
+                    };
+                    GameObjects[index] = TeamFactories[TeamColor.Red].CreateGameObject(serverGameObject);
                 }
             }
 
@@ -125,10 +159,21 @@ namespace TinyCiv.Client.Code
             {
                 var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
                 GameObjects[gameObjectIndex] = gameObject;
-                ShowCombatState(gameObject);                
+
+                if (gameObject.OpponentId != null)
+                {
+                    ShowCombatState(gameObject);
+                    Task.Run(() => ClientSingleton.Instance.serverClient.SendAsync(new AttackUnitClientEvent(gameObject.Id, gameObject.OpponentId.Value)));
+                }
+                
                 if (isUnitSelected && selectedUnit.Id == gameObject.Id)
                 {
                     SelectUnit(gameObject);
+                }
+
+                if (HealthValues.ContainsKey(gameObject.Id))
+                {
+                    ((Unit)gameObject).Health = HealthValues[gameObject.Id];
                 }
             }
             AddClickEvents();

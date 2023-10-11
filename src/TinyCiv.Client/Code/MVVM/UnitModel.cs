@@ -1,4 +1,5 @@
-﻿using TinyCiv.Shared.Game;
+﻿using TinyCiv.Client.Code.Factories;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.MVVM
 {
@@ -23,7 +24,7 @@ namespace TinyCiv.Client.Code.MVVM
             Description = description;
             Type = type;
             Color = color;
-            ImagePath = Images.GetImage(Color, Type);
+            ImagePath = AbstractGameObjectFactory.getGameObjectImage(color, type);
             Name = type.ToString();
         }
     }

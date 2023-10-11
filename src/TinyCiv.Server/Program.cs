@@ -23,9 +23,12 @@ builder.Host.UseSerilog();
 builder.Services.AddSingleton<IResourceService, ResourceService>();
 builder.Services.AddSingleton<ISessionService, SessionService>();
 builder.Services.AddSingleton<IMapService, MapService>();
+builder.Services.AddSingleton<IInteractableObjectService, InteractableObjectService>();
+builder.Services.AddSingleton<ICombatService, CombatService>();
 
 builder.Services.AddScoped<IConnectionIdAccessor, ConnectionIdAccessor>();
 
+builder.Services.AddTransient<IMapReader, LocalFileMapReader>();
 builder.Services.AddTransient<IMapLoader, MapLoader>();
 
 builder.Services.AddTransient<IClientHandler, UnitMoveHandler>();
@@ -33,6 +36,7 @@ builder.Services.AddTransient<IClientHandler, UnitAddHandler>();
 builder.Services.AddTransient<IClientHandler, JoinLobbyHandler>();
 builder.Services.AddTransient<IClientHandler, LeaveLobbyHandler>();
 builder.Services.AddTransient<IClientHandler, GameStartHandler>();
+builder.Services.AddTransient<IClientHandler, UnitAttackHandler>();
 builder.Services.AddTransient<IClientHandler, CreateBuildingHandler>();
 
 builder.Services

@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.SignalR;
-using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;

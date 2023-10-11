@@ -4,36 +4,36 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Services;
 
+/// <summary>
+/// Pattern: Bridge (1 of 2)
+/// Reasoning:
+/// We can easily switch up implementation that could read the map from the database or
+/// retrieve it from some external API, just a matter of adding a new implementation,
+/// and no need to change anything in <see cref="MapLoader"/>
+/// </summary>
 public class MapLoader : IMapLoader
 {
-    private const string MapsDirectory = "Resources";
-
+    private readonly IMapReader _mapReader;
     private readonly ILogger<MapLoader> _logger;
 
-    public MapLoader(ILogger<MapLoader> logger)
+    public MapLoader(IMapReader mapReader, ILogger<MapLoader> logger)
     {
         _logger = logger;
+        _mapReader = mapReader;
     }
 
     public List<ServerGameObject> Load(MapType type)
     {
-        var mapPath = $"{MapsDirectory}/{type.ToString()}";
-
-        if (!File.Exists(mapPath))
-        {
-            _logger.LogError("Could not find map '{type}' in path '{path}', directory info: {dir}", type, mapPath, Directory.GetFiles(MapsDirectory));
-            throw new InvalidOperationException();
-        }
+        var mapContent = _mapReader.Read(type);
         
-        var mapContent = File.ReadAllLines(mapPath);
         EnsureValid(mapContent);
-        return GenerateObjects(mapContent);;
+        return GenerateObjects(mapContent);
     }
 
-    private List<ServerGameObject> GenerateObjects(string[] mapContent)
+    private List<ServerGameObject> GenerateObjects(IList<string> mapContent)
     {
         var objects = new List<ServerGameObject>();
-        for (var y = 0; y < mapContent.Length; y++)
+        for (var y = 0; y < mapContent.Count; y++)
         {
             var line = mapContent[y];
 
@@ -68,7 +68,7 @@ public class MapLoader : IMapLoader
         };
     }
 
-    private void EnsureValid(IReadOnlyCollection<string> mapContent)
+    private void EnsureValid(IList<string> mapContent)
     {
         if (mapContent.Count != Constants.Game.HeightSquareCount)
         {

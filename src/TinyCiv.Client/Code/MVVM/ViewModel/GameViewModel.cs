@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using TinyCiv.Client.Code.Factories;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Server;
 
@@ -43,17 +44,17 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             gameState = new GameState(Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
             gameState.onPropertyChanged = () => { OnPropertyChanged("GameObjectList"); };
 
-            var goFactory = new GameObjectFactory();
+            var goFactory = new MapObjectFactory();
 
             gameState.GameObjects = response.Map.Objects
                 //.Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
-                .Select(serverGameObect => goFactory.Create(serverGameObect))
+                .Select(serverGameObect => goFactory.createMapTile(serverGameObect))
                 .ToList<GameObject>();
             gameState.AddClickEvents();
 
 
             gameState.mapImages = response.Map.Objects
-                .Select(mapImageObect => Images.GetTileImage(mapImageObect.Type))
+                .Select(mapImageObect => goFactory.getMapImage(mapImageObect.Type))
                 .ToList();
 
             OnPropertyChanged("GameObjectList");

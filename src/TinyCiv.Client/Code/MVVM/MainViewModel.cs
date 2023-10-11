@@ -1,8 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TinyCiv.Shared.Game;
 using TinyCiv.Client.Code.MVVM.ViewModel;
+using TinyCiv.Server.Client;
+using TinyCiv.Shared.Events.Client;
 using System.Windows;
 using TinyCiv.Shared.Events.Server;
+using TinyCiv.Client.Code.Units;
 using System.Threading;
+using System.ComponentModel;
 using TinyCiv.Shared.Events.Client.Lobby;
 
 namespace TinyCiv.Client.Code.MVVM
@@ -25,14 +34,18 @@ namespace TinyCiv.Client.Code.MVVM
             Game.Value = GameVM;
             UpperMenu.Value = UpperMenuVM;
 
-            Thread playerConnectionThread = new Thread(() =>
+            DependencyObject dep = new DependencyObject();
+            if (!DesignerProperties.GetIsInDesignMode(dep))
             {
-                ClientSingleton.Instance.WaitForInitialization();
-                ClientSingleton.Instance.serverClient.ListenForNewPlayerCreation(OnPlayerJoin);
-                ClientSingleton.Instance.serverClient.ListenForGameStart(OnGameStart);
-                ClientSingleton.Instance.serverClient.SendAsync(new JoinLobbyClientEvent()).Wait();
-            });
-            playerConnectionThread.Start();     
+                Thread playerConnectionThread = new Thread(() =>
+                {
+                    ClientSingleton.Instance.WaitForInitialization();
+                    ClientSingleton.Instance.serverClient.ListenForNewPlayerCreation(OnPlayerJoin);
+                    ClientSingleton.Instance.serverClient.ListenForGameStart(OnGameStart);
+                    ClientSingleton.Instance.serverClient.SendAsync(new JoinLobbyClientEvent()).Wait();
+                });
+                playerConnectionThread.Start();
+            }
         }
 
         private void OnPlayerJoin(JoinLobbyServerEvent response)
@@ -46,7 +59,6 @@ namespace TinyCiv.Client.Code.MVVM
             // If the party is full
             if (CurrentPlayer.Instance.player == null)
             {
-                MessageBox.Show("The game party is full! Try again later.");
             }
         }
 
