@@ -40,9 +40,9 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             }
         }
 
-        public async void ExecuteUnitBuy(Position position)
+        public async void ExecuteUnitPurchase(Position position)
         {
-            await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, position.row, position.column));
+            await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value.Type));
             SelectedBuyUnit.Value = null;
             Mouse.OverrideCursor= Cursors.Arrow;
         }
@@ -51,7 +51,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         {
             if (parameter is UnitModel || parameter is BuildingModel)
             {
-                if (SelectedBuyUnit.Value != null && SelectedBuyBuilding.Value != null)
+                if (SelectedBuyUnit.Value != null || SelectedBuyBuilding.Value != null)
                 {
                     return false;
                 }
@@ -69,12 +69,12 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         }
 
         // NO COMMAND HANDLER ON THE BUILD BUTTON
-        public async void ExecuteBuildingBuy(Position position)
+        public async void ExecuteBuildingPurchase(Position position)
         {
             ServerPosition serverPos = new ServerPosition { X = position.row, Y = position.column };
             BuildingType parsedType = (BuildingType)Enum.Parse(typeof(BuildingType), SelectedBuyBuilding.Value.Type.ToString());
             await ClientSingleton.Instance.serverClient.SendAsync(new CreateBuildingClientEvent(CurrentPlayer.Id, parsedType, serverPos));
-            SelectedBuyUnit.Value = null;
+            SelectedBuyBuilding.Value = null;
             Mouse.OverrideCursor = Cursors.Arrow;
         }
 

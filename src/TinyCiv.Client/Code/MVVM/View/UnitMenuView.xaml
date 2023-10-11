@@ -119,7 +119,10 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" FontSize="10" VerticalAlignment="Bottom">Cost:</TextBlock>
                                         <TextBlock Grid.Column="1" FontSize="10" VerticalAlignment="Bottom" Text="{Binding Cost}"/>
-                                        <Button Grid.Column="2" FontSize="10">Buy</Button>
+                                        <Button Grid.Column="2" FontSize="10" 
+                                            Command="{Binding DataContext.SelectBuildingToBuyCommand, 
+                                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" 
+                                            CommandParameter="{Binding}">Build</Button>
                                     </Grid>
                                 </Grid>
                             </Grid>

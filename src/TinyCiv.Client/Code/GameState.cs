@@ -48,21 +48,44 @@ namespace TinyCiv.Client.Code
             ClientSingleton.Instance.serverClient.ListenForInteractableObjectChanges(OnInteractableChange);
         }
 
-        private async void Tile_Click(Position clickedPosition)
+        private async void Grass_Tile_Click(Position clickedPosition)
         {
+            var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
+            var unitUnderPurchase = UnitMenuVM.SelectedBuyUnit.Value;
+
             if (isUnitSelected)
             {
                 var unit = (Unit)selectedUnit;
                 UnselectUnit(unit);
                 await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
             }
-            else if (UnitMenuVM.SelectedBuyUnit.Value != null) 
+            else if (unitUnderPurchase != null) 
             {
-                UnitMenuVM.ExecuteUnitBuy(clickedPosition);
+                UnitMenuVM.ExecuteUnitPurchase(clickedPosition);
             }
-            else if (UnitMenuVM.SelectedBuyBuilding.Value != null)
+            else if (buildingUnderPurchase != null 
+                && buildingUnderPurchase.Type != GameObjectType.Port 
+                && buildingUnderPurchase.Type != GameObjectType.Mine)
             {
-                UnitMenuVM.ExecuteBuildingBuy(clickedPosition);
+                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
+            }
+        }
+
+        private void Water_Tile_Click(Position clickedPosition)
+        {
+            var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
+            if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Port)
+            {
+                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
+            }
+        }
+
+        private void Rock_Tile_Click(Position clickedPosition)
+        {
+            var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
+            if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Mine)
+            {
+                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
             }
         }
 
@@ -107,11 +130,6 @@ namespace TinyCiv.Client.Code
         {            
            gameObject.BorderThickness = new Thickness(2);
            gameObject.BorderBrush = Brushes.IndianRed;
-        }
-
-        private async void Create_Unit(Position clickedPosition)
-        {
-            await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, clickedPosition.row, clickedPosition.column));
         }
 
         private void OnInteractableChange(InteractableObjectServerEvent response)
@@ -186,10 +204,17 @@ namespace TinyCiv.Client.Code
             {
                 if (gameObject.Type == GameObjectType.Empty)
                 {
-                    gameObject.LeftAction = () => { Tile_Click(gameObject.Position); };
-                    gameObject.RightAction = () => { Create_Unit(gameObject.Position); };
+                    gameObject.LeftAction = () => { Grass_Tile_Click(gameObject.Position); };
                 }
-                else if (gameObject.Type == GameObjectType.Warrior)
+                else if (gameObject.Type == GameObjectType.StaticWater)
+                {
+                    gameObject.LeftAction = () => { Water_Tile_Click(gameObject.Position); };
+                }
+                else if (gameObject.Type == GameObjectType.StaticMountain)
+                {
+                    gameObject.LeftAction = () => { Rock_Tile_Click(gameObject.Position); };
+                }
+                else if (gameObject is Unit)
                 {
                     gameObject.LeftAction = () => { Unit_Click(gameObject); };
                     gameObject.RightAction = () => { };

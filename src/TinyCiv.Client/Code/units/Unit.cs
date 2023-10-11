@@ -5,12 +5,12 @@ namespace TinyCiv.Client.Code.Units;
 public abstract class Unit : GameObject
 {
     public int Health { get; set; }
-    public abstract int MaxHealth { get; }
-    public abstract int Damage { get; }
-    public abstract int Speed { get; }
-    public abstract int ProductionPrice { get; }
-    public abstract int ExpReward { get; }
-    public abstract string Description { get; }
+    public int MaxHealth { get; set; }
+    public int Damage { get; set; }
+    public int Speed { get; set; }
+    public int ProductionPrice { get; set; }
+    public int ExpReward { get; set; }
+    public string Description { get; set; }
 
     protected Unit(ServerGameObject serverGameObject) : base(serverGameObject)
     {

@@ -5,16 +5,15 @@ namespace TinyCiv.Client.Code.units
 {
     public class Tarran : Unit
     {
-        public override int MaxHealth => Shared.Constants.Game.Interactable.Tarran.InitialHealth;
-        public override int Damage => Shared.Constants.Game.Interactable.Tarran.Damage;
-        public override int Speed => 1;
-        public override int ProductionPrice => 50;
-        public override int ExpReward => 50;
-        public override string Description => "5x more damage against the cities and 5x reduced damage from them";
-
         public Tarran(ServerGameObject serverGameObject) : base(serverGameObject)
         {
+            MaxHealth = Shared.Constants.Game.Interactable.Tarran.InitialHealth;
             Health = MaxHealth;
+            Damage = Shared.Constants.Game.Interactable.Tarran.Damage;
+            Speed = 1;
+            ProductionPrice = 50;
+            ExpReward = 50;
+            Description = "5x more damage against the cities and 5x reduced damage from them";
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TinyCiv.Client.Code.units;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Shared.Game;
 
@@ -34,15 +35,15 @@ namespace TinyCiv.Client.Code.Factories
                     warrior.ImageSource = sources[serverGameObject.Type];
                     return warrior;
                 case GameObjectType.Colonist:
-                    var colonist = new Warrior(serverGameObject);
+                    var colonist = new Colonist(serverGameObject);
                     colonist.ImageSource = sources[serverGameObject.Type];
                     return colonist;
                 case GameObjectType.Cavalry:
-                    var cavalry = new Warrior(serverGameObject);
+                    var cavalry = new Cavalry(serverGameObject);
                     cavalry.ImageSource = sources[serverGameObject.Type];
                     return cavalry;
                 case GameObjectType.Tarran:
-                    var tarran = new Warrior(serverGameObject);
+                    var tarran = new Tarran(serverGameObject);
                     tarran.ImageSource = sources[serverGameObject.Type];
                     return tarran;
                 case GameObjectType.City:
