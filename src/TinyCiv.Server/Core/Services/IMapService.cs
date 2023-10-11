@@ -10,7 +10,11 @@ public interface IMapService
     ServerGameObject? GetUnit(ServerPosition position);
     ServerGameObject? GetUnit(Guid? unitId);
 
+    bool PlaceCity(Guid playerId);
+    bool IsCityOwner(Guid playerId);
+
     void ReplaceWithEmpty(Guid id);
+    bool IsTileFree(ServerPosition position);
     
     Task MoveUnitAsync(Guid unitId, ServerPosition position, Action<UnitMoveResponse> unitMoveCallback);
     ServerGameObject? CreateBuilding(Guid PlayerId,  ServerPosition position, IBuilding building);

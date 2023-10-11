@@ -27,6 +27,11 @@ public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
                 .ConfigureAwait(false);
         }
 
+        if (!_mapService.IsCityOwner(@event.PlayerId))
+        {
+            return;
+        }
+
         bool buildingExist = BuildingsMapper.Buildings.TryGetValue(@event.BuildingType, out var building);
 
         if (buildingExist == false)

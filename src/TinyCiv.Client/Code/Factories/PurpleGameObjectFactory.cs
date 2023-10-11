@@ -16,7 +16,7 @@ namespace TinyCiv.Client.Code.Factories
             { GameObjectType.Colonist, "/Assets/colonistPurple.png" },
             { GameObjectType.Cavalry, "/Assets/cavalryPurple.png" },
             { GameObjectType.Tarran, "/Assets/tarranPurple.png" },
-            { GameObjectType.City, "/Assets/cityPurple.png" },
+            { GameObjectType.Town, "/Assets/cityPurple.png" },
             { GameObjectType.Farm, "/Assets/farmPurple.png" },
             { GameObjectType.Mine, "/Assets/minePurple.png" },
             { GameObjectType.Blacksmith, "/Assets/blacksmithPurple.png" },
@@ -45,7 +45,7 @@ namespace TinyCiv.Client.Code.Factories
                     var tarran = new Warrior(serverGameObject);
                     tarran.ImageSource = sources[serverGameObject.Type];
                     return tarran;
-                case GameObjectType.City:
+                case GameObjectType.Town:
                     var city = new GameObject(serverGameObject);
                     city.ImageSource = sources[serverGameObject.Type];
                     return city;

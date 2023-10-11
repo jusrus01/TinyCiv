@@ -1,4 +1,6 @@
-﻿using TinyCiv.Server.Core.Extensions;
+﻿using Microsoft.AspNetCore.Components.Web;
+using System.Security.Cryptography;
+using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Game.Buildings;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Entities;
@@ -78,7 +80,7 @@ namespace TinyCiv.Server.Services
                 {
                     bool isTown = _map!.Objects!
                         .Where(o => o.Position!.X == x && o.Position.Y == y)
-                        .Where(o => o.Type == GameObjectType.City)
+                        .Where(o => o.Type == GameObjectType.Town)
                         .Any();
 
                     if (isTown)
@@ -147,6 +149,58 @@ namespace TinyCiv.Server.Services
                 unit.Position = target;
                 return true;
             }
+        }
+
+        public bool PlaceCity(Guid playerId)
+        {
+            var colonistObject = _map!.Objects!
+                .Select((o, i) => new { Value = o, Index = i })
+                .Where(o => o.Value.Type == GameObjectType.Colonist)
+                .Where(o => o.Value.OwnerPlayerId == playerId)
+                .FirstOrDefault();
+
+            if (colonistObject == null)
+            {
+                return false;
+            }
+
+            if (IsTownInRange(colonistObject.Value.Position!, Constants.Game.TownSpaceFromTown))
+            {
+                return false;
+            }
+
+            _map.Objects![colonistObject.Index] = new ServerGameObject
+            {
+                OwnerPlayerId = playerId,
+                Id = colonistObject.Value.Id,
+                Position = colonistObject.Value.Position,
+                Type = GameObjectType.Town,
+                Color = colonistObject.Value.Color
+            };
+
+            return true;
+        }
+
+        public bool IsTileFree(ServerPosition position)
+        {
+            var tile = _map!.Objects!
+                .Where(o => o.Position!.X == position.X && o.Position.Y == position.Y)
+                .First();
+
+            if (tile.Type == GameObjectType.Empty || tile.Type == GameObjectType.StaticMountain)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsCityOwner(Guid playerId)
+        {
+            return _map!.Objects!
+                .Where(o => o.Type == GameObjectType.Town)
+                .Where(o => o.OwnerPlayerId == playerId)
+                .Any();
         }
 
         public void ReplaceWithEmpty(Guid id)

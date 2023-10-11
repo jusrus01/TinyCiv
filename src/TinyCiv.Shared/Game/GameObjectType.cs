@@ -11,7 +11,7 @@ public enum GameObjectType
     Tarran,
 
     // STRUCTURES
-    City,
+    Town,
     Bank,
     Blacksmith,
     Farm,

@@ -20,6 +20,11 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
     
     protected override async Task OnHandleAsync(CreateUnitClientEvent @event)
     {
+        if (!_mapService.IsCityOwner(@event.PlayerId))
+        {
+            return;
+        }
+
         var unit = _mapService.CreateUnit(@event.PlayerId, new ServerPosition { X = @event.X, Y = @event.Y }, @event.UnitType);
         if (unit == null)
         {
@@ -46,5 +51,12 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
         
         await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
             .ConfigureAwait(false);
+    }
+
+    protected override bool IgnoreWhen(CreateUnitClientEvent @event)
+    {
+        return @event.UnitType != GameObjectType.Cavalry &&
+            @event.UnitType != GameObjectType.Warrior &&
+            @event.UnitType != GameObjectType.Tarran;
     }
 }

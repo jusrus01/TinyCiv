@@ -511,7 +511,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         yield return new object[] { GameObjectType.Colonist, Constants.Game.Interactable.Colonist.Damage, Constants.Game.Interactable.Colonist.InitialHealth };
         yield return new object[] { GameObjectType.Cavalry, Constants.Game.Interactable.Cavalry.Damage, Constants.Game.Interactable.Cavalry.InitialHealth };
         yield return new object[] { GameObjectType.Tarran, Constants.Game.Interactable.Tarran.Damage, Constants.Game.Interactable.Tarran.InitialHealth };
-        yield return new object[] { GameObjectType.City, null, null };
+        yield return new object[] { GameObjectType.Town, null, null };
         yield return new object[] { GameObjectType.Empty, null, null };
         yield return new object[] { GameObjectType.Mine, null, null };
         yield return new object[] { GameObjectType.StaticMountain, null, null };
