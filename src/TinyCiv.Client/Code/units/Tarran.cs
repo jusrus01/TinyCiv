@@ -11,7 +11,7 @@ namespace TinyCiv.Client.Code.units
         public override int ExpReward => 50;
         public override string Description => "5x more damage against the cities and 5x reduced damage from them";
 
-        public Tarran(Unit go) : base(go)
+        public Tarran(GameObject go) : base(go)
         {
             Health = MaxHealth;
         }       

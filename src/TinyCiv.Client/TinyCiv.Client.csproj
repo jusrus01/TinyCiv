@@ -33,6 +33,7 @@
     <None Remove="Assets\farmPurple.png" />
     <None Remove="Assets\farmRed.png" />
     <None Remove="Assets\farmYellow.png" />
+    <None Remove="Assets\gold.png" />
     <None Remove="Assets\grass_tile.png" />
     <None Remove="Assets\marketGreen.png" />
     <None Remove="Assets\marketPurple.png" />
@@ -90,6 +91,7 @@
     <Resource Include="Assets\farmPurple.png" />
     <Resource Include="Assets\farmRed.png" />
     <Resource Include="Assets\farmYellow.png" />
+    <Resource Include="Assets\gold.png" />
     <Resource Include="Assets\grass_tile.png" />
     <Resource Include="Assets\marketGreen.png" />
     <Resource Include="Assets\marketPurple.png" />

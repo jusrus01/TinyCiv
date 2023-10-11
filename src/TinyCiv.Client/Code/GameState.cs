@@ -17,14 +17,16 @@ namespace TinyCiv.Client.Code
 {
     public class GameState
     {
-        public Dictionary<Guid, int> HealthValues; // : ))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+        public Dictionary<Guid, int> HealthValues; // : ))))))))))))))))))))))))))))))))))))))))))))))))))))))  HACKERMAN
 
         public ObservableValue<List<Border>> SpriteList { get; } = new ObservableValue<List<Border>>();
         public Action onPropertyChanged;
 
+        public Resources Resources;
         public List<string> mapImages = new List<string>();
         public List<GameObject> GameObjects = new List<GameObject>();
         public UnitMenuViewModel UnitMenuVM;
+        public UpperMenuViewModel UpperMenuVM;
         private int Rows;
         private int Columns;
 
@@ -46,6 +48,13 @@ namespace TinyCiv.Client.Code
             Columns = columns;
             ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
             ClientSingleton.Instance.serverClient.ListenForInteractableObjectChanges(OnInteractableChange);
+            ClientSingleton.Instance.serverClient.ListenForResourcesUpdate(OnResourceUpdate);
+        }
+
+        private void OnResourceUpdate(ResourcesUpdateServerEvent response)
+        {
+            Resources = response.Resources;
+            UpperMenuVM.SetResources(Resources);
         }
 
         private async void Grass_Tile_Click(Position clickedPosition)

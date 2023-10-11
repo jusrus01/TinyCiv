@@ -31,19 +31,19 @@ namespace TinyCiv.Client.Code.Factories
             switch (serverGameObject.Type)
             {
                 case GameObjectType.Warrior:
-                    var warrior = new Warrior(serverGameObject);
+                    var warrior = new Warrior(GameObject.fromServerGameObject(serverGameObject));
                     warrior.ImageSource = sources[serverGameObject.Type];
                     return warrior;
                 case GameObjectType.Colonist:
-                    var colonist = new Colonist(serverGameObject);
+                    var colonist = new Colonist(GameObject.fromServerGameObject(serverGameObject));
                     colonist.ImageSource = sources[serverGameObject.Type];
                     return colonist;
                 case GameObjectType.Cavalry:
-                    var cavalry = new Cavalry(serverGameObject);
+                    var cavalry = new Cavalry(GameObject.fromServerGameObject(serverGameObject));
                     cavalry.ImageSource = sources[serverGameObject.Type];
                     return cavalry;
                 case GameObjectType.Tarran:
-                    var tarran = new Tarran(serverGameObject);
+                    var tarran = new Tarran(GameObject.fromServerGameObject(serverGameObject));
                     tarran.ImageSource = sources[serverGameObject.Type];
                     return tarran;
                 case GameObjectType.City:

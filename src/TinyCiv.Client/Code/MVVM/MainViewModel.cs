@@ -32,7 +32,7 @@ namespace TinyCiv.Client.Code.MVVM
         public MainViewModel()
         {
             Game.Value = GameVM;
-            UpperMenu.Value = UpperMenuVM;
+            //UpperMenu.Value = UpperMenuVM;
 
             DependencyObject dep = new DependencyObject();
             if (!DesignerProperties.GetIsInDesignMode(dep))
@@ -65,9 +65,12 @@ namespace TinyCiv.Client.Code.MVVM
         private void OnGameStart(GameStartServerEvent response)
         {
             LowerMenu.Value = UnitMenuVM;
-            GameVM.GameStart(response);
-            GameVM.UnitMenuVM = UnitMenuVM;
+            UpperMenu.Value = UpperMenuVM;
 
+            GameVM.GameStart(response);
+
+            GameVM.UnitMenuVM = UnitMenuVM;
+            GameVM.UpperMenuVM = UpperMenuVM;
         }
 
     }
