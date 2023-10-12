@@ -8,28 +8,20 @@ namespace TinyCiv.Server.Handlers;
 
 public class PlaceTownHandler : ClientHandler<PlaceTownClientEvent>
 {
-    private readonly IMapService _mapService;
+    private readonly IGameService _gameService;
 
-    public PlaceTownHandler(ILogger<IClientHandler> logger, IMapService mapService) : base(logger)
+    public PlaceTownHandler(ILogger<IClientHandler> logger, IGameService gameService) : base(logger)
     {
-        _mapService = mapService;
+        _gameService = gameService;
     }
 
     protected override async Task OnHandleAsync(PlaceTownClientEvent @event)
     {
-        if (_mapService.IsTownOwner(@event.PlayerId))
-        {
-            return;
-        }
+        var map = _gameService.PlaceTown(@event.PlayerId);
 
-        bool result = _mapService.PlaceTown(@event.PlayerId);
+        if (map == null) return;
 
-        if (result == false)
-        {
-            return;
-        }
-
-        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
+        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(map))
             .ConfigureAwait(false);
     }
 }

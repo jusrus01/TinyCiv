@@ -1,6 +1,7 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
 using TinyCiv.Server.Core.Handlers;
 using TinyCiv.Server.Core.Services;
+using TinyCiv.Server.Dtos.Buildings;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
@@ -12,11 +13,13 @@ public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
 {
     private readonly IMapService _mapService;
     private readonly IResourceService _resourceService;
+    private readonly IGameService _gameService;
 
-    public CreateBuildingHandler(ILogger<IClientHandler> logger, IMapService mapService, IResourceService resourceService) : base(logger)
+    public CreateBuildingHandler(ILogger<IClientHandler> logger, IMapService mapService, IResourceService resourceService, IGameService gameService) : base(logger)
     {
         _mapService = mapService;
         _resourceService = resourceService;
+        _gameService = gameService;
     }
 
     protected override async Task OnHandleAsync(CreateBuildingClientEvent @event)
@@ -27,43 +30,15 @@ public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
                 .ConfigureAwait(false);
         }
 
-        if (!_mapService.IsTownOwner(@event.PlayerId))
-        {
-            return;
-        }
+        var request = new CreateBuildingRequest(@event.PlayerId, @event.BuildingType, @event.Position, resourceUpdateCallback);
+        var response = _gameService.CreateBuilding(request);
 
-        bool buildingExist = BuildingsMapper.Buildings.TryGetValue(@event.BuildingType, out var building);
+        if (response == null) return;
 
-        if (buildingExist == false)
-        {
-            return;
-        }
-
-        bool canAfford = _resourceService.GetResources(@event.PlayerId).Industry >= building!.Price;
-
-        if (canAfford == false)
-        {
-            return;
-        }
-
-        _resourceService.AddResources(@event.PlayerId, ResourceType.Industry, -building.Price);
-        var playerResources = _resourceService.GetResources(@event.PlayerId);
-
-        await NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, new ResourcesUpdateServerEvent(playerResources))
+        await NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, new ResourcesUpdateServerEvent(response.Resources))
             .ConfigureAwait(false);
 
-        var buildingTile = _mapService.CreateBuilding(@event.PlayerId, @event.Position, building!);
-
-        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
+        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(response.Map))
             .ConfigureAwait(false);
-
-        if (buildingTile == null)
-        {
-            return;
-        }
-
-        _resourceService.AddBuilding(@event.PlayerId, building!, resourceUpdateCallback);
-
-        return;
     }
 }

@@ -1,55 +1,39 @@
-using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Server;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Game;
 using TinyCiv.Shared;
+using TinyCiv.Server.Dtos.Units;
 
 namespace TinyCiv.Server.Handlers;
 
 public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
 {
-    private readonly IMapService _mapService;
-    private readonly IInteractableObjectService _interactableObjectService;
+    private readonly IGameService _gameService;
 
-    public UnitAddHandler(IMapService mapService, IInteractableObjectService interactableObjectService, ILogger<UnitAddHandler> logger) : base(logger)
+    public UnitAddHandler(ILogger<UnitAddHandler> logger, IGameService gameService) : base(logger)
     {
-        _mapService = mapService;
-        _interactableObjectService = interactableObjectService;
+        _gameService = gameService;
     }
-    
+
     protected override async Task OnHandleAsync(CreateUnitClientEvent @event)
     {
-        if (!_mapService.IsTownOwner(@event.PlayerId))
-        {
-            return;
-        }
+        var position = new ServerPosition { X = @event.X, Y = @event.Y };
+        var request = new AddUnitRequest(@event.PlayerId, position, @event.UnitType);
+        var response = _gameService.AddUnit(request);
 
-        var unit = _mapService.CreateUnit(@event.PlayerId, new ServerPosition { X = @event.X, Y = @event.Y }, @event.UnitType);
-        if (unit == null)
-        {
-            return;
-        }
-
-        Task? interactableNotifierTask = null;
-        if (unit.IsInteractable())
-        {
-            var interactable = _interactableObjectService.Initialize(unit);
-            
-            interactableNotifierTask = NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll,
-                new InteractableObjectServerEvent(unit.Id, interactable.Health, interactable.AttackDamage));
-        }
+        if (response == null) return;
         
-        await NotifyCallerAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(unit))
+        await NotifyCallerAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(response.Unit))
             .ConfigureAwait(false);
 
         // Do not notify about map change before created unit receives properties such as Health, AttackDamage
-        if (interactableNotifierTask != null)
+        if (response.InteractableObjectEvent != null)
         {
-            await interactableNotifierTask;
+            await NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, response.InteractableObjectEvent);
         }
         
-        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
+        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(response.Map))
             .ConfigureAwait(false);
     }
 

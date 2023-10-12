@@ -29,6 +29,7 @@ builder.Services.AddSingleton<ICombatService, CombatService>();
 builder.Services.AddScoped<IConnectionIdAccessor, ConnectionIdAccessor>();
 
 builder.Services.AddTransient<IMapReader, LocalFileMapReader>();
+builder.Services.AddTransient<IGameService,  GameService>();
 builder.Services.AddTransient<IMapLoader, MapLoader>();
 
 builder.Services.AddTransient<IClientHandler, UnitMoveHandler>();
