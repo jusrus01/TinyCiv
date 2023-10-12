@@ -6,11 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using TinyCiv.Client.Code.Decorators;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
 {
-    public class GameObject
+    public class GameObject : IBorderDecorator
     {
         public GameObjectType Type { get; private set; }
         public Position Position { get; set; }
@@ -22,6 +23,7 @@ namespace TinyCiv.Client.Code
         public string ImageSource { get; set; }
         public Thickness BorderThickness { get; set; }
         public Brush BorderBrush { get; set; }
+        public Brush BackgroundBrush { get; set; }
         public Action LeftAction { get; set; }
         public Action RightAction { get; set; }
 
@@ -47,6 +49,16 @@ namespace TinyCiv.Client.Code
             go.Color = serverGameObject.Color;
             go.OpponentId = serverGameObject.OpponentId;
             return go;
+        }
+
+        public void ApplyBorderEffects()
+        {
+            BorderThickness = new Thickness(2);
+        }
+
+        public void RemoveBorderEffects()
+        {
+            BorderThickness = new Thickness(0);
         }
     }
 }
