@@ -74,23 +74,26 @@ namespace TinyCiv.Server.Services
 
         public bool IsInRange(ServerPosition position, int range, GameObjectType type)
         {
-            for (int x = position.X - range; x < position.X + range; x++)
+            lock (_mapChangeLocker)
             {
-                for (int y = position.Y - range; y < position.Y + range; y++)
+                for (int x = position.X - range; x < position.X + range; x++)
                 {
-                    bool found = _map!.Objects!
-                        .Where(o => o.Position!.X == x && o.Position.Y == y)
-                        .Where(o => o.Type == type)
-                        .Any();
-
-                    if (found)
+                    for (int y = position.Y - range; y < position.Y + range; y++)
                     {
-                        return true;
+                        bool found = _map!.Objects!
+                            .Where(o => o.Position!.X == x && o.Position.Y == y)
+                            .Where(o => o.Type == type)
+                            .Any();
+
+                        if (found)
+                        {
+                            return true;
+                        }
                     }
                 }
-            }
 
-            return false;
+                return false;
+            }
         }
 
         public ServerGameObject? CreateUnit(Guid playerId, ServerPosition position, GameObjectType type)
@@ -153,40 +156,46 @@ namespace TinyCiv.Server.Services
 
         public bool PlaceTown(Guid playerId)
         {
-            var colonistObject = _map!.Objects!
-                .Select((o, i) => new { Value = o, Index = i })
-                .Where(o => o.Value.Type == GameObjectType.Colonist)
-                .Where(o => o.Value.OwnerPlayerId == playerId)
-                .FirstOrDefault();
-
-            if (colonistObject == null)
+            lock (_mapChangeLocker)
             {
-                return false;
+                var colonistObject = _map!.Objects!
+                    .Select((o, i) => new { Value = o, Index = i })
+                    .Where(o => o.Value.Type == GameObjectType.Colonist)
+                    .Where(o => o.Value.OwnerPlayerId == playerId)
+                    .FirstOrDefault();
+
+                if (colonistObject == null)
+                {
+                    return false;
+                }
+
+                if (IsInRange(colonistObject.Value.Position!, Constants.Game.TownSpaceFromTown, GameObjectType.Town))
+                {
+                    return false;
+                }
+
+                _map.Objects![colonistObject.Index] = new ServerGameObject
+                {
+                    OwnerPlayerId = playerId,
+                    Id = colonistObject.Value.Id,
+                    Position = colonistObject.Value.Position,
+                    Type = GameObjectType.Town,
+                    Color = colonistObject.Value.Color
+                };
+
+                return true;
             }
-
-            if (IsInRange(colonistObject.Value.Position!, Constants.Game.TownSpaceFromTown, GameObjectType.Town))
-            {
-                return false;
-            }
-
-            _map.Objects![colonistObject.Index] = new ServerGameObject
-            {
-                OwnerPlayerId = playerId,
-                Id = colonistObject.Value.Id,
-                Position = colonistObject.Value.Position,
-                Type = GameObjectType.Town,
-                Color = colonistObject.Value.Color
-            };
-
-            return true;
         }
 
         public bool IsTownOwner(Guid playerId)
         {
-            return _map!.Objects!
-                .Where(o => o.Type == GameObjectType.Town)
-                .Where(o => o.OwnerPlayerId == playerId)
-                .Any();
+            lock (_mapChangeLocker)
+            {
+                return _map!.Objects!
+                    .Where(o => o.Type == GameObjectType.Town)
+                    .Where(o => o.OwnerPlayerId == playerId)
+                    .Any();
+            }
         }
 
         public void ReplaceWithEmpty(Guid id)

@@ -250,7 +250,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         // after two players join lobby, StartGameClientEvent is available for use
         await _sut.SendAsync(new JoinLobbyClientEvent());
-        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
         await WaitForResponseAsync();
 
         //assert
@@ -523,8 +523,11 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await _sut.SendAsync(new StartGameClientEvent());
         await WaitForResponseAsync();
 
+        await _sut.SendAsync(new PlaceTownClientEvent(playerId1!.Value));
+        await anotherClient.SendAsync(new PlaceTownClientEvent(playerId2!.Value));
+
         //act
-        await _sut.SendAsync(new CreateUnitClientEvent(playerId1!.Value, 1, 4, GameObjectType.Colonist));
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId1!.Value, 1, 4, GameObjectType.Cavalry));
         await anotherClient.SendAsync(new CreateUnitClientEvent(playerId2!.Value, 1, 2, GameObjectType.Warrior));
         await WaitForResponseAsync();
 
@@ -541,7 +544,6 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
     public static IEnumerable<object[]> ListenForInteractableObjectChanges_TestData()
     {
         yield return new object[] { GameObjectType.Warrior, Constants.Game.Interactable.Warrior.Damage, Constants.Game.Interactable.Warrior.InitialHealth };
-        yield return new object[] { GameObjectType.Colonist, Constants.Game.Interactable.Colonist.Damage, Constants.Game.Interactable.Colonist.InitialHealth };
         yield return new object[] { GameObjectType.Cavalry, Constants.Game.Interactable.Cavalry.Damage, Constants.Game.Interactable.Cavalry.InitialHealth };
         yield return new object[] { GameObjectType.Tarran, Constants.Game.Interactable.Tarran.Damage, Constants.Game.Interactable.Tarran.InitialHealth };
         yield return new object[] { GameObjectType.Town, null, null };
@@ -580,6 +582,8 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         await _sut.SendAsync(new StartGameClientEvent());
         await WaitForResponseAsync();
+
+        await _sut.SendAsync(new PlaceTownClientEvent(playerId!.Value));
 
         //act
         await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 1, 1, type));

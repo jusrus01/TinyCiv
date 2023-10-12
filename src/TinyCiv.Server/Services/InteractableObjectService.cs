@@ -34,7 +34,6 @@ public class InteractableObjectService : IInteractableObjectService
         return objType switch
         {
             GameObjectType.Warrior => new InteractableWarrior(),
-            GameObjectType.Colonist => new InteractableColonist(),
             GameObjectType.Cavalry => new InteractableCavalry(),
             GameObjectType.Tarran => new InteractableTarran(),
             _ => throw new NotSupportedException()

@@ -14,12 +14,6 @@ public static class Constants
                 public const int Damage = 20;
             }
 
-            public static class Colonist
-            {
-                public const int InitialHealth = 10;
-                public const int Damage = 0;
-            }
-
             public static class Cavalry
             {
                 public const int InitialHealth = 60;
