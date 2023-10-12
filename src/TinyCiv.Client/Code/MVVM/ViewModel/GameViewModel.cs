@@ -17,7 +17,16 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             }
         }
 
+        public UpperMenuViewModel UpperMenuVM
+        {
+            get { return gameState.UpperMenuVM; }
+            set
+            {
+                gameState.UpperMenuVM = value;
+            }
+        }
 
+        
         public string[] MapList { 
             get
             {

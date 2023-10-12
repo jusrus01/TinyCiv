@@ -1,18 +1,21 @@
-﻿using TinyCiv.Shared.Game;
-
-namespace TinyCiv.Client.Code.Units;
+﻿namespace TinyCiv.Client.Code.Units;
 
 public abstract class Unit : GameObject
 {
     public int Health { get; set; }
-    public abstract int MaxHealth { get; }
-    public abstract int Damage { get; }
-    public abstract int Speed { get; }
-    public abstract int ProductionPrice { get; }
-    public abstract int ExpReward { get; }
-    public abstract string Description { get; }
+    public virtual int MaxHealth { get; }
+    public virtual int Damage { get; }
+    public virtual int Speed { get; }
+    public virtual int ProductionPrice { get; }
+    public virtual int ExpReward { get; }
+    public virtual string Description { get; }
 
-    protected Unit(ServerGameObject serverGameObject) : base(serverGameObject)
+    protected Unit(Unit unit) : base(unit.Type, unit.Position, unit.OwnerId, unit.Id, unit.Color, unit.OpponentId)
+    {
+        Health = unit.Health;
+    }
+
+    protected Unit(GameObject go) : base(go.Type, go.Position, go.OwnerId, go.Id, go.Color, go.OpponentId)
     {
 
     }

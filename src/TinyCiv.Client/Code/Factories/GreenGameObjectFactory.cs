@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TinyCiv.Client.Code.units;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Shared.Game;
 
@@ -30,51 +31,51 @@ namespace TinyCiv.Client.Code.Factories
             switch (serverGameObject.Type)
             {
                 case GameObjectType.Warrior:
-                    var warrior = new Warrior(serverGameObject);
+                    var warrior = new Warrior(GameObject.fromServerGameObject(serverGameObject));
                     warrior.ImageSource = sources[serverGameObject.Type];
                     return warrior;
                 case GameObjectType.Colonist:
-                    var colonist = new Warrior(serverGameObject);
+                    var colonist = new Colonist(GameObject.fromServerGameObject(serverGameObject));
                     colonist.ImageSource = sources[serverGameObject.Type];
                     return colonist;
                 case GameObjectType.Cavalry:
-                    var cavalry = new Warrior(serverGameObject);
+                    var cavalry = new Cavalry(GameObject.fromServerGameObject(serverGameObject));
                     cavalry.ImageSource = sources[serverGameObject.Type];
                     return cavalry;
                 case GameObjectType.Tarran:
-                    var tarran = new Warrior(serverGameObject);
+                    var tarran = new Tarran(GameObject.fromServerGameObject(serverGameObject));
                     tarran.ImageSource = sources[serverGameObject.Type];
                     return tarran;
                 case GameObjectType.City:
-                    var city = new GameObject(serverGameObject);
+                    var city = GameObject.fromServerGameObject(serverGameObject);
                     city.ImageSource = sources[serverGameObject.Type];
                     return city;
                 case GameObjectType.Farm:
-                    var farm = new GameObject(serverGameObject);
+                    var farm = GameObject.fromServerGameObject(serverGameObject);
                     farm.ImageSource = sources[serverGameObject.Type];
                     return farm;
                 case GameObjectType.Mine:
-                    var mine = new GameObject(serverGameObject);
+                    var mine = GameObject.fromServerGameObject(serverGameObject);
                     mine.ImageSource = sources[serverGameObject.Type];
                     return mine;
                 case GameObjectType.Blacksmith:
-                    var blacksmith = new GameObject(serverGameObject);
+                    var blacksmith = GameObject.fromServerGameObject(serverGameObject);
                     blacksmith.ImageSource = sources[serverGameObject.Type];
                     return blacksmith;
                 case GameObjectType.Shop:
-                    var market = new GameObject(serverGameObject);
+                    var market = GameObject.fromServerGameObject(serverGameObject);
                     market.ImageSource = sources[serverGameObject.Type];
                     return market;
                 case GameObjectType.Bank:
-                    var bank = new GameObject(serverGameObject);
+                    var bank = GameObject.fromServerGameObject(serverGameObject);
                     bank.ImageSource = sources[serverGameObject.Type];
                     return bank;
                 case GameObjectType.Port:
-                    var port = new GameObject(serverGameObject);
+                    var port = GameObject.fromServerGameObject(serverGameObject);
                     port.ImageSource = sources[serverGameObject.Type];
                     return port;
                 default:
-                    var go = new GameObject(serverGameObject);
+                    var go = GameObject.fromServerGameObject(serverGameObject);
                     go.ImageSource = "";
                     return go;
             }

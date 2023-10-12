@@ -11,7 +11,7 @@ public class Cavalry : Unit
     public override int ExpReward => 60;
     public override string Description => null;
 
-    public Cavalry(ServerGameObject serverGameObject) : base(serverGameObject)
+    public Cavalry(GameObject gameObject) : base(gameObject)
     {
         Health = MaxHealth;
     }
