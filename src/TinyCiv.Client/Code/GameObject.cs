@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using TinyCiv.Client.Code.Decorators;
@@ -11,7 +6,7 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
 {
-    public class GameObject : IBorderDecorator
+    public class GameObject : BorderObject
     {
         public GameObjectType Type { get; private set; }
         public Position Position { get; set; }
@@ -21,11 +16,12 @@ namespace TinyCiv.Client.Code
         public Guid? OpponentId { get; private set; }
 
         public string ImageSource { get; set; }
-        public Thickness BorderThickness { get; set; }
-        public Brush BorderBrush { get; set; }
-        public Brush BackgroundBrush { get; set; }
+        public override Thickness BorderThickness { get; set; }
+        public override Brush BorderBrush { get; set; }
+        public override Brush BackgroundBrush { get; set; }
         public Action LeftAction { get; set; }
         public Action RightAction { get; set; }
+       
 
         public GameObject(GameObjectType type, Position position, Guid ownerId, Guid id, TeamColor color, Guid? opponentId)
         {
@@ -51,12 +47,12 @@ namespace TinyCiv.Client.Code
             return go;
         }
 
-        public void ApplyBorderEffects()
+        public override void ApplyBorderEffects()
         {
             BorderThickness = new Thickness(2);
         }
 
-        public void RemoveBorderEffects()
+        public override void RemoveBorderEffects()
         {
             BorderThickness = new Thickness(0);
         }

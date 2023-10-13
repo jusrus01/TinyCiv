@@ -13,16 +13,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace TinyCiv.Client.Code.MVVM.View
+namespace TinyCiv.Client.Code.MVVM.View.UserControls
 {
     /// <summary>
-    /// Interaction logic for UnitMenuView.xaml
+    /// Interaction logic for ToggleView.xaml
     /// </summary>
-    public partial class UnitMenuView : UserControl
+    public partial class ToggleView : UserControl
     {
-        public UnitMenuView()
+        public ToggleView()
         {
             InitializeComponent();
         }
+
+        public virtual void Show() { }
+        public virtual void Hide() { }
     }
 }

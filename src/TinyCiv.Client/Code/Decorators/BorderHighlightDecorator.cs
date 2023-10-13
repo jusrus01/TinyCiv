@@ -8,16 +8,21 @@ namespace TinyCiv.Client.Code.Decorators
     {
         private Color _color;
 
-        public BorderHighlightDecorator(GameObject gameObject, Color color) : base(gameObject)
+        public BorderHighlightDecorator(BorderObject borderObject, Color color) : base(borderObject)
         {
             _color = color;
         }
 
-        new public void ApplyBorderEffects()
+        public override void ApplyBorderEffects()
         {
             base.ApplyBorderEffects();
             wrappee.BorderThickness = new Thickness(2);
             wrappee.BorderBrush = new SolidColorBrush(_color);
+        }
+
+        protected BorderObject GetWreppee()
+        {          
+            return wrappee;
         }
     }
 }

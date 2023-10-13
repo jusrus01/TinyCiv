@@ -1,5 +1,6 @@
 ﻿using TinyCiv.Client.Code.UnitDecorators;
 using System.Windows.Media;
+using System.Windows;
 
 namespace TinyCiv.Client.Code.Decorators
 {
@@ -7,15 +8,15 @@ namespace TinyCiv.Client.Code.Decorators
     {
         private Color _color;
 
-        public BorderBackgroundDecorator(GameObject gameObject, Color color) : base(gameObject)
+        public BorderBackgroundDecorator(BorderObject borderObject, Color color) : base(borderObject)
         {
             _color = color;
         }
 
-        new public void ApplyBorderEffects()
+        public override void ApplyBorderEffects()
         {
             base.ApplyBorderEffects();
-            _color.A = 220;
+            _color.A = 64;
             wrappee.BackgroundBrush = new SolidColorBrush(_color);
         }
     }

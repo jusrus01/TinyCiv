@@ -2,23 +2,26 @@
 
 namespace TinyCiv.Client.Code.UnitDecorators
 {
-    public abstract class BorderDecorator : IBorderDecorator
+    public abstract class BorderDecorator : BorderObject
     {
-        protected GameObject wrappee;
+        protected BorderObject wrappee;
 
-        public BorderDecorator(GameObject gameObject)
+        public BorderDecorator(BorderObject borderObject)
         {
-            wrappee = gameObject;
+            wrappee = borderObject;
         }
-
-        public void ApplyBorderEffects()
+        public override void ApplyBorderEffects() 
         {
             wrappee.ApplyBorderEffects();
         }
-
-        public void RemoveBorderEffects()
+        public override void RemoveBorderEffects()
         {
-            wrappee?.RemoveBorderEffects();
+            wrappee.RemoveBorderEffects();
+        }
+
+        public BorderObject GetWrappee() 
+        { 
+            return wrappee;
         }
     }
 }

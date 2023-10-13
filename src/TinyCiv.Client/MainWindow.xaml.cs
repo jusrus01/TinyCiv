@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using TinyCiv.Client.Code.MVVM.View;
 
 namespace TinyCiv.Client
 {
@@ -10,6 +11,7 @@ namespace TinyCiv.Client
         public MainWindow()
         {
             InitializeComponent();
+           
         }             
     }
 }

@@ -10,36 +10,41 @@ namespace TinyCiv.Client.Code.Decorators
     {
         private bool isFlashing = false;
         private DispatcherTimer flashTimer;
-        private GameObject gameObject;
+        private Brush originalBackgroundColor;
 
-        public BorderFlashDecorator(GameObject gameObject) : base(gameObject)
+        public BorderFlashDecorator(BorderObject borderObject) : base(borderObject)
         {
             flashTimer = new DispatcherTimer();
-            flashTimer.Interval = TimeSpan.FromMilliseconds(1000); 
+            flashTimer.Interval = TimeSpan.FromMilliseconds(1000);
             flashTimer.Tick += FlashTimer_Tick;
+            originalBackgroundColor = wrappee.BackgroundBrush;
         }
 
-        new public void ApplyBorderEffects()
+        public override void ApplyBorderEffects()
         {
             isFlashing = true;
             flashTimer.Start();
+            base.ApplyBorderEffects();
         }
 
-        new public void RemoveBorderEffects()
+        public override void RemoveBorderEffects()
         {
             isFlashing = false;
             flashTimer.Stop();
+            base.RemoveBorderEffects();
         }
 
         private void FlashTimer_Tick(object sender, EventArgs e)
         {
             if (isFlashing)
             {
-                gameObject.BorderThickness = new Thickness(2);
+                wrappee.BackgroundBrush = originalBackgroundColor;
+                wrappee.BorderThickness = new Thickness(2);
             }
             else
-            { 
-                gameObject.BorderThickness = new Thickness(0);
+            {
+                wrappee.BackgroundBrush = Brushes.Transparent;
+                wrappee.BorderThickness = new Thickness(0);
             }
 
             isFlashing = !isFlashing;

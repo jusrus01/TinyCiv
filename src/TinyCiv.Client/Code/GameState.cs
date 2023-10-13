@@ -12,6 +12,9 @@ using System;
 using System.Threading.Tasks;
 using TinyCiv.Client.Code.MVVM.ViewModel;
 using TinyCiv.Client.Code.Factories;
+using TinyCiv.Client.Code.Decorators;
+using System.Net.WebSockets;
+using TinyCiv.Client.Code.UnitDecorators;
 
 namespace TinyCiv.Client.Code
 {
@@ -121,8 +124,12 @@ namespace TinyCiv.Client.Code
         {
             isUnitSelected = true;
             selectedUnit = gameObject;
-            gameObject.BorderBrush = Brushes.Aquamarine;
-            gameObject.BorderThickness = new Thickness(2);
+
+            var goHighlightedBorder = new BorderHighlightDecorator(gameObject, Colors.Aquamarine);
+            var goDecoratedBG = new BorderBackgroundDecorator(goHighlightedBorder, Colors.Aquamarine);
+            var goFlashBorder = new BorderFlashDecorator(goDecoratedBG);
+            goFlashBorder.ApplyBorderEffects();
+
             UnitMenuVM.SetCurrentUnit(gameObject);
             onPropertyChanged?.Invoke();
         }

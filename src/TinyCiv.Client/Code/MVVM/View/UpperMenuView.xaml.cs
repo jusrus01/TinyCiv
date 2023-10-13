@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using TinyCiv.Client.Code.Decorators;
 
 namespace TinyCiv.Client.Code.MVVM.View
 {
     /// <summary>
     /// Interaction logic for UpperMenuView.xaml
     /// </summary>
-    public partial class UpperMenuView : UserControl
+    public partial class UpperMenuView : ToggleView
     {
         public UpperMenuView()
         {
             InitializeComponent();
+        }
+
+        public void Hide()
+        {
+            base.Visibility = Visibility.Collapsed;
+        }
+
+        public void Show()
+        {
+            base.Visibility = Visibility.Visible;
         }
     }
 }
