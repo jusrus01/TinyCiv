@@ -15,12 +15,6 @@ public static class Constants
                 public const int TarranDamageReductionMultiplier = 2;
             }
 
-            public static class Colonist
-            {
-                public const int InitialHealth = 10;
-                public const int Damage = 0;
-            }
-
             public static class Cavalry
             {
                 public const int InitialHealth = 60;
@@ -45,6 +39,7 @@ public static class Constants
         public const int MovementSpeedMs = 500;
 
         public const int BuildingSpaceFromTown = 2;
+        public const int TownSpaceFromTown = 5;
 
         public const int FarmInterval = 5000;
         public const int MineInterval = 4500;

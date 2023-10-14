@@ -61,6 +61,11 @@ public class SessionService : ISessionService
         return _players.Single(p => p.Id == playerId);
     }
 
+    public List<Player> GetPlayers()
+    {
+        return _players;
+    }
+
     public void RemovePlayerByConnectionId(string connectionId)
     {
         if (_isGameStarted)

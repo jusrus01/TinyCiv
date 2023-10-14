@@ -1,19 +1,20 @@
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
-using Constants = TinyCiv.Shared.Constants;
+using TinyCiv.Shared.Game;
+using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Handlers;
 
 public class GameStartHandler : ClientHandler<StartGameClientEvent>
 {
-    private readonly IMapService _mapService;
     private readonly ISessionService _sessionService;
+    private readonly IGameService _gameService;
 
-    public GameStartHandler(ISessionService sessionService, IMapService mapService, ILogger<GameStartHandler> logger) : base(logger)
+    public GameStartHandler(ISessionService sessionService, ILogger<GameStartHandler> logger, IGameService gameService) : base(logger)
     {
         _sessionService = sessionService;
-        _mapService = mapService;
+        _gameService = gameService;
     }
 
     protected override bool IgnoreWhen(StartGameClientEvent @event) =>
@@ -21,9 +22,7 @@ public class GameStartHandler : ClientHandler<StartGameClientEvent>
 
     protected override Task OnHandleAsync(StartGameClientEvent @event)
     {
-        _sessionService.StartGame();
-        var map = _mapService.Initialize(@event.MapType) ?? throw new InvalidOperationException("Something went wrong, unable to initialize map");
-
+        Map map = _gameService.StartGame(@event.MapType);
         return NotifyAllAsync(Constants.Server.SendGameStartToAll, new GameStartServerEvent(map));
     }
 }

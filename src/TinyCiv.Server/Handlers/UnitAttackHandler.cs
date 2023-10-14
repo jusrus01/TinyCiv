@@ -1,6 +1,7 @@
 using TinyCiv.Server.Core.Game.InteractableObjects;
 using TinyCiv.Server.Core.Handlers;
 using TinyCiv.Server.Core.Services;
+using TinyCiv.Server.Dtos.Units;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
@@ -11,17 +12,17 @@ namespace TinyCiv.Server.Handlers;
 public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
 {
     private readonly ISessionService _sessionService;
-    private readonly ICombatService _combatService;
+    private readonly IGameService _gameService;
 
     public UnitAttackHandler(
         ISessionService sessionService,
-        ICombatService combatService,
-        ILogger<IClientHandler> logger)
+        ILogger<IClientHandler> logger,
+        IGameService gameService)
         :
         base(logger)
     {
         _sessionService = sessionService;
-        _combatService = combatService;
+        _gameService = gameService;
     }
 
     protected override bool IgnoreWhen(AttackUnitClientEvent @event) =>
@@ -29,7 +30,8 @@ public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
     
     protected override Task OnHandleAsync(AttackUnitClientEvent @event)
     {
-        Task.Run(() => _combatService.InitiateCombatAsync(@event.AttackerId, @event.OpponentId, MapChangeNotifier, InteractableObjectStateChangeNotifier));
+        var request = new AttackUnitRequest(@event.AttackerId, @event.OpponentId, MapChangeNotifier, InteractableObjectStateChangeNotifier);
+        _gameService.AttackUnit(request);
         return Task.CompletedTask;
         
         Task MapChangeNotifier(Map updatedMap) =>

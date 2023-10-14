@@ -29,6 +29,7 @@ builder.Services.AddSingleton<ICombatService, CombatService>();
 builder.Services.AddScoped<IConnectionIdAccessor, ConnectionIdAccessor>();
 
 builder.Services.AddTransient<IMapReader, LocalFileMapReader>();
+builder.Services.AddTransient<IGameService,  GameService>();
 builder.Services.AddTransient<IMapLoader, MapLoader>();
 
 builder.Services.AddTransient<IClientHandler, UnitMoveHandler>();
@@ -38,6 +39,7 @@ builder.Services.AddTransient<IClientHandler, LeaveLobbyHandler>();
 builder.Services.AddTransient<IClientHandler, GameStartHandler>();
 builder.Services.AddTransient<IClientHandler, UnitAttackHandler>();
 builder.Services.AddTransient<IClientHandler, CreateBuildingHandler>();
+builder.Services.AddTransient<IClientHandler, PlaceTownHandler>();
 
 builder.Services
     .AddSignalR()
