@@ -527,7 +527,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await anotherClient.SendAsync(new PlaceTownClientEvent(playerId2!.Value));
 
         //act
-        await _sut.SendAsync(new CreateUnitClientEvent(playerId1!.Value, 1, 4, GameObjectType.Cavalry));
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId1!.Value, 1, 4, GameObjectType.Tarran));
         await anotherClient.SendAsync(new CreateUnitClientEvent(playerId2!.Value, 1, 2, GameObjectType.Warrior));
         await WaitForResponseAsync();
 
