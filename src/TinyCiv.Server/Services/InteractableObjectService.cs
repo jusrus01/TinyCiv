@@ -29,6 +29,19 @@ public class InteractableObjectService : IInteractableObjectService
         return interactable;
     }
 
+    public IInteractableInfo? GetInfo(GameObjectType type)
+    {
+        try
+        {
+            var dummyInteractable = ResolveInteractable(new ServerGameObject());
+            return dummyInteractable;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     private static IInteractableObject ResolveInteractable(ServerGameObject obj)
     {
         return obj.Type switch

@@ -8,7 +8,8 @@ public class InteractableTarran : IInteractableObject
     public int AttackRateInMilliseconds => Constants.Game.Interactable.AttackIntervalInMilliseconds;
     public bool IsAbleToCounterAttack => false;
     public bool IsBuilding => false;
-    
+    public int Price => Constants.Game.Interactable.Tarran.Price;
+
     public int Health { get; set; } = Constants.Game.Interactable.Tarran.InitialHealth;
     public Guid GameObjectReferenceId { get; init; }
 

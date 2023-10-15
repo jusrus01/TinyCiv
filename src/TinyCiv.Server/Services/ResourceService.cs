@@ -1,4 +1,5 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
+using TinyCiv.Server.Core.Game.InteractableObjects;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Entities;
 using TinyCiv.Shared.Game;
@@ -19,7 +20,7 @@ public class ResourceService : IResourceService
 
     public Resources InitializeResources(Guid playerId)
     {
-        lock (_resources)
+        lock (_resourceLocker)
         {
             var resourceEntry = new PlayerResources() { PlayerId = playerId };
             resourceEntry.AddResource(ResourceType.Industry, Constants.Game.StartingIndustry);
@@ -50,7 +51,7 @@ public class ResourceService : IResourceService
 
     public void AddResources(Guid PlayerId, ResourceType resourceType, int amount)
     {
-        lock (_resources)
+        lock (_resourceLocker)
         {
             var resourceEntry = _resources
                 .Where(r => r.PlayerId == PlayerId)
@@ -62,12 +63,28 @@ public class ResourceService : IResourceService
 
     public Resources GetResources(Guid playerId)
     {
-        lock (_resources)
+        lock (_resourceLocker)
         {
             return _resources
                 .Where(r => r.PlayerId == playerId)
                 .Single()
                 .GetResources();
+        }
+    }
+
+    public Resources? BuyInteractable(Guid playerId, IInteractableInfo info)
+    {
+        lock (_resourceLocker)
+        {
+            var playerResource = _resources.SingleOrDefault(player => player.PlayerId == playerId);
+            if (playerResource == null)
+            {
+                return null;
+            }
+
+            var isPurchaseSuccessful = playerResource.DecreaseResource(ResourceType.Gold, info.Price);
+            
+            return isPurchaseSuccessful ? playerResource.GetResources() : null;
         }
     }
 }
