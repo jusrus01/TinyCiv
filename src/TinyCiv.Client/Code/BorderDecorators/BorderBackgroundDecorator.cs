@@ -1,12 +1,13 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace TinyCiv.Client.Code.BorderDecorators
 {
     public class BorderBackgroundDecorator : BorderDecorator
     {
-        private Color _color;
-        public BorderBackgroundDecorator(IBorderObject decoratedObject, Color color) : base(decoratedObject)
+        private Brush _color;
+        public BorderBackgroundDecorator(BorderObject decoratedObject, Brush color) : base(decoratedObject)
         {
             _color = color;
         }
@@ -17,8 +18,11 @@ namespace TinyCiv.Client.Code.BorderDecorators
 
             if (decoratedBorder != null)
             {
-                _color = Color.FromArgb(128, _color.R, _color.G, _color.B);
-                decoratedBorder.BackgroundBrush = new SolidColorBrush(_color);
+                Color brushColor = ConvertBrushToColor(_color);
+                var transparentColor = Color.FromArgb(64, brushColor.R, brushColor.G, brushColor.B);
+
+                decoratedBorder.BackgroundBrush = ConvertColorToBrush(transparentColor);
+
             }
 
             return decoratedBorder;

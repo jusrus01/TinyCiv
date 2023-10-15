@@ -9,10 +9,10 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
 {
-    public class GameObject : IBorderObject
+    public class GameObject : BorderObject
     {
         public GameObjectType Type { get; private set; }
-        public Position Position { get; set; }
+        public override Position Position { get; set; }
         public Guid OwnerId { get; private set; }
         public Guid Id { get; private set; }
         public TeamColor Color { get; private set; }
@@ -51,25 +51,21 @@ namespace TinyCiv.Client.Code
             go.Id = serverGameObject.Id;
             go.Color = serverGameObject.Color;
             go.OpponentId = serverGameObject.OpponentId;
+            go.Border = new BorderProperties();
+            go.Border.BackgroundBrush = Brushes.Transparent;
             return go;
         }
 
-        public BorderProperties ApplyEffects()
+        public override BorderProperties ApplyEffects()
         {
-            //Application.Current.Dispatcher.Invoke(() =>
-            //{
-                Border.BorderBrush = Brushes.Black;
-            //});
+            Border.BorderBrush = Brushes.Black;
             return Border;
         }
 
-        public BorderProperties RemoveEffects()
+        public override BorderProperties RemoveEffects()
         {
-            //Application.Current.Dispatcher.Invoke(() =>
-            //{
-                Border.BorderThickness = new Thickness(0);
-                Border.BackgroundBrush = Brushes.Transparent;
-            //});
+            Border.BorderThickness = new Thickness(0);
+            Border.BackgroundBrush = Brushes.Transparent;
 
             return Border;
         }

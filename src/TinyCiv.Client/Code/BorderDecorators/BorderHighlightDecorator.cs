@@ -8,10 +8,11 @@ namespace TinyCiv.Client.Code.BorderDecorators
     {
         private readonly Brush _color;
 
-        public BorderHighlightDecorator(IBorderObject decoratedObject, Brush color) : base(decoratedObject)
+        public BorderHighlightDecorator(BorderObject decoratedObject, Brush color) : base(decoratedObject)
         {
             _color = color;
         }
+
 
         public override BorderProperties ApplyEffects()
         {
@@ -19,11 +20,8 @@ namespace TinyCiv.Client.Code.BorderDecorators
 
             if (decoratedBorder != null)
             {
-                //Application.Current.Dispatcher.Invoke(() =>
-                //{
-                    decoratedBorder.BorderThickness = new Thickness(2);
-                decoratedBorder.BorderBrush = _color;
-                //});
+                decoratedBorder.BorderThickness = new Thickness(2);
+                decoratedBorder.BorderBrush = _color;                
             }
 
             return decoratedBorder;

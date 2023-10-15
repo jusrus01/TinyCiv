@@ -123,10 +123,10 @@ namespace TinyCiv.Client.Code
             isUnitSelected = true;
             selectedUnit = gameObject;
 
-            //gameObject.Border.BorderBrush = Brushes.Aquamarine;
-            //gameObject.Border.BorderThickness = new Thickness(2);
+            var decoratedObject =
+                new BorderBackgroundDecorator(
+                    new BorderHighlightDecorator(gameObject, Brushes.Aquamarine), Brushes.Aquamarine);
 
-            var decoratedObject = new BorderHighlightDecorator(gameObject, Brushes.Aquamarine);
             decoratedObject.ApplyEffects();
 
             UnitMenuVM.SetCurrentUnit(gameObject);
@@ -136,9 +136,7 @@ namespace TinyCiv.Client.Code
         private void UnselectUnit(GameObject gameObject)
         {
             isUnitSelected = false;
-            //gameObject.BorderThickness = new Thickness(0);
             gameObject.RemoveEffects();
-            //selectedUnit = null;
             UnitMenuVM.UnselectUnit();
             onPropertyChanged?.Invoke();
         }
@@ -148,9 +146,8 @@ namespace TinyCiv.Client.Code
             gameObject.RemoveEffects();
 
             var decoratedObject =
-                new BorderFlashDecorator(
-                    new BorderBackgroundDecorator(
-                        new BorderHighlightDecorator(gameObject, Brushes.IndianRed), Colors.IndianRed));
+                new BorderBackgroundDecorator(
+                    new BorderHighlightDecorator(gameObject, Brushes.IndianRed), Brushes.IndianRed);
 
             decoratedObject.ApplyEffects();
         }
