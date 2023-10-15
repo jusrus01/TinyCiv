@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using TinyCiv.Server.Core.Game.InteractableObjects;
 using TinyCiv.Server.Core.Services;
+using TinyCiv.Server.Game.InteractableObjects;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Services;
@@ -49,30 +50,30 @@ public class CombatService : ICombatService
             return Task.CompletedTask;
         }
 
-        var objectUnderAttack = _mapService.GetUnit(opponentId);
-        if (objectUnderAttack == null)
-        {
-            return Task.CompletedTask;
-        }
-
         _combatParticipants.TryAdd(attackerId, opponentId);
 
         return Task.Run(async () =>
         {
+            IInteractableController attackerController = new InteractableController(attackerInteractableObject, attackStateNotifier);
+            IInteractableController objectUnderAttackController =
+                new InteractableController(interactableUnderAttackObject, attackStateNotifier);
+            
             var isCombatActive = true;
             while (isCombatActive)
             {
+                await attackerController.WaitAsync();
+                
                 lock (_combatLocker)
                 {
-                    var isAttackerAlive = _interactableObjectService.IsAlive(attackerInteractableObject);
+                    var isAttackerAlive = attackerController.IsAlive();
                     if (!isAttackerAlive)
                     {
                         _combatParticipants.Remove(attackerId, out _);
                         _interactableObjectService.Remove(attackerId);
                         _mapService.ReplaceWithEmpty(attackerId);
                     }
-                    
-                    var isObjectUnderAttackAlive = _interactableObjectService.IsAlive(interactableUnderAttackObject);
+
+                    var isObjectUnderAttackAlive = objectUnderAttackController.IsAlive();
                     if (!isObjectUnderAttackAlive)
                     {
                         _combatParticipants.Remove(opponentId, out _);
@@ -80,16 +81,13 @@ public class CombatService : ICombatService
                         _mapService.ReplaceWithEmpty(opponentId);
                     }
 
-                    // TODO: consider not relying on map service,
-                    // or at least get "agro" state from map service
-                    var isAttacking = attacker.OpponentId != null;
+                    var isAttacking = objectUnderAttackController.IsUnderAttack(attacker);
                     if (!isAttacking)
                     {
                         _combatParticipants.Remove(attackerId, out _);
                     }
                     
                     isCombatActive = isAttackerAlive && isObjectUnderAttackAlive && isAttacking;
-
                     if (!isCombatActive && (!isAttackerAlive || !isObjectUnderAttackAlive))
                     {
                         mapChangeNotifier(_mapService.GetMap() ?? throw new Exception()).GetAwaiter().GetResult();
@@ -100,8 +98,7 @@ public class CombatService : ICombatService
                         return Task.CompletedTask;
                     }
 
-                    interactableUnderAttackObject.Health -= attackerInteractableObject.AttackDamage;
-                    var attackedStateTask = attackStateNotifier(interactableUnderAttackObject);
+                    attackerController.Attack(interactableUnderAttackObject);
 
                     var isAfterAttackAlive = _interactableObjectService.IsAlive(interactableUnderAttackObject);
                     if (!isAfterAttackAlive)
@@ -113,16 +110,9 @@ public class CombatService : ICombatService
 
                     if (!isAfterAttackAlive || !isAttackerAlive || !isObjectUnderAttackAlive)
                     {
-                        attackedStateTask.GetAwaiter().GetResult();
                         mapChangeNotifier(_mapService.GetMap() ?? throw new Exception()).GetAwaiter().GetResult();
                     }
-                    else
-                    {
-                        attackedStateTask.GetAwaiter().GetResult();
-                    }
                 }
-
-                await Task.Delay(attackerInteractableObject.AttackRateInMilliseconds);
             }
 
             return Task.CompletedTask;

@@ -9,13 +9,10 @@ namespace TinyCiv.Client.Code.Units
         public override int Speed => 2;
         public override int ProductionPrice => 50;
         public override int ExpReward => 50;
-        public override string Description => null;
 
-        public Warrior(ServerGameObject serverGameObject) : base(serverGameObject)
+        public Warrior(GameObject go) : base(go)
         {
             Health = MaxHealth;
         }
-
-        
     }
 }

@@ -17,14 +17,16 @@ namespace TinyCiv.Client.Code
 {
     public class GameState
     {
-        public Dictionary<Guid, int> HealthValues; // : ))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+        public Dictionary<Guid, int> HealthValues; // : ))))))))))))))))))))))))))))))))))))))))))))))))))))))  HACKERMAN
 
         public ObservableValue<List<Border>> SpriteList { get; } = new ObservableValue<List<Border>>();
         public Action onPropertyChanged;
 
+        public Resources Resources;
         public List<string> mapImages = new List<string>();
         public List<GameObject> GameObjects = new List<GameObject>();
         public UnitMenuViewModel UnitMenuVM;
+        public UpperMenuViewModel UpperMenuVM;
         private int Rows;
         private int Columns;
 
@@ -46,15 +48,53 @@ namespace TinyCiv.Client.Code
             Columns = columns;
             ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
             ClientSingleton.Instance.serverClient.ListenForInteractableObjectChanges(OnInteractableChange);
+            ClientSingleton.Instance.serverClient.ListenForResourcesUpdate(OnResourceUpdate);
         }
 
-        private async void Tile_Click(Position clickedPosition)
+        private void OnResourceUpdate(ResourcesUpdateServerEvent response)
         {
+            Resources = response.Resources;
+            UpperMenuVM.SetResources(Resources);
+        }
+
+        private async void Grass_Tile_Click(Position clickedPosition)
+        {
+            var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
+            var unitUnderPurchase = UnitMenuVM.SelectedBuyUnit.Value;
+
             if (isUnitSelected)
             {
                 var unit = (Unit)selectedUnit;
                 UnselectUnit(unit);
                 await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
+            }
+            else if (unitUnderPurchase != null) 
+            {
+                UnitMenuVM.ExecuteUnitPurchase(clickedPosition);
+            }
+            else if (buildingUnderPurchase != null 
+                && buildingUnderPurchase.Type != GameObjectType.Port 
+                && buildingUnderPurchase.Type != GameObjectType.Mine)
+            {
+                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
+            }
+        }
+
+        private void Water_Tile_Click(Position clickedPosition)
+        {
+            var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
+            if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Port)
+            {
+                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
+            }
+        }
+
+        private void Rock_Tile_Click(Position clickedPosition)
+        {
+            var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
+            if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Mine)
+            {
+                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
             }
         }
 
@@ -99,11 +139,6 @@ namespace TinyCiv.Client.Code
         {            
            gameObject.BorderThickness = new Thickness(2);
            gameObject.BorderBrush = Brushes.IndianRed;
-        }
-
-        private async void Create_Unit(Position clickedPosition)
-        {
-            await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, clickedPosition.row, clickedPosition.column));
         }
 
         private void OnInteractableChange(InteractableObjectServerEvent response)
@@ -178,10 +213,17 @@ namespace TinyCiv.Client.Code
             {
                 if (gameObject.Type == GameObjectType.Empty)
                 {
-                    gameObject.LeftAction = () => { Tile_Click(gameObject.Position); };
-                    gameObject.RightAction = () => { Create_Unit(gameObject.Position); };
+                    gameObject.LeftAction = () => { Grass_Tile_Click(gameObject.Position); };
                 }
-                else if (gameObject.Type == GameObjectType.Warrior)
+                else if (gameObject.Type == GameObjectType.StaticWater)
+                {
+                    gameObject.LeftAction = () => { Water_Tile_Click(gameObject.Position); };
+                }
+                else if (gameObject.Type == GameObjectType.StaticMountain)
+                {
+                    gameObject.LeftAction = () => { Rock_Tile_Click(gameObject.Position); };
+                }
+                else if (gameObject is Unit)
                 {
                     gameObject.LeftAction = () => { Unit_Click(gameObject); };
                     gameObject.RightAction = () => { };

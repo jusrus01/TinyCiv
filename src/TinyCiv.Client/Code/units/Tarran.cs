@@ -1,5 +1,4 @@
 ﻿using TinyCiv.Client.Code.Units;
-using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.units
 {
@@ -12,9 +11,9 @@ namespace TinyCiv.Client.Code.units
         public override int ExpReward => 50;
         public override string Description => "5x more damage against the cities and 5x reduced damage from them";
 
-        public Tarran(ServerGameObject serverGameObject) : base(serverGameObject)
+        public Tarran(GameObject go) : base(go)
         {
             Health = MaxHealth;
-        }
+        }       
     }
 }

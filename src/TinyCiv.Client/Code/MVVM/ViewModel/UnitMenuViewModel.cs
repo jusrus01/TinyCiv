@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Input;
+using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.MVVM.ViewModel
@@ -9,10 +11,32 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
     {
         public ObservableValue<bool> IsUnitsListVisible { get; } = new ObservableValue<bool>(true);
         public ObservableValue<bool> IsBuildingsListVisible { get; } = new ObservableValue<bool>(false);
+        public ObservableValue<bool> IsUnderPurchase { get; } = new ObservableValue<bool>(false);
+        public ObservableValue<UnitModel> SelectedBuyUnit { get; } = new ObservableValue<UnitModel>(null);
+        public ObservableValue<BuildingModel> SelectedBuyBuilding { get; } = new ObservableValue<BuildingModel>(null);
         public ObservableValue<String> UnitName { get; } = new ObservableValue<string>("EMPTY");
-
         public RelayCommand ShowUnitsCommand => new RelayCommand(execute => ShowUnits());
         public RelayCommand ShowBuildingsCommand => new RelayCommand(execute => ShowBuildings());
+        public RelayCommand SelectUnitToBuyCommand => new RelayCommand(SelectUnitToBuy, CanBuy);
+        public RelayCommand SelectBuildingToBuyCommand => new RelayCommand(SelectBuildingToBuy, CanBuy);
+        public RelayCommand EscapeKeyCommand => new RelayCommand(HandleEscapeKey, CanCancelPurchase);
+
+        private void HandleEscapeKey(object obj)
+        {
+            SelectedBuyUnit.Value = null;
+            SelectedBuyBuilding.Value = null;
+            IsUnderPurchase.Value = false;
+            Mouse.OverrideCursor = Cursors.Arrow;
+        }
+
+        private bool CanCancelPurchase(object parameter)
+        {
+            if (SelectedBuyUnit.Value != null || SelectedBuyBuilding.Value != null)
+            {
+                return true;
+            }
+            return false;
+        }
 
         private void ShowUnits()
         {
@@ -24,6 +48,57 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         {
             IsBuildingsListVisible.Value = true;
             IsUnitsListVisible.Value = false;
+        }
+
+        private void SelectUnitToBuy(object parameter)
+        {
+            if (parameter is UnitModel unit)
+            {
+                SelectedBuyUnit.Value = unit;
+                IsUnderPurchase.Value = true;
+                Mouse.OverrideCursor = Cursors.Hand;
+            }
+        }
+
+        public async void ExecuteUnitPurchase(Position position)
+        {
+            await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value.Type));
+            SelectedBuyUnit.Value = null;
+            Mouse.OverrideCursor= Cursors.Arrow;
+            IsUnderPurchase.Value = false;
+        }
+
+        private bool CanBuy(object parameter)
+        {
+            if (parameter is UnitModel || parameter is BuildingModel)
+            {
+                if (SelectedBuyUnit.Value != null || SelectedBuyBuilding.Value != null)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private void SelectBuildingToBuy(object parameter)
+        {
+            if (parameter is BuildingModel building)
+            {
+                SelectedBuyBuilding.Value = building;
+                IsUnderPurchase.Value = true;
+                Mouse.OverrideCursor = Cursors.Hand;
+            }
+        }
+
+        // NO COMMAND HANDLER ON THE BUILD BUTTON
+        public async void ExecuteBuildingPurchase(Position position)
+        {
+            ServerPosition serverPos = new ServerPosition { X = position.row, Y = position.column };
+            BuildingType parsedType = (BuildingType)Enum.Parse(typeof(BuildingType), SelectedBuyBuilding.Value.Type.ToString());
+            await ClientSingleton.Instance.serverClient.SendAsync(new CreateBuildingClientEvent(CurrentPlayer.Id, parsedType, serverPos));
+            SelectedBuyBuilding.Value = null;
+            Mouse.OverrideCursor = Cursors.Arrow;
+            IsUnderPurchase.Value = false;
         }
 
         public List<UnitModel> UnitList {

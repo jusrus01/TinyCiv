@@ -18,7 +18,7 @@ namespace TinyCiv.Client.Code.Factories
 
         public GameObject createMapTile(ServerGameObject serverGameObject)
         {
-            var gameObject = new GameObject(serverGameObject);
+            var gameObject = GameObject.fromServerGameObject(serverGameObject);
             gameObject.ImageSource = TileSprite.GetValueOrDefault(serverGameObject.Type);
             return gameObject;
         }

@@ -7,7 +7,7 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Client.IntegrationTests;
 
-public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, IDisposable
+public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, IAsyncDisposable
 {
     private readonly WebApplicationFactory<Program> _factory;
 
@@ -686,9 +686,11 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
     }
 
     #endregion
-
-    public void Dispose()
+    
+    public async ValueTask DisposeAsync()
     {
-        _factory.Dispose();
+        _factory.Server.Dispose();
+        await _factory.DisposeAsync();
+        await _sut.DisposeAsync();
     }
 }
