@@ -1,6 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
-using TinyCiv.Client.Code.Decorators;
 
 namespace TinyCiv.Client.Code.MVVM.View
 {
@@ -14,14 +12,14 @@ namespace TinyCiv.Client.Code.MVVM.View
             InitializeComponent();
         }
 
-        public void Hide()
+        public override void Hide()
         {
-            base.Visibility = Visibility.Collapsed;
+            Visibility = Visibility.Collapsed;
         }
 
-        public void Show()
+        public override void Show()
         {
-            base.Visibility = Visibility.Visible;
+            Visibility = Visibility.Visible;
         }
     }
 }

@@ -28,9 +28,9 @@
 
         <!-- UNIT TEMPLATE !-->
         <DataTemplate x:Key="UnitTemplate">
-            <Border BorderThickness="{Binding BorderThickness}" 
-                BorderBrush="{Binding BorderBrush}"
-                Background="{Binding BackgroundBrush}"
+            <Border BorderThickness="{Binding Border.BorderThickness}" 
+                BorderBrush="{Binding Border.BorderBrush}"
+                Background="{Binding Border.BackgroundBrush}"
                 MouseLeftButtonDown="gameObjectLeftDown"
                 MouseRightButtonDown="gameObjectRightDown"
                 Height="30"

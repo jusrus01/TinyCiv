@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
-using TinyCiv.Client.Code.Decorators;
+using System.Windows.Media.Animation;
+using System.Windows.Threading;
+using TinyCiv.Client.Code.BorderDecorators;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
 {
-    public class GameObject : BorderObject
+    public class GameObject : IBorderObject
     {
         public GameObjectType Type { get; private set; }
         public Position Position { get; set; }
@@ -16,9 +19,12 @@ namespace TinyCiv.Client.Code
         public Guid? OpponentId { get; private set; }
 
         public string ImageSource { get; set; }
-        public override Thickness BorderThickness { get; set; }
-        public override Brush BorderBrush { get; set; }
-        public override Brush BackgroundBrush { get; set; }
+        public BorderProperties Border {  get; set; }
+
+        //public Border Border { get; set; }
+        //public Thickness BorderThickness { get; set; }
+        //public Brush BorderBrush { get; set; }
+        //public Brush BackgroundBrush { get; set; }
         public Action LeftAction { get; set; }
         public Action RightAction { get; set; }
        
@@ -31,6 +37,7 @@ namespace TinyCiv.Client.Code
             Id = id;
             Color = color;
             OpponentId = opponentId;
+            Border = new BorderProperties();
         }
 
         protected GameObject() { }
@@ -47,14 +54,24 @@ namespace TinyCiv.Client.Code
             return go;
         }
 
-        public override void ApplyBorderEffects()
+        public BorderProperties ApplyEffects()
         {
-            BorderThickness = new Thickness(2);
+            //Application.Current.Dispatcher.Invoke(() =>
+            //{
+                Border.BorderBrush = Brushes.Black;
+            //});
+            return Border;
         }
 
-        public override void RemoveBorderEffects()
+        public BorderProperties RemoveEffects()
         {
-            BorderThickness = new Thickness(0);
+            //Application.Current.Dispatcher.Invoke(() =>
+            //{
+                Border.BorderThickness = new Thickness(0);
+                Border.BackgroundBrush = Brushes.Transparent;
+            //});
+
+            return Border;
         }
     }
 }
