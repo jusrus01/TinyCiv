@@ -126,7 +126,7 @@ namespace TinyCiv.Client.Code
             //gameObject.Border.BorderBrush = Brushes.Aquamarine;
             //gameObject.Border.BorderThickness = new Thickness(2);
 
-            var decoratedObject = new BorderHighlightDecorator(gameObject, Colors.Aquamarine);
+            var decoratedObject = new BorderHighlightDecorator(gameObject, Brushes.Aquamarine);
             decoratedObject.ApplyEffects();
 
             UnitMenuVM.SetCurrentUnit(gameObject);
@@ -150,7 +150,7 @@ namespace TinyCiv.Client.Code
             var decoratedObject =
                 new BorderFlashDecorator(
                     new BorderBackgroundDecorator(
-                        new BorderHighlightDecorator(gameObject, Colors.IndianRed), Colors.IndianRed));
+                        new BorderHighlightDecorator(gameObject, Brushes.IndianRed), Colors.IndianRed));
 
             decoratedObject.ApplyEffects();
         }

@@ -6,9 +6,9 @@ namespace TinyCiv.Client.Code.BorderDecorators
 {
     public class BorderHighlightDecorator : BorderDecorator
     {
-        private readonly Color _color;
+        private readonly Brush _color;
 
-        public BorderHighlightDecorator(IBorderObject decoratedObject, Color color) : base(decoratedObject)
+        public BorderHighlightDecorator(IBorderObject decoratedObject, Brush color) : base(decoratedObject)
         {
             _color = color;
         }
@@ -22,7 +22,7 @@ namespace TinyCiv.Client.Code.BorderDecorators
                 //Application.Current.Dispatcher.Invoke(() =>
                 //{
                     decoratedBorder.BorderThickness = new Thickness(2);
-                    decoratedBorder.BorderBrush = new SolidColorBrush(_color);
+                decoratedBorder.BorderBrush = _color;
                 //});
             }
 
