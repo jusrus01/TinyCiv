@@ -87,4 +87,23 @@ public class ResourceService : IResourceService
             return isPurchaseSuccessful ? playerResource.GetResources() : null;
         }
     }
+
+    public void CancelInteractablePayment(Guid playerId, IInteractableInfo? info)
+    {
+        if (info == null)
+        {
+            return;
+        }
+
+        lock (_resourceLocker)
+        {
+            var playerResource = _resources.SingleOrDefault(player => player.PlayerId == playerId);
+            if (playerResource == null)
+            {
+                return;
+            }
+            
+            playerResource.AddResource(ResourceType.Gold, info.Price);
+        }
+    }
 }

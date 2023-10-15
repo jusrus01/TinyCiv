@@ -140,7 +140,7 @@ public class GameService : IGameService
         }
 
         var responseServerEvents = new List<ServerEvent>();
-        
+
         var interactableStaticInfo = _interactableObjectService.GetInfo(request.UnitType);
         if (interactableStaticInfo != null)
         {
@@ -157,6 +157,7 @@ public class GameService : IGameService
         var unit = _mapService.CreateUnit(request.PlayerId, request.Position, request.UnitType);
         if (unit == null)
         {
+            _resourceService.CancelInteractablePayment(request.PlayerId, interactableStaticInfo);
             return null;
         }
 

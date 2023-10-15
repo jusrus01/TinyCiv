@@ -533,9 +533,17 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
             playerResources = response.Resources;
         });
 
-        int warriorAttackDamage = 0;
+        var warriorAttackDamage = 0;
+        var skipFirst = true;
+        
         _sut.ListenForInteractableObjectChanges(response =>
         {
+            if (skipFirst)
+            {
+                skipFirst = false;
+                return;
+            }
+            
             warriorAttackDamage = response.AttackDamage;
         });
 
