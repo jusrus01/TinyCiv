@@ -23,9 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyCiv.Client", "src\TinyC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyCiv.Server.Client.IntegrationTests", "tests\TinyCiv.Server.Client.IntegrationTests\TinyCiv.Server.Client.IntegrationTests.csproj", "{DBB1892B-BDED-4001-860B-46A87A115333}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TinyCiv.Cli", "src\Cli\TinyCiv.Cli.csproj", "{FF45EDF3-4867-49B9-BF66-29DF365E64FF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCiv.Client.Tests", "TinyCiv.Client.Tests\TinyCiv.Client.Tests.csproj", "{D457CB52-8CF5-43B1-9705-DFCF743CE5F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCiv.Cli", "src\Cli\TinyCiv.Cli.csproj", "{FF45EDF3-4867-49B9-BF66-29DF365E64FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,10 +55,6 @@ Global
 		{FF45EDF3-4867-49B9-BF66-29DF365E64FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF45EDF3-4867-49B9-BF66-29DF365E64FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF45EDF3-4867-49B9-BF66-29DF365E64FF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D457CB52-8CF5-43B1-9705-DFCF743CE5F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D457CB52-8CF5-43B1-9705-DFCF743CE5F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D457CB52-8CF5-43B1-9705-DFCF743CE5F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D457CB52-8CF5-43B1-9705-DFCF743CE5F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,7 +69,6 @@ Global
 		{7FDCDF54-D8A9-4C10-85CD-4A1040B20AA7} = {4E2FED6F-9B17-4045-A8DB-26C70EB8DAF1}
 		{DBB1892B-BDED-4001-860B-46A87A115333} = {ACAFB2B5-C9F3-4BDD-89B0-4326C5177BC7}
 		{FF45EDF3-4867-49B9-BF66-29DF365E64FF} = {4E2FED6F-9B17-4045-A8DB-26C70EB8DAF1}
-		{D457CB52-8CF5-43B1-9705-DFCF743CE5F1} = {ACAFB2B5-C9F3-4BDD-89B0-4326C5177BC7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C534836F-B273-4675-B7E6-E1CB11B27FE2}
