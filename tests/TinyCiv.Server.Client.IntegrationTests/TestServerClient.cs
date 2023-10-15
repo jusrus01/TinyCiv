@@ -464,6 +464,102 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
             return new ServerPosition { X = x, Y = y };
         }
     }
+    
+    [Fact]
+    public async Task ListenForResourcesUpdate_When_UnitBought_Then_GoldChanged()
+    {
+        // arrange
+        var anotherClient = InitializeClient();
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+
+        Guid playerId = Guid.Empty;
+        _sut.ListenForNewPlayerCreation(player =>
+        {
+            playerId = player.Created.Id;
+        });
+
+        Resources playerResources = null;
+        _sut.ListenForResourcesUpdate(response =>
+        {
+            playerResources = response.Resources;
+        });
+
+        int warriorAttackDamage = 0;
+        _sut.ListenForInteractableObjectChanges(response =>
+        {
+            warriorAttackDamage = response.AttackDamage;
+        });
+
+        // after two players join lobby, StartGameClientEvent is available for use
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+
+        // start game
+        await anotherClient.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new PlaceTownClientEvent(playerId));
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId, 1, 1, GameObjectType.Warrior));
+        await WaitForResponseAsync();
+        
+        Assert.Equal(Constants.Game.Interactable.Warrior.Damage, warriorAttackDamage);
+        Assert.Equal(Constants.Game.StartingGold - Constants.Game.Interactable.Warrior.Price, playerResources.Gold);
+    }
+    
+    [Fact]
+    public async Task ListenForResourcesUpdate_When_UnitFailsToBeAdded_Then_GoldRemainsTheSame()
+    {
+        // arrange
+        var anotherClient = InitializeClient();
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+        
+        Guid anotherPlayerId = Guid.Empty;
+        anotherClient.ListenForNewPlayerCreation(player =>
+        {
+            anotherPlayerId = player.Created.Id;
+        });
+        
+        Guid playerId = Guid.Empty;
+        _sut.ListenForNewPlayerCreation(player =>
+        {
+            playerId = player.Created.Id;
+        });
+
+        Resources playerResources = null;
+        _sut.ListenForResourcesUpdate(response =>
+        {
+            playerResources = response.Resources;
+        });
+
+        int warriorAttackDamage = 0;
+        _sut.ListenForInteractableObjectChanges(response =>
+        {
+            warriorAttackDamage = response.AttackDamage;
+        });
+
+        // after two players join lobby, StartGameClientEvent is available for use
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+
+        // start game
+        await anotherClient.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new PlaceTownClientEvent(playerId));
+        await anotherClient.SendAsync(new PlaceTownClientEvent(anotherPlayerId));
+        await WaitForResponseAsync();
+        
+        await anotherClient.SendAsync(new CreateUnitClientEvent(anotherPlayerId, 1, 1, GameObjectType.Warrior));
+        await WaitForResponseAsync();
+        
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId, 1, 1, GameObjectType.Warrior));
+        await WaitForResponseAsync();
+        
+        Assert.Equal(0, warriorAttackDamage);
+        Assert.Equal(Constants.Game.StartingGold, playerResources.Gold);
+    }
     #endregion
 
     #region ListenForInteractableObjectChanges
@@ -664,6 +760,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await _sut.SendAsync(new PlaceTownClientEvent(playerId2!.Value));
         await WaitForResponseAsync();
     }
+    
     #endregion
 
     #region Helpers
