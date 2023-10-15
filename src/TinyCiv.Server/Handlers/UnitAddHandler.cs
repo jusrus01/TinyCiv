@@ -35,10 +35,10 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
 
         // Start notification tasks
         var interactableNotifyTask = interactableEvent != null
-            ? NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, interactableEvent)
+            ? NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, (InteractableObjectServerEvent)interactableEvent)
             : Task.CompletedTask;
         var resourceNotifyTask = resourceEvent != null
-            ? NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, resourceEvent)
+            ? NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, (ResourcesUpdateServerEvent)resourceEvent)
             : Task.CompletedTask;
 
         await Task.WhenAll(interactableNotifyTask, resourceNotifyTask);

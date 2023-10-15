@@ -8,8 +8,14 @@ namespace TinyCiv.Server.Services;
 
 public class InteractableObjectService : IInteractableObjectService
 {
+    private readonly ILogger<InteractableObjectService> _logger;
     private readonly ConcurrentDictionary<Guid, IInteractableObject> _objects = new();
 
+    public InteractableObjectService(ILogger<InteractableObjectService> logger)
+    {
+        _logger = logger;
+    }
+    
     public IInteractableObject Initialize(ServerGameObject obj)
     {
         if (!obj.IsInteractable())
@@ -33,11 +39,12 @@ public class InteractableObjectService : IInteractableObjectService
     {
         try
         {
-            var dummyInteractable = ResolveInteractable(new ServerGameObject());
+            var dummyInteractable = ResolveInteractable(new ServerGameObject { Type = type });
             return dummyInteractable;
         }
-        catch
+        catch (Exception e)
         {
+            _logger.LogError(e, "Something went wrong");
             return null;
         }
     }
