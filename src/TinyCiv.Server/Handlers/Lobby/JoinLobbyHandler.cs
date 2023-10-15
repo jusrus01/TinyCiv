@@ -1,3 +1,4 @@
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Shared.Events.Client.Lobby;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Server;
@@ -10,7 +11,7 @@ public class JoinLobbyHandler : ClientHandler<JoinLobbyClientEvent>
     private readonly ISessionService _sessionService;
     private readonly IGameService _gameService;
 
-    public JoinLobbyHandler(ISessionService sessionService, ILogger<JoinLobbyHandler> logger, IGameService gameService) : base(logger)
+    public JoinLobbyHandler(ISessionService sessionService, ILogger<JoinLobbyHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
     {
         _sessionService = sessionService;
         _gameService = gameService;

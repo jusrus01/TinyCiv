@@ -1,3 +1,4 @@
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
@@ -11,7 +12,7 @@ public class GameStartHandler : ClientHandler<StartGameClientEvent>
     private readonly ISessionService _sessionService;
     private readonly IGameService _gameService;
 
-    public GameStartHandler(ISessionService sessionService, ILogger<GameStartHandler> logger, IGameService gameService) : base(logger)
+    public GameStartHandler(ISessionService sessionService, ILogger<GameStartHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
     {
         _sessionService = sessionService;
         _gameService = gameService;

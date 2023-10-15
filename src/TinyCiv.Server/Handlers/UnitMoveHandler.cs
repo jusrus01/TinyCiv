@@ -1,4 +1,5 @@
-﻿using TinyCiv.Server.Core.Services;
+﻿using TinyCiv.Server.Core.Publishers;
+using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
 using TinyCiv.Server.Dtos.Units;
@@ -12,7 +13,7 @@ namespace TinyCiv.Server.Handlers
     {
         private readonly IGameService _gameService;
 
-        public UnitMoveHandler(ILogger<UnitMoveHandler> logger, IGameService gameService) : base(logger)
+        public UnitMoveHandler(ILogger<UnitMoveHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
         {
             _gameService = gameService;
         }
