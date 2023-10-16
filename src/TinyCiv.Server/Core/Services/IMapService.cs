@@ -10,10 +10,14 @@ public interface IMapService
     ServerGameObject? GetUnit(ServerPosition position);
     ServerGameObject? GetUnit(Guid? unitId);
 
+    ServerGameObject? PlaceTown(Guid playerId);
+    bool IsTownOwner(Guid playerId);
+    bool IsInRange(ServerPosition position, int range, GameObjectType type);
+
     void ReplaceWithEmpty(Guid id);
-    
+
     Task MoveUnitAsync(Guid unitId, ServerPosition position, Action<UnitMoveResponse> unitMoveCallback);
-    ServerGameObject? CreateBuilding(Guid PlayerId,  ServerPosition position, IBuilding building);
+    ServerGameObject? CreateBuilding(Guid playerId, ServerPosition position, IBuilding building);
 
     Map? Initialize(MapType mapType);
     Map? GetMap();

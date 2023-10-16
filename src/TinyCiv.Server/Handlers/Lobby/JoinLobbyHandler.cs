@@ -1,22 +1,20 @@
-using TinyCiv.Server.Core.Services;
-using TinyCiv.Server.Entities;
-using TinyCiv.Shared;
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Shared.Events.Client.Lobby;
+using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Server;
+using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Handlers.Lobby;
 
 public class JoinLobbyHandler : ClientHandler<JoinLobbyClientEvent>
 {
     private readonly ISessionService _sessionService;
-    private readonly IConnectionIdAccessor _accessor;
-    private readonly IResourceService _resourceService;
+    private readonly IGameService _gameService;
 
-    public JoinLobbyHandler(ISessionService sessionService, IConnectionIdAccessor accessor, ILogger<JoinLobbyHandler> logger, IResourceService resourceService) : base(logger)
+    public JoinLobbyHandler(ISessionService sessionService, ILogger<JoinLobbyHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
     {
         _sessionService = sessionService;
-        _accessor = accessor;
-        _resourceService = resourceService;
+        _gameService = gameService;
     }
 
     protected override bool IgnoreWhen(JoinLobbyClientEvent @event) =>
@@ -24,22 +22,18 @@ public class JoinLobbyHandler : ClientHandler<JoinLobbyClientEvent>
 
     protected override async Task OnHandleAsync(JoinLobbyClientEvent @event)
     {
-        var newPlayer = _sessionService.AddPlayer(_accessor.ConnectionId);
-        if (newPlayer == null)
-        {
-            return;
-        }
+        var response = _gameService.ConnectPlayer();
 
-        await NotifyCallerAsync(Constants.Server.SendCreatedPlayer, new JoinLobbyServerEvent(newPlayer)).ConfigureAwait(false);
-        
-        var playerResources = _resourceService.InitializeResources(newPlayer.Id);
-        await NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, new ResourcesUpdateServerEvent(playerResources))
+        if (response == null) return;
+
+        await NotifyCallerAsync(Constants.Server.SendCreatedPlayer, new JoinLobbyServerEvent(response.Player))
+            .ConfigureAwait(false);
+        await NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, new ResourcesUpdateServerEvent(response.Resources!))
             .ConfigureAwait(false);
 
-        var canGameStart = _sessionService.CanGameStart();
-        if (canGameStart)
+        if (response.CanGameStart)
         {
-            await NotifyAllAsync(Constants.Server.SendLobbyStateToAll, new LobbyStateServerEvent(canGameStart))
+            await NotifyAllAsync(Constants.Server.SendLobbyStateToAll, new LobbyStateServerEvent(response.CanGameStart))
                 .ConfigureAwait(false);
         }
     } 

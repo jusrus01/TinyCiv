@@ -7,18 +7,19 @@ public static class Constants
         public static class Interactable
         {
             public const int AttackIntervalInMilliseconds = 2000;
+
+            public static class City
+            {
+                public const int InitialHealth = 200;
+                public const int Damage = 20;
+            }
             
             public static class Warrior
             {
                 public const int InitialHealth = 40;
                 public const int Damage = 20;
                 public const int TarranDamageReductionMultiplier = 2;
-            }
-
-            public static class Colonist
-            {
-                public const int InitialHealth = 10;
-                public const int Damage = 0;
+                public const int Price = 50;
             }
 
             public static class Cavalry
@@ -26,6 +27,7 @@ public static class Constants
                 public const int InitialHealth = 60;
                 public const int Damage = 30;
                 public const int LifeStealPercentage = 5;
+                public const int Price = 100;
             }
 
             public static class Tarran
@@ -33,6 +35,7 @@ public static class Constants
                 public const int InitialHealth = 60;
                 public const int Damage = 10;
                 public const int BuildingAttackMultiplier = 5;
+                public const int Price = 50;
             }
         }
         
@@ -45,6 +48,7 @@ public static class Constants
         public const int MovementSpeedMs = 500;
 
         public const int BuildingSpaceFromTown = 2;
+        public const int TownSpaceFromTown = 5;
 
         public const int FarmInterval = 5000;
         public const int MineInterval = 4500;
@@ -63,14 +67,6 @@ public static class Constants
         public const int StartingIndustry = 200;
         public const int StartingFood = 100;
         public const int StartingGold = 50;
-
-        // Temporary map stuff, need to clarify how to best do this
-        public const string Map =
-            ".....\n" +
-            ".....\n" +
-            ".....\n" +
-            ".....\n" +
-            ".....\n";
     }
     
     public static class Server

@@ -86,6 +86,10 @@ async Task SampleIdAssignmentDemo()
 
     await Task.Delay(1000);
 
+    // Place towns
+    await client.SendAsync(new PlaceTownClientEvent(playerList[0].Id));
+    await client.SendAsync(new PlaceTownClientEvent(playerList[1].Id));
+
     // Spawning 3 units
     await client.SendAsync(new CreateUnitClientEvent(playerList[0].Id, 1, 1));
     await client.SendAsync(new CreateUnitClientEvent(playerList[0].Id, 2, 2));
