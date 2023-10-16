@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Testing;
+using TinyCiv.Server.Dtos.Units;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Client.Lobby;
@@ -581,6 +582,122 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
     #region ListenForInteractableObjectChanges
 
+    [Fact]
+    public async Task ListenForInteractableObjectChanges_WhenTownPlaced_Then_HealthAndAttackDamageReceived()
+    {
+        //arrange
+        Guid? playerId = null;
+        _sut.ListenForNewPlayerCreation(resp =>
+        {
+            playerId = resp.Created.Id;
+        });
+        
+        var townHealth = 0;
+        var townAttackDamage = 0;
+        _sut.ListenForInteractableObjectChanges(resp =>
+        {
+            townHealth = resp.Health;
+            townAttackDamage = resp.AttackDamage;
+        });
+
+        var anotherClient = InitializeClient();
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync(1000);
+        
+        //act
+        await _sut.SendAsync(new PlaceTownClientEvent(playerId!.Value));
+        await WaitForResponseAsync();
+
+        //assert
+        Assert.Equal(Constants.Game.Interactable.City.InitialHealth, townHealth);
+        Assert.Equal(Constants.Game.Interactable.City.Damage, townAttackDamage);
+    }
+    
+    [Fact]
+    public async Task ListenForInteractableObjectChanges_WhenTownAttacked_Then_AttackerAndTownHasHealthDecreased()
+    {
+        //arrange
+        Guid? playerId = null;
+        _sut.ListenForNewPlayerCreation(resp =>
+        {
+            playerId = resp.Created.Id;
+        });
+        
+        var townHealth = 0;
+        var townAttackDamage = 0;
+        _sut.ListenForInteractableObjectChanges(resp =>
+        {
+            townHealth = resp.Health;
+            townAttackDamage = resp.AttackDamage;
+        });
+
+        Guid? anotherPlayerId = null;
+        var anotherClient = InitializeClient();
+        anotherClient.ListenForNewPlayerCreation(resp =>
+        {
+            anotherPlayerId = resp.Created.Id;
+        });
+        
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync();
+        
+        Map? latestMap = null;
+        _sut.ListenForMapChange(resp =>
+        {
+            latestMap = resp.Map;
+        });
+
+        await _sut.SendAsync(new PlaceTownClientEvent(playerId!.Value));
+        await anotherClient.SendAsync(new PlaceTownClientEvent(anotherPlayerId!.Value));
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 1, 1, GameObjectType.Warrior));
+        await WaitForResponseAsync();
+        
+        var anotherPlayerTown =
+            latestMap!.Objects!.Single(obj => obj.Type == GameObjectType.City && obj.OwnerPlayerId == anotherPlayerId);
+        
+        var attacker = latestMap!.Objects!.Single(obj => obj.Type == GameObjectType.Warrior && obj.OwnerPlayerId == playerId);
+        
+        var afterCombatAttackerHealth = -1;
+        var afterCombatTownHealth = -1;
+        _sut.ListenForInteractableObjectChanges(resp =>
+        {
+            if (resp.ObjectId == attacker.Id)
+            {
+                afterCombatAttackerHealth = resp.Health;
+            }
+            
+            if (resp.ObjectId == anotherPlayerTown.Id)
+            {
+                afterCombatTownHealth = resp.Health;
+            }
+        });
+        
+        //act
+        await _sut.SendAsync(new MoveUnitClientEvent(attacker.Id, anotherPlayerTown.Position!.X,
+            anotherPlayerTown.Position!.Y));
+        await WaitForResponseAsync(6000);
+
+        await _sut.SendAsync(new AttackUnitClientEvent(attacker.Id, anotherPlayerTown.Id));
+        await WaitForResponseAsync(6000);
+        
+        //assert
+        Assert.NotEqual(-1, afterCombatAttackerHealth);
+        Assert.NotEqual(-1, afterCombatTownHealth);
+        
+        Assert.NotEqual(Constants.Game.Interactable.City.InitialHealth, afterCombatTownHealth);
+        Assert.NotEqual(Constants.Game.Interactable.Warrior.InitialHealth, afterCombatAttackerHealth);
+    }
+    
     [Fact]
     public async Task ListenForInteractableObjectChanges_WhenUnitDead_Then_ChangedStateReceived()
     {
