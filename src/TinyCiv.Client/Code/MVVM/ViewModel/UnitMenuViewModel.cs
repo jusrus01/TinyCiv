@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
+using TinyCiv.Client.Code.Commands;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Game;
 
@@ -9,6 +10,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 {
     public class UnitMenuViewModel : ObservableObject
     {
+        private CommandsManager commandsManager = new CommandsManager();
         public ObservableValue<bool> IsUnitsListVisible { get; } = new ObservableValue<bool>(true);
         public ObservableValue<bool> IsBuildingsListVisible { get; } = new ObservableValue<bool>(false);
         public ObservableValue<bool> IsUnderPurchase { get; } = new ObservableValue<bool>(false);
@@ -61,11 +63,12 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         }
 
         public async void ExecuteUnitPurchase(Position position)
-        {
-            await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value.Type));
-            SelectedBuyUnit.Value = null;
+        {            
+            IGameCommand createUnitCommand = new CreateUnitCommand(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value.Type);
             Mouse.OverrideCursor= Cursors.Arrow;
             IsUnderPurchase.Value = false;
+            SelectedBuyUnit.Value = null;
+            await commandsManager.ExecuteCommandWithTimer(createUnitCommand, 3000);
         }
 
         private bool CanBuy(object parameter)
