@@ -1,14 +1,14 @@
 ﻿using TinyCiv.Client.Code.Factories;
 using TinyCiv.Shared.Game;
 
-namespace TinyCiv.Client.Code.MVVM;
+namespace TinyCiv.Client.Code.MVVM.Model;
 
 public class BuildingModel
 {
     public string ImagePath { get; }
     public string Name { get; }
-    public string Production {  get; }
-    public string Cost {  get; }
+    public string Production { get; }
+    public string Cost { get; }
     public TeamColor Color { get; }
     public GameObjectType Type { get; }
 

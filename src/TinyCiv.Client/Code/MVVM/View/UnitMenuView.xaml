@@ -17,6 +17,7 @@
             <RowDefinition Height="30"></RowDefinition>
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         
         <Grid Grid.Row="0">
@@ -140,6 +141,19 @@
 
         <TextBlock Grid.Row="2" Text="Press Esc button to cancel" TextWrapping="Wrap" FontWeight="Bold" Margin="5" FontSize="10"
                    Visibility="{Binding IsUnderPurchase.Value, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+        <Grid Grid.Row="3">
+            <ItemsControl ItemsSource="{Binding ObjectsClocks}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <!--<TextBlock Text="{Binding Name}" Margin="5" FontSize="16" Background="LightGray" Foreground="Black" />-->
+                            <TextBlock Text="{Binding RemainingTime.Seconds}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
 
     </Grid>
 </UserControl>

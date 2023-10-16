@@ -1,7 +1,7 @@
 ﻿using TinyCiv.Client.Code.Factories;
 using TinyCiv.Shared.Game;
 
-namespace TinyCiv.Client.Code.MVVM
+namespace TinyCiv.Client.Code.MVVM.Model
 {
     public class UnitModel
     {
@@ -10,7 +10,7 @@ namespace TinyCiv.Client.Code.MVVM
         public int Speed { get; }
         public int ProductionPrice { get; }
         public string Description { get; }
-        public string ImagePath {  get; }
+        public string ImagePath { get; }
         public GameObjectType Type { get; }
         public TeamColor Color { get; }
         public string Name { get; }
