@@ -4,30 +4,50 @@ namespace TinyCiv.Server.Entities;
 
 public class PlayerResources
 {
-    public Guid PlayerId { get; init; }
-    public int Food { get; private set; } = 0;
-    public int Industry { get; private set; } = 0;
-    public int Gold { get; private set; } = 0;
-
-    public void AddResource(ResourceType resource, int amount)
+    private readonly Dictionary<ResourceType, int> _resources = new()
     {
-        switch (resource)
+        { ResourceType.Food, 0 },
+        { ResourceType.Industry, 0 },
+        { ResourceType.Gold, 0 },
+    };
+    
+    public Guid PlayerId { get; init; }
+
+    public bool DecreaseResource(ResourceType type, int amount)
+    {
+        EnsureResourceTypePresent(type);
+
+        var decreasedAmount = _resources[type] - amount;
+        if (decreasedAmount < 0)
         {
-            case ResourceType.Food:
-                Food += amount;
-                break;
-            case ResourceType.Industry:
-                Industry += amount;
-                break;
-            case ResourceType.Gold:
-                Gold += amount;
-                break;
+            return false;
+        }
+
+        _resources[type] = decreasedAmount;
+        return true;
+    }
+    
+    public void AddResource(ResourceType type, int amount)
+    {
+        EnsureResourceTypePresent(type);
+        _resources[type] += amount;
+    }
+
+    private void EnsureResourceTypePresent(ResourceType type)
+    {
+        if (!_resources.ContainsKey(type))
+        {
+            throw new InvalidOperationException();
         }
     }
 
     public Resources GetResources()
     {
-        // Questionable
-        return new Resources { Food = Food, Gold = Gold, Industry = Industry };
+        return new Resources
+        {
+            Food = _resources[ResourceType.Food],
+            Gold = _resources[ResourceType.Gold],
+            Industry = _resources[ResourceType.Industry]
+        };
     }
 }

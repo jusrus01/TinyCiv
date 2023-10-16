@@ -13,6 +13,7 @@ public static class Constants
                 public const int InitialHealth = 40;
                 public const int Damage = 20;
                 public const int TarranDamageReductionMultiplier = 2;
+                public const int Price = 50;
             }
 
             public static class Cavalry
@@ -20,6 +21,7 @@ public static class Constants
                 public const int InitialHealth = 60;
                 public const int Damage = 30;
                 public const int LifeStealPercentage = 5;
+                public const int Price = 100;
             }
 
             public static class Tarran
@@ -27,6 +29,7 @@ public static class Constants
                 public const int InitialHealth = 60;
                 public const int Damage = 10;
                 public const int BuildingAttackMultiplier = 5;
+                public const int Price = 50;
             }
         }
         

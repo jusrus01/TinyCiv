@@ -7,7 +7,6 @@ using TinyCiv.Server.Dtos.Players;
 using TinyCiv.Server.Dtos.Units;
 using TinyCiv.Shared.Game;
 using TinyCiv.Shared;
-using Microsoft.Extensions.Logging;
 using TinyCiv.Server.Enums;
 
 namespace TinyCiv.Server.Services;
@@ -20,8 +19,9 @@ public class GameService : IGameService
     private readonly IMapService _mapService;
     private readonly IInteractableObjectService _interactableObjectService;
     private readonly ICombatService _combatService;
+    private readonly ILogger<GameService> _logger;
 
-    public GameService(ISessionService sessionService, IConnectionIdAccessor accessor, IResourceService resourceService, IMapService mapService, IInteractableObjectService interactableObjectService, ICombatService combatService)
+    public GameService(ISessionService sessionService, IConnectionIdAccessor accessor, IResourceService resourceService, IMapService mapService, IInteractableObjectService interactableObjectService, ICombatService combatService, ILogger<GameService> logger)
     {
         _sessionService = sessionService;
         _accessor = accessor;
@@ -29,6 +29,7 @@ public class GameService : IGameService
         _mapService = mapService;
         _interactableObjectService = interactableObjectService;
         _combatService = combatService;
+        _logger = logger;
     }
 
     public ConnectPlayerResponse? ConnectPlayer()
@@ -138,22 +139,37 @@ public class GameService : IGameService
             return null;
         }
 
+        var responseServerEvents = new List<ServerEvent>();
+
+        var interactableStaticInfo = _interactableObjectService.GetInfo(request.UnitType);
+        if (interactableStaticInfo != null)
+        {
+            var resourcesAfterPurchase = _resourceService.BuyInteractable(request.PlayerId, interactableStaticInfo);
+            if (resourcesAfterPurchase == null)
+            {
+                _logger.LogWarning("Player '{player_id}' was not able to buy new unit, not enough resources", request.PlayerId);
+                return null;
+            }
+            
+            responseServerEvents.Add(new ResourcesUpdateServerEvent(resourcesAfterPurchase));
+        }
+        
         var unit = _mapService.CreateUnit(request.PlayerId, request.Position, request.UnitType);
         if (unit == null)
         {
+            _resourceService.CancelInteractablePayment(request.PlayerId, interactableStaticInfo);
             return null;
         }
 
-        InteractableObjectServerEvent? interactableObjectEvent = null;
-        if (unit.IsInteractable())
+        if (interactableStaticInfo != null)
         {
             var interactable = _interactableObjectService.Initialize(unit);
-            interactableObjectEvent = new InteractableObjectServerEvent(unit.Id, interactable.Health, interactable.AttackDamage);
+            responseServerEvents.Add(new InteractableObjectServerEvent(unit.Id, interactable.Health, interactable.AttackDamage));
         }
 
         var map = _mapService.GetMap()!;
 
-        return new AddUnitResponse(unit, map, interactableObjectEvent);
+        return new AddUnitResponse(unit, map, responseServerEvents.ToArray());
     }
 
     public void AttackUnit(AttackUnitRequest request)

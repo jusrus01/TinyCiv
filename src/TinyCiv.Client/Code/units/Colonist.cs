@@ -8,7 +8,6 @@ namespace TinyCiv.Client.Code.units
         // What to do here? >.<
         public override int MaxHealth => 0;
         public override int Damage => 0;
-
         public override int Speed => 2;
         public override int ProductionPrice => 100;
         public override int ExpReward => 10;

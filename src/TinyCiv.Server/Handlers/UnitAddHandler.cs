@@ -22,17 +22,28 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
         var request = new AddUnitRequest(@event.PlayerId, position, @event.UnitType);
         var response = _gameService.AddUnit(request);
 
-        if (response == null) return;
+        if (response == null)
+        {
+            return;
+        }
         
         await NotifyCallerAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(response.Unit))
             .ConfigureAwait(false);
 
-        // Do not notify about map change before created unit receives properties such as Health, AttackDamage
-        if (response.InteractableObjectEvent != null)
-        {
-            await NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, response.InteractableObjectEvent);
-        }
+        var interactableEvent = response.Events?.SingleOrDefault(e => e is InteractableObjectServerEvent);
+        var resourceEvent = response.Events?.SingleOrDefault(e => e is ResourcesUpdateServerEvent);
+
+        // Start notification tasks
+        var interactableNotifyTask = interactableEvent != null
+            ? NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, (InteractableObjectServerEvent)interactableEvent)
+            : Task.CompletedTask;
+        var resourceNotifyTask = resourceEvent != null
+            ? NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, (ResourcesUpdateServerEvent)resourceEvent)
+            : Task.CompletedTask;
+
+        await Task.WhenAll(interactableNotifyTask, resourceNotifyTask);
         
+        // Trigger map update when interactable and resources are updated
         await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(response.Map))
             .ConfigureAwait(false);
     }

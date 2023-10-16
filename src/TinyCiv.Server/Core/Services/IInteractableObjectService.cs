@@ -6,6 +6,7 @@ namespace TinyCiv.Server.Core.Services;
 public interface IInteractableObjectService
 {
     IInteractableObject Initialize(ServerGameObject obj);
+    IInteractableInfo? GetInfo(GameObjectType type);
 
     IInteractableObject? Get(Guid id);
 

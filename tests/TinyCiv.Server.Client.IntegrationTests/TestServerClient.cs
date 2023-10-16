@@ -464,6 +464,110 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
             return new ServerPosition { X = x, Y = y };
         }
     }
+    
+    [Fact]
+    public async Task ListenForResourcesUpdate_When_UnitBought_Then_GoldChanged()
+    {
+        // arrange
+        var anotherClient = InitializeClient();
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+
+        Guid playerId = Guid.Empty;
+        _sut.ListenForNewPlayerCreation(player =>
+        {
+            playerId = player.Created.Id;
+        });
+
+        Resources playerResources = null;
+        _sut.ListenForResourcesUpdate(response =>
+        {
+            playerResources = response.Resources;
+        });
+
+        int warriorAttackDamage = 0;
+        _sut.ListenForInteractableObjectChanges(response =>
+        {
+            warriorAttackDamage = response.AttackDamage;
+        });
+
+        // after two players join lobby, StartGameClientEvent is available for use
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+
+        // start game
+        await anotherClient.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new PlaceTownClientEvent(playerId));
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId, 1, 1, GameObjectType.Warrior));
+        await WaitForResponseAsync();
+        
+        Assert.Equal(Constants.Game.Interactable.Warrior.Damage, warriorAttackDamage);
+        Assert.Equal(Constants.Game.StartingGold - Constants.Game.Interactable.Warrior.Price, playerResources.Gold);
+    }
+    
+    [Fact]
+    public async Task ListenForResourcesUpdate_When_UnitFailsToBeAdded_Then_GoldRemainsTheSame()
+    {
+        // arrange
+        var anotherClient = InitializeClient();
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+        
+        Guid anotherPlayerId = Guid.Empty;
+        anotherClient.ListenForNewPlayerCreation(player =>
+        {
+            anotherPlayerId = player.Created.Id;
+        });
+        
+        Guid playerId = Guid.Empty;
+        _sut.ListenForNewPlayerCreation(player =>
+        {
+            playerId = player.Created.Id;
+        });
+
+        Resources playerResources = null;
+        _sut.ListenForResourcesUpdate(response =>
+        {
+            playerResources = response.Resources;
+        });
+
+        var warriorAttackDamage = 0;
+        var skipFirst = true;
+        
+        _sut.ListenForInteractableObjectChanges(response =>
+        {
+            if (skipFirst)
+            {
+                skipFirst = false;
+                return;
+            }
+            
+            warriorAttackDamage = response.AttackDamage;
+        });
+
+        // after two players join lobby, StartGameClientEvent is available for use
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+
+        // start game
+        await anotherClient.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new PlaceTownClientEvent(playerId));
+        await anotherClient.SendAsync(new PlaceTownClientEvent(anotherPlayerId));
+        await WaitForResponseAsync();
+        
+        await anotherClient.SendAsync(new CreateUnitClientEvent(anotherPlayerId, 1, 1, GameObjectType.Warrior));
+        await WaitForResponseAsync();
+        
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId, 1, 1, GameObjectType.Warrior));
+        await WaitForResponseAsync();
+        
+        Assert.Equal(0, warriorAttackDamage);
+        Assert.Equal(Constants.Game.StartingGold, playerResources.Gold);
+    }
     #endregion
 
     #region ListenForInteractableObjectChanges
@@ -527,7 +631,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await anotherClient.SendAsync(new PlaceTownClientEvent(playerId2!.Value));
 
         //act
-        await _sut.SendAsync(new CreateUnitClientEvent(playerId1!.Value, 1, 4, GameObjectType.Tarran));
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId1!.Value, 1, 4, GameObjectType.Warrior));
         await anotherClient.SendAsync(new CreateUnitClientEvent(playerId2!.Value, 1, 2, GameObjectType.Warrior));
         await WaitForResponseAsync();
 
@@ -544,7 +648,8 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
     public static IEnumerable<object[]> ListenForInteractableObjectChanges_TestData()
     {
         yield return new object[] { GameObjectType.Warrior, Constants.Game.Interactable.Warrior.Damage, Constants.Game.Interactable.Warrior.InitialHealth };
-        yield return new object[] { GameObjectType.Cavalry, Constants.Game.Interactable.Cavalry.Damage, Constants.Game.Interactable.Cavalry.InitialHealth };
+        // Not enough gold to buy cavalry
+        // yield return new object[] { GameObjectType.Cavalry, Constants.Game.Interactable.Cavalry.Damage, Constants.Game.Interactable.Cavalry.InitialHealth };
         yield return new object[] { GameObjectType.Tarran, Constants.Game.Interactable.Tarran.Damage, Constants.Game.Interactable.Tarran.InitialHealth };
         yield return new object[] { GameObjectType.City, null, null };
         yield return new object[] { GameObjectType.Empty, null, null };
@@ -584,7 +689,8 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await WaitForResponseAsync();
 
         await _sut.SendAsync(new PlaceTownClientEvent(playerId!.Value));
-
+        await WaitForResponseAsync();
+        
         //act
         await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 1, 1, type));
         await WaitForResponseAsync();
@@ -662,6 +768,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await _sut.SendAsync(new PlaceTownClientEvent(playerId2!.Value));
         await WaitForResponseAsync();
     }
+    
     #endregion
 
     #region Helpers
@@ -686,7 +793,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
     }
 
     #endregion
-    
+
     public async ValueTask DisposeAsync()
     {
         _factory.Server.Dispose();
