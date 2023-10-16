@@ -1,9 +1,9 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
-using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Dtos.Buildings;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Server;
 using TinyCiv.Server.Dtos.Players;
+using TinyCiv.Server.Dtos.Towns;
 using TinyCiv.Server.Dtos.Units;
 using TinyCiv.Shared.Game;
 using TinyCiv.Shared;
@@ -115,21 +115,24 @@ public class GameService : IGameService
         return new CreateBuildingResponse(playerResources, map);
     }
 
-    public Map? PlaceTown(Guid playerId)
+    public PlaceTownResponse? PlaceTown(Guid playerId)
     {
         if (_mapService.IsTownOwner(playerId))
         {
             return null;
         }
 
-        bool result = _mapService.PlaceTown(playerId);
+        var createdTown = _mapService.PlaceTown(playerId);
 
-        if (result == false)
+        if (createdTown == null)
         {
             return null;
         }
+        
+        var interactable = _interactableObjectService.Initialize(createdTown);
+        var interactableInitEvent = new InteractableObjectServerEvent(createdTown.Id, interactable.Health, interactable.AttackDamage);
 
-        return _mapService.GetMap()!;
+        return new PlaceTownResponse(_mapService.GetMap()!, interactableInitEvent);
     }
 
     public AddUnitResponse? AddUnit(AddUnitRequest request)

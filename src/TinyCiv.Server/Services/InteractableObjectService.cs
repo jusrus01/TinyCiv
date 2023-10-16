@@ -56,6 +56,7 @@ public class InteractableObjectService : IInteractableObjectService
             GameObjectType.Warrior => new InteractableWarrior { GameObjectReferenceId = obj.Id },
             GameObjectType.Cavalry => new InteractableCavalry { GameObjectReferenceId = obj.Id },
             GameObjectType.Tarran => new InteractableTarran { GameObjectReferenceId = obj.Id },
+            GameObjectType.City => new InteractableCity { GameObjectReferenceId = obj.Id },
             _ => throw new NotSupportedException()
         };
     }

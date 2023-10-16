@@ -536,11 +536,20 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         var warriorAttackDamage = 0;
         var skipFirst = true;
         
+        const int skipCityTimes = 2;
+        var citySkipped = 0;
+        
         _sut.ListenForInteractableObjectChanges(response =>
         {
             if (skipFirst)
             {
                 skipFirst = false;
+                return;
+            }
+
+            if (citySkipped < skipCityTimes)
+            {
+                citySkipped++;
                 return;
             }
             
@@ -651,7 +660,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         // Not enough gold to buy cavalry
         // yield return new object[] { GameObjectType.Cavalry, Constants.Game.Interactable.Cavalry.Damage, Constants.Game.Interactable.Cavalry.InitialHealth };
         yield return new object[] { GameObjectType.Tarran, Constants.Game.Interactable.Tarran.Damage, Constants.Game.Interactable.Tarran.InitialHealth };
-        yield return new object[] { GameObjectType.City, null, null };
+        yield return new object[] { GameObjectType.City, Constants.Game.Interactable.City.Damage, Constants.Game.Interactable.City.InitialHealth };
         yield return new object[] { GameObjectType.Empty, null, null };
         yield return new object[] { GameObjectType.Mine, null, null };
         yield return new object[] { GameObjectType.StaticMountain, null, null };
@@ -662,6 +671,8 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
     public async Task ListenForInteractableObjectChanges_WhenUnitCreated_Then_ChangedStateReceivedWithInitialValues(GameObjectType type, int? expectedAttackDamage, int? expectedInitialHealth)
     {
         //arrange
+        var skipFirst = type != GameObjectType.City;
+        
         var anotherClient = InitializeClient();
 
         Guid? playerId = null;
@@ -676,6 +687,12 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         _sut.ListenForInteractableObjectChanges(resp =>
         {
+            if (skipFirst)
+            {
+                skipFirst = false;
+                return;
+            }
+            
             receivedAttackDamage = resp.AttackDamage;
             receivedInitialHealth = resp.Health;
         });
@@ -689,7 +706,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await WaitForResponseAsync();
 
         await _sut.SendAsync(new PlaceTownClientEvent(playerId!.Value));
-        await WaitForResponseAsync();
+        await WaitForResponseAsync(1000);
         
         //act
         await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 1, 1, type));
