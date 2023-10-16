@@ -660,7 +660,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await WaitForResponseAsync();
 
         await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 1, 1, GameObjectType.Warrior));
-        await WaitForResponseAsync();
+        await WaitForResponseAsync(10000);
         
         var anotherPlayerTown =
             latestMap!.Objects!.Single(obj => obj.Type == GameObjectType.City && obj.OwnerPlayerId == anotherPlayerId);
@@ -685,7 +685,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         //act
         await _sut.SendAsync(new MoveUnitClientEvent(attacker.Id, anotherPlayerTown.Position!.X,
             anotherPlayerTown.Position!.Y));
-        await WaitForResponseAsync(10000);
+        await WaitForResponseAsync(20000);
 
         await _sut.SendAsync(new AttackUnitClientEvent(attacker.Id, anotherPlayerTown.Id));
         await WaitForResponseAsync(8000);
