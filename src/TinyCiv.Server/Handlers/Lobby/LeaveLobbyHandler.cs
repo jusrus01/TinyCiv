@@ -1,25 +1,25 @@
+using TinyCiv.Shared.Events.Client.Lobby;
 using TinyCiv.Server.Core.Handlers;
 using TinyCiv.Server.Core.Services;
-using TinyCiv.Shared;
-using TinyCiv.Shared.Events.Client.Lobby;
 using TinyCiv.Shared.Events.Server;
+using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Handlers.Lobby;
 
 public class LeaveLobbyHandler : ClientHandler<LeaveLobbyClientEvent>
 {
     private readonly ISessionService _sessionService;
-    private readonly IConnectionIdAccessor _accessor;
+    private readonly IGameService _gameService;
 
     public LeaveLobbyHandler(
         ISessionService sessionService,
-        IConnectionIdAccessor accessor,
-        ILogger<IClientHandler> logger)
+        ILogger<IClientHandler> logger,
+        IGameService gameService)
         :
         base(logger)
     {
-        _accessor = accessor;
         _sessionService = sessionService;
+        _gameService = gameService;
     }
 
     // Do not allow leaving once the game starts.
@@ -28,13 +28,11 @@ public class LeaveLobbyHandler : ClientHandler<LeaveLobbyClientEvent>
 
     protected override Task OnHandleAsync(LeaveLobbyClientEvent @event)
     {
-        _sessionService.RemovePlayerByConnectionId(_accessor.ConnectionId);
+        var response = _gameService.DisconnectPlayer();
 
-        var canGameStart = _sessionService.CanGameStart();
-        // Assume other handler sent previously that game could start
-        if (!canGameStart)
+        if (!response.CanGameStart)
         {
-            return NotifyAllAsync(Constants.Server.SendLobbyStateToAll, new LobbyStateServerEvent(canGameStart));
+            return NotifyAllAsync(Constants.Server.SendLobbyStateToAll, new LobbyStateServerEvent(response.CanGameStart));
         }
         
         return Task.CompletedTask;

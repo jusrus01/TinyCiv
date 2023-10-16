@@ -34,7 +34,7 @@ public class InteractableObjectService : IInteractableObjectService
         return obj.Type switch
         {
             GameObjectType.Warrior => new InteractableWarrior { GameObjectReferenceId = obj.Id },
-            GameObjectType.Colonist => new InteractableColonist { GameObjectReferenceId = obj.Id },
+            // GameObjectType.Colonist => new InteractableColonist { GameObjectReferenceId = obj.Id },
             GameObjectType.Cavalry => new InteractableCavalry { GameObjectReferenceId = obj.Id },
             GameObjectType.Tarran => new InteractableTarran { GameObjectReferenceId = obj.Id },
             _ => throw new NotSupportedException()
