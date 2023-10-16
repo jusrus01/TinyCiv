@@ -651,7 +651,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         // Not enough gold to buy cavalry
         // yield return new object[] { GameObjectType.Cavalry, Constants.Game.Interactable.Cavalry.Damage, Constants.Game.Interactable.Cavalry.InitialHealth };
         yield return new object[] { GameObjectType.Tarran, Constants.Game.Interactable.Tarran.Damage, Constants.Game.Interactable.Tarran.InitialHealth };
-        yield return new object[] { GameObjectType.Town, null, null };
+        yield return new object[] { GameObjectType.City, null, null };
         yield return new object[] { GameObjectType.Empty, null, null };
         yield return new object[] { GameObjectType.Mine, null, null };
         yield return new object[] { GameObjectType.StaticMountain, null, null };
@@ -736,7 +736,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
             if (testIndex == 1)
             {
                 int townCount = eventas.Map.Objects!
-                    .Where(o => o.Type == GameObjectType.Town)
+                    .Where(o => o.Type == GameObjectType.City)
                     .Count();
                 Assert.Equal(1, townCount);
             }
@@ -744,7 +744,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
             if (testIndex == 2)
             {
                 int townCount = eventas.Map.Objects!
-                    .Where(o => o.Type == GameObjectType.Town)
+                    .Where(o => o.Type == GameObjectType.City)
                     .Count();
                 Assert.Equal(2, townCount);
             }
