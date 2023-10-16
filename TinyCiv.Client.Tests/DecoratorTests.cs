@@ -78,5 +78,34 @@ namespace TinyCiv.Client.Tests
             Assert.Equal(Brushes.Transparent, properties.BackgroundBrush);
         }
 
+        [Fact]
+        public void MultipleDecoratorsShouldApply()
+        {
+            GameObject warrior = GetWarrior();
+            Brush expectedBackgroundBrush = new SolidColorBrush(Color.FromArgb(64, 255, 0, 0));
+
+            BorderDecorator decoratedWarrior = new BorderBackgroundDecorator(warrior, Brushes.Red);
+            decoratedWarrior = new BorderHighlightDecorator(decoratedWarrior, Brushes.Green);
+            var properties = decoratedWarrior.ApplyEffects();
+
+            Assert.Equal(expectedBackgroundBrush.ToString(), properties.BackgroundBrush.ToString());
+            Assert.Equal(Brushes.Green, properties.BorderBrush);
+            Assert.Equal(new Thickness(2), properties.BorderThickness);
+        }
+
+        [Fact]
+        public void MultipleDecoratorsShouldRemove()
+        {
+            GameObject warrior = GetWarrior();
+
+            BorderDecorator decoratedWarrior = new BorderBackgroundDecorator(warrior, Brushes.Red);
+            decoratedWarrior = new BorderHighlightDecorator(decoratedWarrior, Brushes.Green);
+            decoratedWarrior.ApplyEffects();
+            var properties = decoratedWarrior.RemoveEffects();
+
+            Assert.Equal(Brushes.Transparent, properties.BackgroundBrush);
+            Assert.Equal(new Thickness(0), properties.BorderThickness);
+        }
+
     }
 }

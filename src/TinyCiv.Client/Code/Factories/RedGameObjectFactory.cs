@@ -9,7 +9,7 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.Factories
 {
-    internal class RedGameObjectFactory : AbstractGameObjectFactory
+    public class RedGameObjectFactory : AbstractGameObjectFactory
     {
         public static Dictionary<GameObjectType, string> sources = new Dictionary<GameObjectType, string>
         {
