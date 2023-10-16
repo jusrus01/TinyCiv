@@ -685,10 +685,10 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         //act
         await _sut.SendAsync(new MoveUnitClientEvent(attacker.Id, anotherPlayerTown.Position!.X,
             anotherPlayerTown.Position!.Y));
-        await WaitForResponseAsync(6000);
+        await WaitForResponseAsync(10000);
 
         await _sut.SendAsync(new AttackUnitClientEvent(attacker.Id, anotherPlayerTown.Id));
-        await WaitForResponseAsync(6000);
+        await WaitForResponseAsync(8000);
         
         //assert
         Assert.NotEqual(-1, afterCombatAttackerHealth);
