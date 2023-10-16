@@ -1,5 +1,6 @@
 using TinyCiv.Server.Core.Game.InteractableObjects;
 using TinyCiv.Server.Core.Handlers;
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Dtos.Units;
 using TinyCiv.Shared;
@@ -17,9 +18,10 @@ public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
     public UnitAttackHandler(
         ISessionService sessionService,
         ILogger<IClientHandler> logger,
-        IGameService gameService)
+        IGameService gameService,
+        IPublisher publisher)
         :
-        base(logger)
+        base(publisher, logger)
     {
         _sessionService = sessionService;
         _gameService = gameService;

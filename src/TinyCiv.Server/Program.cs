@@ -1,9 +1,11 @@
 using Serilog;
 using TinyCiv.Server.Core.Handlers;
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Handlers;
 using TinyCiv.Server.Handlers.Lobby;
 using TinyCiv.Server.Hubs;
+using TinyCiv.Server.Publishers;
 using TinyCiv.Server.Services;
 using TinyCiv.Shared.Events.Client;
 using Constants = TinyCiv.Shared.Constants;
@@ -19,6 +21,8 @@ Log.Logger = new LoggerConfiguration()
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog();
+
+builder.Services.AddSingleton<IPublisher, Publisher>();
 
 builder.Services.AddSingleton<IResourceService, ResourceService>();
 builder.Services.AddSingleton<ISessionService, SessionService>();

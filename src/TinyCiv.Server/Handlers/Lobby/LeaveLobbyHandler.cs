@@ -1,5 +1,6 @@
 using TinyCiv.Shared.Events.Client.Lobby;
 using TinyCiv.Server.Core.Handlers;
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Server;
 using TinyCiv.Shared;
@@ -14,9 +15,10 @@ public class LeaveLobbyHandler : ClientHandler<LeaveLobbyClientEvent>
     public LeaveLobbyHandler(
         ISessionService sessionService,
         ILogger<IClientHandler> logger,
-        IGameService gameService)
+        IGameService gameService,
+        IPublisher publisher)
         :
-        base(logger)
+        base(publisher, logger)
     {
         _sessionService = sessionService;
         _gameService = gameService;

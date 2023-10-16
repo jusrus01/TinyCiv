@@ -1,4 +1,5 @@
 ﻿using TinyCiv.Server.Core.Handlers;
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
@@ -10,7 +11,7 @@ public class PlaceTownHandler : ClientHandler<PlaceTownClientEvent>
 {
     private readonly IGameService _gameService;
 
-    public PlaceTownHandler(ILogger<IClientHandler> logger, IGameService gameService) : base(logger)
+    public PlaceTownHandler(ILogger<IClientHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
     {
         _gameService = gameService;
     }

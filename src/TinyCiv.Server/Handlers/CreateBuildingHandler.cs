@@ -1,5 +1,6 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
 using TinyCiv.Server.Core.Handlers;
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Dtos.Buildings;
 using TinyCiv.Shared;
@@ -15,7 +16,7 @@ public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
     private readonly IResourceService _resourceService;
     private readonly IGameService _gameService;
 
-    public CreateBuildingHandler(ILogger<IClientHandler> logger, IMapService mapService, IResourceService resourceService, IGameService gameService) : base(logger)
+    public CreateBuildingHandler(ILogger<IClientHandler> logger, IMapService mapService, IResourceService resourceService, IGameService gameService, IPublisher publisher) : base(publisher, logger)
     {
         _mapService = mapService;
         _resourceService = resourceService;

@@ -1,3 +1,4 @@
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Server;
 using TinyCiv.Shared.Events.Client;
@@ -11,7 +12,7 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
 {
     private readonly IGameService _gameService;
 
-    public UnitAddHandler(ILogger<UnitAddHandler> logger, IGameService gameService) : base(logger)
+    public UnitAddHandler(ILogger<UnitAddHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
     {
         _gameService = gameService;
     }
