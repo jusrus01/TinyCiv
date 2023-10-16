@@ -1,5 +1,6 @@
 ﻿using TinyCiv.Server.Dtos.Buildings;
 using TinyCiv.Server.Dtos.Players;
+using TinyCiv.Server.Dtos.Towns;
 using TinyCiv.Server.Dtos.Units;
 using TinyCiv.Shared.Game;
 
@@ -13,7 +14,7 @@ public interface IGameService
     Map StartGame(MapType mapType);
 
     CreateBuildingResponse? CreateBuilding(CreateBuildingRequest request);
-    Map? PlaceTown(Guid playerId);
+    PlaceTownResponse? PlaceTown(Guid playerId);
 
     AddUnitResponse? AddUnit(AddUnitRequest request);
     void AttackUnit(AttackUnitRequest request);

@@ -12,7 +12,8 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
 {
     private readonly IGameService _gameService;
 
-    public UnitAddHandler(ILogger<UnitAddHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
+    public UnitAddHandler(ILogger<UnitAddHandler> logger, IGameService gameService, IPublisher publisher) : base(
+        publisher, logger)
     {
         _gameService = gameService;
     }
@@ -27,7 +28,7 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
         {
             return;
         }
-        
+
         await NotifyCallerAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(response.Unit))
             .ConfigureAwait(false);
 
@@ -36,14 +37,15 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
 
         // Start notification tasks
         var interactableNotifyTask = interactableEvent != null
-            ? NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, (InteractableObjectServerEvent)interactableEvent)
+            ? NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll,
+                (InteractableObjectServerEvent)interactableEvent)
             : Task.CompletedTask;
         var resourceNotifyTask = resourceEvent != null
             ? NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, (ResourcesUpdateServerEvent)resourceEvent)
             : Task.CompletedTask;
 
         await Task.WhenAll(interactableNotifyTask, resourceNotifyTask);
-        
+
         // Trigger map update when interactable and resources are updated
         await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(response.Map))
             .ConfigureAwait(false);
@@ -52,7 +54,7 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
     protected override bool IgnoreWhen(CreateUnitClientEvent @event)
     {
         return @event.UnitType != GameObjectType.Cavalry &&
-            @event.UnitType != GameObjectType.Warrior &&
-            @event.UnitType != GameObjectType.Tarran;
+               @event.UnitType != GameObjectType.Warrior &&
+               @event.UnitType != GameObjectType.Tarran;
     }
 }

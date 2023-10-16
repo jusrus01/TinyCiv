@@ -7,6 +7,12 @@ public static class Constants
         public static class Interactable
         {
             public const int AttackIntervalInMilliseconds = 2000;
+
+            public static class City
+            {
+                public const int InitialHealth = 200;
+                public const int Damage = 20;
+            }
             
             public static class Warrior
             {
@@ -61,14 +67,6 @@ public static class Constants
         public const int StartingIndustry = 200;
         public const int StartingFood = 100;
         public const int StartingGold = 50;
-
-        // Temporary map stuff, need to clarify how to best do this
-        public const string Map =
-            ".....\n" +
-            ".....\n" +
-            ".....\n" +
-            ".....\n" +
-            ".....\n";
     }
     
     public static class Server

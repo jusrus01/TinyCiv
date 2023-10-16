@@ -11,6 +11,6 @@ public static class GameObjectExtensions
 
     public static bool IsInteractable(this GameObjectType type)
     {
-        return type is GameObjectType.Warrior or GameObjectType.Cavalry or GameObjectType.Tarran;
+        return type is GameObjectType.Warrior or GameObjectType.Cavalry or GameObjectType.Tarran or GameObjectType.City;
     }
 }

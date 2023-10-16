@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Web;
-using System.Security.Cryptography;
-using TinyCiv.Server.Core.Extensions;
-using TinyCiv.Server.Core.Game.Buildings;
+﻿using TinyCiv.Server.Core.Game.Buildings;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Entities;
 using TinyCiv.Server.Enums;
@@ -154,7 +151,7 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        public bool PlaceTown(Guid playerId)
+        public ServerGameObject? PlaceTown(Guid playerId)
         {
             lock (_mapChangeLocker)
             {
@@ -166,12 +163,12 @@ namespace TinyCiv.Server.Services
 
                 if (colonistObject == null)
                 {
-                    return false;
+                    return null;
                 }
 
                 if (IsInRange(colonistObject.Value.Position!, Constants.Game.TownSpaceFromTown, GameObjectType.City))
                 {
-                    return false;
+                    return null;
                 }
 
                 _map.Objects![colonistObject.Index] = new ServerGameObject
@@ -183,7 +180,7 @@ namespace TinyCiv.Server.Services
                     Color = colonistObject.Value.Color
                 };
 
-                return true;
+                return _map.Objects![colonistObject.Index];
             }
         }
 
