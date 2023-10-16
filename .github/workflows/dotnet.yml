@@ -20,5 +20,5 @@ jobs:
               run: dotnet restore
             - name: Build
               run: dotnet build --no-restore
-            - name: Run TinyCiv.Server.Client.IntegrationTests tests
-              run: dotnet test tests/TinyCiv.Server.Client.IntegrationTests/TinyCiv.Server.Client.IntegrationTests.csproj --no-build
+            - name: Tests
+              run: dotnet test --no-build
