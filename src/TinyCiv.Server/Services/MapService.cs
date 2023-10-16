@@ -43,7 +43,7 @@ namespace TinyCiv.Server.Services
 
                 var player = _sessionService.GetPlayer(playerId);
 
-                bool isTownInRange = IsInRange(position, Constants.Game.BuildingSpaceFromTown, GameObjectType.Town);
+                bool isTownInRange = IsInRange(position, Constants.Game.BuildingSpaceFromTown, GameObjectType.City);
 
                 bool doesEnumExist = Enum.TryParse<GameObjectType>(Enum.GetName(building.BuildingType), out var gameObjectType);
 
@@ -169,7 +169,7 @@ namespace TinyCiv.Server.Services
                     return false;
                 }
 
-                if (IsInRange(colonistObject.Value.Position!, Constants.Game.TownSpaceFromTown, GameObjectType.Town))
+                if (IsInRange(colonistObject.Value.Position!, Constants.Game.TownSpaceFromTown, GameObjectType.City))
                 {
                     return false;
                 }
@@ -179,7 +179,7 @@ namespace TinyCiv.Server.Services
                     OwnerPlayerId = playerId,
                     Id = colonistObject.Value.Id,
                     Position = colonistObject.Value.Position,
-                    Type = GameObjectType.Town,
+                    Type = GameObjectType.City,
                     Color = colonistObject.Value.Color
                 };
 
@@ -192,7 +192,7 @@ namespace TinyCiv.Server.Services
             lock (_mapChangeLocker)
             {
                 return _map!.Objects!
-                    .Where(o => o.Type == GameObjectType.Town)
+                    .Where(o => o.Type == GameObjectType.City)
                     .Where(o => o.OwnerPlayerId == playerId)
                     .Any();
             }

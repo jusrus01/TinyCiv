@@ -12,6 +12,7 @@ namespace TinyCiv.Client.Code.units
         public override int ProductionPrice => 100;
         public override int ExpReward => 10;
         public override string Description => "Can create a new city";
+
         public Colonist(GameObject go) : base(go)
         {
             Health = MaxHealth;
