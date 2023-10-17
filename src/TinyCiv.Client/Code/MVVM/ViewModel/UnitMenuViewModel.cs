@@ -26,6 +26,8 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         public RelayCommand SelectUnitToBuyCommand => new RelayCommand(SelectUnitToBuy, CanBuy);
         public RelayCommand SelectBuildingToBuyCommand => new RelayCommand(SelectBuildingToBuy, CanBuy);
         public RelayCommand EscapeKeyCommand => new RelayCommand(HandleEscapeKey, CanCancelPurchase);
+        public RelayCommand UndoCommand => new RelayCommand(HandleUndo, CanUndo);
+        
 
         public UnitMenuViewModel()
         {
@@ -163,11 +165,23 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
                 {
                     ObjectsClocks.Remove(clockToRemove);
                 }
+
+                CommandManager.InvalidateRequerySuggested();
             };
 
             timer.Start();
         }
 
+        private bool CanUndo(object arg)
+        {
+            return ObjectsClocks.Count > 0;
+        }
+
+        private void HandleUndo(object obj)
+        {
+            ObjectsClocks.RemoveAt(ObjectsClocks.Count - 1);
+            commandsManager.UndoLastCommand();
+        }
 
         public void SetCurrentUnit(GameObject gameObject)
         {

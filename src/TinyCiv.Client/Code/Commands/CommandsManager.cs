@@ -9,15 +9,15 @@ namespace TinyCiv.Client.Code.Commands
 {
     public class CommandsManager
     {
-        private Queue<(IGameCommand Command, CancellationTokenSource CancellationTokenSource)> commandQueue = new Queue<(IGameCommand, CancellationTokenSource)>();
-        private Stack<Queue<(IGameCommand, CancellationTokenSource)>> stateHistory = new Stack<Queue<(IGameCommand, CancellationTokenSource)>>();
+        private Stack<(IGameCommand Command, CancellationTokenSource CancellationTokenSource)> commandQueue = new Stack<(IGameCommand, CancellationTokenSource)>();
+        private Stack<Stack<(IGameCommand, CancellationTokenSource)>> stateHistory = new Stack<Stack<(IGameCommand, CancellationTokenSource)>>();
 
         public async Task ExecuteCommandWithTimer(IGameCommand command, long durationInMillis)
         {
-            stateHistory.Push(new Queue<(IGameCommand, CancellationTokenSource)>(commandQueue));
+            stateHistory.Push(new Stack<(IGameCommand, CancellationTokenSource)>(commandQueue));
 
             var cancellationTokenSource = new CancellationTokenSource();
-            commandQueue.Enqueue((command, cancellationTokenSource));
+            commandQueue.Push((command, cancellationTokenSource));
 
             try
             {
@@ -31,7 +31,7 @@ namespace TinyCiv.Client.Code.Commands
         {
             if (commandQueue.Count > 0)
             {
-                var (_, currentCancellationTokenSource) = commandQueue.Dequeue();
+                var (_, currentCancellationTokenSource) = commandQueue.Pop();
                 currentCancellationTokenSource.Cancel();
                 currentCancellationTokenSource.Dispose();
 

@@ -142,18 +142,41 @@
         <TextBlock Grid.Row="2" Text="Press Esc button to cancel" TextWrapping="Wrap" FontWeight="Bold" Margin="5" FontSize="10"
                    Visibility="{Binding IsUnderPurchase.Value, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-        <Grid Grid.Row="3">
-            <ItemsControl ItemsSource="{Binding ObjectsClocks}">
-                <ItemsControl.ItemTemplate>
+        <!-- Execution Queue -->
+        <Grid Grid.Row="3" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="0,0,0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="75*"/>
+                    <ColumnDefinition Width="25*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" VerticalAlignment="Center">Queue:</TextBlock>
+                <Button x:Name="undoButton" Grid.Column="1" Command="{Binding UndoCommand}">Undo</Button>
+            </Grid>
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding ObjectsClocks}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>                       
                     <DataTemplate>
-                        <Grid>
-                            <!--<TextBlock Text="{Binding Name}" Margin="5" FontSize="16" Background="LightGray" Foreground="Black" />-->
-                            <TextBlock Text="{Binding RemainingTime.Seconds}" />
-                        </Grid>
+                        <Border BorderBrush="LightGray" BorderThickness="1">
+                            <Grid Width="30" Margin="5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Image Grid.Row="0" VerticalAlignment="Center" Source="{Binding ImagePath}" />
+                                <TextBlock Grid.Row="1" Margin="0,5,0,0" HorizontalAlignment="Center" Text="{Binding RemainingTime.Seconds}" />
+                            </Grid>
+                        </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Grid>
-
     </Grid>
 </UserControl>
