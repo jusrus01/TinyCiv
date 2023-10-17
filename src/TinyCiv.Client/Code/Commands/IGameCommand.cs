@@ -6,5 +6,6 @@ namespace TinyCiv.Client.Code.Commands
     public interface IGameCommand
     {
         void Execute();
+        bool CanExecute();
     }
 }

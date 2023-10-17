@@ -26,12 +26,11 @@ namespace TinyCiv.Client.Code
         public Resources Resources;
         public List<string> mapImages = new List<string>();
         public List<GameObject> GameObjects = new List<GameObject>();
-        public List<GameObject> DecoyObjects = new List<GameObject>();
+        public Dictionary<int, GameObject> DecoyObjects = new();
         public UnitMenuViewModel UnitMenuVM;
         public UpperMenuViewModel UpperMenuVM;
         private int Rows;
         private int Columns;
-
         private bool isUnitSelected = false;
         private GameObject selectedUnit;
 
@@ -48,6 +47,7 @@ namespace TinyCiv.Client.Code
             HealthValues = new Dictionary<Guid, int>();
             Rows = rows;
             Columns = columns;
+            GameObjects = new List<GameObject>(Rows*Columns);
             ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
             ClientSingleton.Instance.serverClient.ListenForInteractableObjectChanges(OnInteractableChange);
             ClientSingleton.Instance.serverClient.ListenForResourcesUpdate(OnResourceUpdate);
@@ -55,6 +55,7 @@ namespace TinyCiv.Client.Code
 
         private void OnResourceUpdate(ResourcesUpdateServerEvent response)
         {
+            CurrentPlayer.Instance.Resources = response.Resources;
             Resources = response.Resources;
             UpperMenuVM.SetResources(Resources);
         }
@@ -67,20 +68,18 @@ namespace TinyCiv.Client.Code
             if (isUnitSelected)
             {
                 var unit = selectedUnit as Unit;
-                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
+                await unit.MoveTo(clickedPosition);
                 UnselectUnit(unit);
             }
             else if (unitUnderPurchase != null) 
             {
-                AddDecoy(unitUnderPurchase.Type, clickedPosition);
-                UnitMenuVM.ExecuteUnitPurchase(clickedPosition);
-                onPropertyChanged?.Invoke();
+                InvokeUnitSpawnProcess(clickedPosition);
             }
             else if (buildingUnderPurchase != null 
                 && buildingUnderPurchase.Type != GameObjectType.Port 
                 && buildingUnderPurchase.Type != GameObjectType.Mine)
             {
-                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
+                InvokeBuildingProcess(clickedPosition);
             }
         }
 
@@ -89,7 +88,7 @@ namespace TinyCiv.Client.Code
             var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
             if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Port)
             {
-                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
+                InvokeBuildingProcess(clickedPosition);
             }
         }
 
@@ -98,8 +97,24 @@ namespace TinyCiv.Client.Code
             var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
             if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Mine)
             {
-                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
+                InvokeBuildingProcess(clickedPosition);
             }
+        }
+
+        private void InvokeBuildingProcess(Position position)
+        {
+            var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
+            AddDecoy(buildingUnderPurchase.Type, position);
+            UnitMenuVM.ExecuteBuildingPurchase(position);
+            onPropertyChanged?.Invoke();
+        }
+
+        private void InvokeUnitSpawnProcess(Position position)
+        {
+            var unitUnderPurchase = UnitMenuVM.SelectedBuyUnit.Value;
+            AddDecoy(unitUnderPurchase.Type, position);
+            UnitMenuVM.ExecuteUnitPurchase(position);
+            onPropertyChanged?.Invoke();
         }
 
         private async void Unit_Click(GameObject selectedGameObject)
@@ -112,7 +127,8 @@ namespace TinyCiv.Client.Code
             } 
             else if (isUnitSelected && GameObjects[gameObjectIndex].OwnerId != CurrentPlayer.Id)
             {
-                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(selectedUnit.Id, selectedGameObject.Position.row, selectedGameObject.Position.column));
+                var unit = selectedUnit as Unit;
+                await unit.MoveTo(selectedGameObject.Position);
                 UnselectUnit(selectedUnit);
             }
             else if (isUnitSelected && selectedGameObject == selectedUnit)
@@ -204,9 +220,8 @@ namespace TinyCiv.Client.Code
             {
                 AddClickEvent(gameObject);
                 var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
+                RemoveDecoyAt(gameObjectIndex);
                 GameObjects[gameObjectIndex] = gameObject;
-
-                //RemoveDecoyAt(gameObjectIndex);
 
                 if (gameObject.OpponentId != null)
                 {
@@ -230,7 +245,7 @@ namespace TinyCiv.Client.Code
 
         private void ShowDecoys()
         {
-            foreach(var go in DecoyObjects)
+            foreach (var go in DecoyObjects.Values)
             {
                 var goIndex = go.Position.column * Columns + go.Position.row;
                 GameObjects[goIndex] = go;
@@ -239,9 +254,9 @@ namespace TinyCiv.Client.Code
 
         private void RemoveDecoyAt(int index)
         {
-            if (DecoyObjects[index] != null)
+            if (DecoyObjects.ContainsKey(index))
             {
-                DecoyObjects.RemoveAt(index);
+                DecoyObjects.Remove(index);
             }
         }
 
@@ -249,8 +264,13 @@ namespace TinyCiv.Client.Code
         {
             var goIndex = position.column * Columns + position.row;
             var decoy = new GameObject(type, position, CurrentPlayer.Color, 0.5);
-            DecoyObjects.Add(decoy);
+            DecoyObjects.Add(goIndex, decoy);
             GameObjects[goIndex] = decoy;
+        }
+
+        public int PositionToIndex(Position position)
+        {
+            return position.column * Columns + position.row;
         }
 
         private void AddClickEvent(GameObject gameObject)

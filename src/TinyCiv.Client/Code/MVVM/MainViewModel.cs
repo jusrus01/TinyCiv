@@ -13,6 +13,7 @@ using TinyCiv.Client.Code.Units;
 using System.Threading;
 using System.ComponentModel;
 using TinyCiv.Shared.Events.Client.Lobby;
+using TinyCiv.Shared;
 
 namespace TinyCiv.Client.Code.MVVM
 {
@@ -53,6 +54,7 @@ namespace TinyCiv.Client.Code.MVVM
             if (CurrentPlayer.Instance.player == null)
             {
                 CurrentPlayer.Instance.player = response.Created;
+                CurrentPlayer.Instance.Resources = new Resources{ Industry = Constants.Game.StartingIndustry, Food = Constants.Game.StartingFood, Gold = Constants.Game.StartingGold };
                 UpperMenuVM.PlayerColor.Value = CurrentPlayer.Color;
             }
 
@@ -64,10 +66,12 @@ namespace TinyCiv.Client.Code.MVVM
 
         private void OnGameStart(GameStartServerEvent response)
         {
-            LowerMenu.Value = UnitMenuVM;
             UpperMenu.Value = UpperMenuVM;
 
             GameVM.GameStart(response);
+
+            UnitMenuVM.gameState = GameVM.gameState;
+            LowerMenu.Value = UnitMenuVM;
 
             GameVM.UnitMenuVM = UnitMenuVM;
             GameVM.UpperMenuVM = UpperMenuVM;

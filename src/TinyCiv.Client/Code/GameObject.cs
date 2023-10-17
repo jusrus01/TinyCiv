@@ -60,6 +60,7 @@ namespace TinyCiv.Client.Code
             go.OpponentId = serverGameObject.OpponentId;
             go.Border = new BorderProperties();
             go.Border.BackgroundBrush = Brushes.Transparent;
+            go.Border.Opacity = 1;
             return go;
         }
 

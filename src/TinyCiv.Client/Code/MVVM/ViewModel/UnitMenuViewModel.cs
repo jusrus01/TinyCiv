@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Common;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using TinyCiv.Client.Code.Commands;
+using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.MVVM.Model;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Game;
@@ -13,6 +16,8 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 {
     public class UnitMenuViewModel : ObservableObject
     {
+        public GameState gameState;
+
         private CommandsManager commandsManager = new CommandsManager();
         public ObservableValue<bool> IsUnitsListVisible { get; } = new ObservableValue<bool>(true);
         public ObservableValue<bool> IsBuildingsListVisible { get; } = new ObservableValue<bool>(false);
@@ -20,7 +25,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         public ObservableValue<UnitModel> SelectedBuyUnit { get; } = new ObservableValue<UnitModel>(null);
         public ObservableValue<BuildingModel> SelectedBuyBuilding { get; } = new ObservableValue<BuildingModel>(null);
         public ObservableValue<String> UnitName { get; } = new ObservableValue<string>("EMPTY");
-        public ObservableCollection<ClockModel> ObjectsClocks { get; } = new ObservableCollection<ClockModel>();
+        public ObservableCollection<ClockModel> ObjectsInQueue { get; } = new ObservableCollection<ClockModel>();
         public RelayCommand ShowUnitsCommand => new RelayCommand(execute => ShowUnits());
         public RelayCommand ShowBuildingsCommand => new RelayCommand(execute => ShowBuildings());
         public RelayCommand SelectUnitToBuyCommand => new RelayCommand(SelectUnitToBuy, CanBuy);
@@ -51,12 +56,12 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             {
                 return new List<BuildingModel>()
                 {
-                    new BuildingModel("+2 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Farm),
-                    new BuildingModel("+2 production", "50 prod.", CurrentPlayer.Color, GameObjectType.Mine),
-                    new BuildingModel("+5 production, -1 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Blacksmith),
-                    new BuildingModel("+2 gold", "50 prod.", CurrentPlayer.Color, GameObjectType.Shop),
-                    new BuildingModel("+5 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Bank),
-                    new BuildingModel("+2 production, +1 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Port),
+                    new BuildingModel("+2 food", 50, CurrentPlayer.Color, GameObjectType.Farm),
+                    new BuildingModel("+2 production", 50, CurrentPlayer.Color, GameObjectType.Mine),
+                    new BuildingModel("+5 production, -1 gold", 100, CurrentPlayer.Color, GameObjectType.Blacksmith),
+                    new BuildingModel("+2 gold", 50, CurrentPlayer.Color, GameObjectType.Shop),
+                    new BuildingModel("+5 gold", 50, CurrentPlayer.Color, GameObjectType.Bank),
+                    new BuildingModel("+2 production, +1 food", 50, CurrentPlayer.Color, GameObjectType.Port),
                 };
             }
         }
@@ -102,14 +107,14 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 
         public async void ExecuteUnitPurchase(Position position)
         {            
-            IGameCommand createUnitCommand = new CreateUnitCommand(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value.Type);
-            ObjectsClocks.Add(new ClockModel(SelectedBuyUnit.Value.ImagePath, TimeSpan.FromMilliseconds(3500))); // exists ~500ms delay
+            IGameCommand createUnitCommand = new CreateUnitCommand(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value);
+            ObjectsInQueue.Add(new ClockModel(SelectedBuyUnit.Value, SelectedBuyUnit.Value.ImagePath, TimeSpan.FromMilliseconds(3500))); // exists ~500ms delay
 
             Mouse.OverrideCursor = Cursors.Arrow;
             IsUnderPurchase.Value = false;
             SelectedBuyUnit.Value = null;
 
-            await commandsManager.ExecuteCommandWithTimer(createUnitCommand, 3000);
+            await commandsManager.AddCommandToQueue(createUnitCommand, 3000, position);
         }
 
         private bool CanBuy(object parameter)
@@ -137,15 +142,15 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         public async void ExecuteBuildingPurchase(Position position)
         {
             ServerPosition serverPos = new ServerPosition { X = position.row, Y = position.column };
-            BuildingType parsedType = (BuildingType)Enum.Parse(typeof(BuildingType), SelectedBuyBuilding.Value.Type.ToString());
-            IGameCommand createBuildingCommand = new CreateBuildingCommand(CurrentPlayer.Id, parsedType, serverPos);
-            ObjectsClocks.Add(new ClockModel(SelectedBuyBuilding.Value.ImagePath, TimeSpan.FromMilliseconds(3500))); // exists ~500ms delay
+            
+            IGameCommand createBuildingCommand = new CreateBuildingCommand(CurrentPlayer.Id, SelectedBuyBuilding.Value, serverPos);
+            ObjectsInQueue.Add(new ClockModel(SelectedBuyBuilding.Value, SelectedBuyBuilding.Value.ImagePath, TimeSpan.FromMilliseconds(3000))); // exists ~500ms delay
 
             SelectedBuyBuilding.Value = null;
             IsUnderPurchase.Value = false;
             Mouse.OverrideCursor = Cursors.Arrow;
 
-            await commandsManager.ExecuteCommandWithTimer(createBuildingCommand, 3000);
+            await commandsManager.AddCommandToQueue(createBuildingCommand, 3000, position);            
         }
 
         private void UpdateClocks()
@@ -153,20 +158,17 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             timer.Tick += (s, e) =>
             {
-                List<ClockModel> clocksToRemove = new List<ClockModel>();
-
-                foreach (var clock in ObjectsClocks)
+                if (ObjectsInQueue.Count > 0)
                 {
-                    clock.RemainingTime = clock.RemainingTime.Subtract(TimeSpan.FromSeconds(1));
-                    if (clock.RemainingTime <= TimeSpan.Zero)
+                    var objectInQueue = ObjectsInQueue[0];
+                    if (objectInQueue.BuyableObject.IsBuyable())
                     {
-                        clocksToRemove.Add(clock);
+                        objectInQueue.RemainingTime = objectInQueue.RemainingTime.Subtract(TimeSpan.FromSeconds(1));
+                        if (objectInQueue.RemainingTime <= TimeSpan.Zero)
+                        {
+                            ObjectsInQueue.Remove(objectInQueue);
+                        }
                     }
-                }
-
-                foreach (var clockToRemove in clocksToRemove)
-                {
-                    ObjectsClocks.Remove(clockToRemove);
                 }
 
                 CommandManager.InvalidateRequerySuggested();
@@ -177,13 +179,25 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 
         private bool CanUndo(object arg)
         {
-            return ObjectsClocks.Count > 0;
+            return ObjectsInQueue.Count > 0;
         }
 
         private void HandleUndo(object obj)
         {
-            ObjectsClocks.RemoveAt(ObjectsClocks.Count - 1);
-            commandsManager.UndoLastCommand();
+            ObjectsInQueue.RemoveAt(ObjectsInQueue.Count - 1);
+            Position undoPosition = commandsManager.UndoLastCommand();
+
+            int index = gameState.PositionToIndex(undoPosition);
+            gameState.DecoyObjects.Remove(index);
+            var serverGameObject = new ServerGameObject
+            {
+                Type = GameObjectType.Empty,
+                Position = new ServerPosition() { X = undoPosition.row, Y = undoPosition.column }
+            };
+            var redFactory = new RedGameObjectFactory();
+            var tileReplacement = redFactory.CreateGameObject(serverGameObject);
+            gameState.GameObjects[index] = tileReplacement;
+            gameState.onPropertyChanged?.Invoke();
         }
 
         public void SetCurrentUnit(GameObject gameObject)
@@ -195,8 +209,5 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         {
             UnitName.Value = "";
         }
-
-
-
     }
 }

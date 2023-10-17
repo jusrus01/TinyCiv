@@ -1,18 +1,19 @@
-﻿using TinyCiv.Client.Code.Factories;
+﻿using System.Windows.Navigation;
+using TinyCiv.Client.Code.Factories;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.MVVM.Model;
 
-public class BuildingModel
+public class BuildingModel : IBuyable
 {
     public string ImagePath { get; }
     public string Name { get; }
     public string Production { get; }
-    public string Cost { get; }
+    public int Cost { get; }
     public TeamColor Color { get; }
     public GameObjectType Type { get; }
 
-    public BuildingModel(string production, string cost, TeamColor color, GameObjectType type)
+    public BuildingModel(string production, int cost, TeamColor color, GameObjectType type)
     {
         Production = production;
         Cost = cost;
@@ -20,5 +21,10 @@ public class BuildingModel
         Type = type;
         Name = type.ToString();
         ImagePath = AbstractGameObjectFactory.getGameObjectImage(color, type);
+    }
+
+    public bool IsBuyable()
+    {
+        return CurrentPlayer.Instance.Resources.Industry >= Cost;
     }
 }

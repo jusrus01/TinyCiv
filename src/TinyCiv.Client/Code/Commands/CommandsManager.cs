@@ -4,43 +4,69 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TinyCiv.Client.Code.MVVM.Model;
 
 namespace TinyCiv.Client.Code.Commands
 {
     public class CommandsManager
     {
-        private Stack<(IGameCommand Command, CancellationTokenSource CancellationTokenSource)> commandQueue = new Stack<(IGameCommand, CancellationTokenSource)>();
-        private Stack<Stack<(IGameCommand, CancellationTokenSource)>> stateHistory = new Stack<Stack<(IGameCommand, CancellationTokenSource)>>();
+        private LinkedList<CommandQueueModel> commandQueue = new LinkedList<CommandQueueModel>();
+        private bool isExecuting = false;
 
-        public async Task ExecuteCommandWithTimer(IGameCommand command, long durationInMillis)
+        public async Task AddCommandToQueue(IGameCommand command, long durationInMillis, Position position)
         {
-            stateHistory.Push(new Stack<(IGameCommand, CancellationTokenSource)>(commandQueue));
-
             var cancellationTokenSource = new CancellationTokenSource();
-            commandQueue.Push((command, cancellationTokenSource));
+            commandQueue.AddLast(new CommandQueueModel(command, durationInMillis, cancellationTokenSource, position));
 
-            try
+            if (!isExecuting)
             {
-                await Task.Delay(TimeSpan.FromMilliseconds(durationInMillis), cancellationTokenSource.Token);
-                command.Execute();
+                await ExecuteNextCommand();
             }
-            catch (OperationCanceledException) { }
         }
 
-        public void UndoLastCommand()
+        private async Task ExecuteNextCommand()
         {
             if (commandQueue.Count > 0)
             {
-                var (_, currentCancellationTokenSource) = commandQueue.Pop();
-                currentCancellationTokenSource.Cancel();
-                currentCancellationTokenSource.Dispose();
-
-                if (stateHistory.Count > 0)
+                isExecuting = true;
+                var commandTask = commandQueue.First();
+                try
                 {
-                    var previousCommandQueue = stateHistory.Pop();
-                    commandQueue = previousCommandQueue;
+                    if (commandTask.Command.CanExecute())
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(commandTask.Duration), commandTask.CancellationTokenSource.Token);
+                        commandTask.Command.Execute();
+                        commandQueue.RemoveFirst();
+                    }
+                    else
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(1));
+                    }
+                }
+                catch (OperationCanceledException) { }
+
+                if (commandQueue.Count == 0)
+                {
+                    isExecuting = false;
+                }
+                else
+                {
+                    await ExecuteNextCommand();
                 }
             }
+        }
+
+        public Position UndoLastCommand()
+        {
+            if (commandQueue.Count > 0)
+            {
+                var commandTask = commandQueue.Last();
+                commandQueue.RemoveLast();
+                commandTask.CancellationTokenSource.Cancel();
+                commandTask.CancellationTokenSource.Dispose();
+                return commandTask.Position;
+            }
+            return null;
         }
     }
 }

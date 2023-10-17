@@ -124,7 +124,7 @@
                                             <ColumnDefinition Width="30*"/>
                                             <ColumnDefinition Width="35*"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" FontSize="10" VerticalAlignment="Bottom">Cost:</TextBlock>
+                                        <TextBlock Grid.Column="0" FontSize="10" VerticalAlignment="Bottom">Cost ind.:</TextBlock>
                                         <TextBlock Grid.Column="1" FontSize="10" VerticalAlignment="Bottom" Text="{Binding Cost}"/>
                                         <Button Grid.Column="2" FontSize="10" 
                                             Command="{Binding DataContext.SelectBuildingToBuyCommand, 
@@ -156,7 +156,7 @@
                 <TextBlock Grid.Column="0" VerticalAlignment="Center">Queue:</TextBlock>
                 <Button x:Name="undoButton" Grid.Column="1" Command="{Binding UndoCommand}">Undo</Button>
             </Grid>
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding ObjectsClocks}">
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding ObjectsInQueue}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel Orientation="Horizontal" />
