@@ -12,6 +12,7 @@ using System;
 using System.Threading.Tasks;
 using TinyCiv.Client.Code.MVVM.ViewModel;
 using TinyCiv.Client.Code.Factories;
+using TinyCiv.Client.Code.BorderDecorators;
 
 namespace TinyCiv.Client.Code
 {
@@ -64,9 +65,9 @@ namespace TinyCiv.Client.Code
 
             if (isUnitSelected)
             {
-                var unit = (Unit)selectedUnit;
-                UnselectUnit(unit);
+                var unit = selectedUnit as Unit;
                 await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
+                UnselectUnit(unit);
             }
             else if (unitUnderPurchase != null) 
             {
@@ -98,22 +99,22 @@ namespace TinyCiv.Client.Code
             }
         }
 
-        private async void Unit_Click(GameObject slectedGameObject)
+        private async void Unit_Click(GameObject selectedGameObject)
         {
-            var gameObjectIndex = slectedGameObject.Position.column * Columns + slectedGameObject.Position.row;
+            var gameObjectIndex = selectedGameObject.Position.column * Columns + selectedGameObject.Position.row;
 
             if (!isUnitSelected && GameObjects[gameObjectIndex].OwnerId == CurrentPlayer.Id)
             {
-                SelectUnit(slectedGameObject);
+                SelectUnit(selectedGameObject);
             } 
             else if (isUnitSelected && GameObjects[gameObjectIndex].OwnerId != CurrentPlayer.Id)
             {
+                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(selectedUnit.Id, selectedGameObject.Position.row, selectedGameObject.Position.column));
                 UnselectUnit(selectedUnit);
-                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(selectedUnit.Id, slectedGameObject.Position.row, slectedGameObject.Position.column));
             }
-            else if (isUnitSelected && slectedGameObject == selectedUnit)
+            else if (isUnitSelected && selectedGameObject == selectedUnit)
             {
-                UnselectUnit(slectedGameObject);
+                UnselectUnit(selectedGameObject);
             }
         }
 
@@ -121,8 +122,13 @@ namespace TinyCiv.Client.Code
         {
             isUnitSelected = true;
             selectedUnit = gameObject;
-            gameObject.BorderBrush = Brushes.Aquamarine;
-            gameObject.BorderThickness = new Thickness(2);
+
+            var decoratedObject =
+                new BorderBackgroundDecorator(
+                    new BorderHighlightDecorator(gameObject, Brushes.Aquamarine), Brushes.Aquamarine);
+
+            decoratedObject.ApplyEffects();
+
             UnitMenuVM.SetCurrentUnit(gameObject);
             onPropertyChanged?.Invoke();
         }
@@ -130,15 +136,20 @@ namespace TinyCiv.Client.Code
         private void UnselectUnit(GameObject gameObject)
         {
             isUnitSelected = false;
-            gameObject.BorderThickness = new Thickness(0);
+            gameObject.RemoveEffects();
             UnitMenuVM.UnselectUnit();
             onPropertyChanged?.Invoke();
         }
 
         private void ShowCombatState(GameObject gameObject)
-        {            
-           gameObject.BorderThickness = new Thickness(2);
-           gameObject.BorderBrush = Brushes.IndianRed;
+        {
+            gameObject.RemoveEffects();
+
+            var decoratedObject =
+                new BorderBackgroundDecorator(
+                    new BorderHighlightDecorator(gameObject, Brushes.IndianRed), Brushes.IndianRed);
+
+            decoratedObject.ApplyEffects();
         }
 
         private void OnInteractableChange(InteractableObjectServerEvent response)
@@ -166,7 +177,7 @@ namespace TinyCiv.Client.Code
             var ResponseGameObjects = response.Map.Objects
                 .Where(serverGameObject => serverGameObject.Type != GameObjectType.Empty)
                 .Select(serverGameObect => TeamFactories[serverGameObect.Color].CreateGameObject(serverGameObect))
-                .ToList<GameObject>();
+                .ToList();
 
             for(int row = 0; row < Rows; row++)
             {
@@ -178,12 +189,15 @@ namespace TinyCiv.Client.Code
                         Type = GameObjectType.Empty,
                         Position = new ServerPosition() { X = row, Y = column }
                     };
-                    GameObjects[index] = TeamFactories[TeamColor.Red].CreateGameObject(serverGameObject);
+                    var gameObject = TeamFactories[TeamColor.Red].CreateGameObject(serverGameObject);
+                    AddClickEvent(gameObject);
+                    GameObjects[index] = gameObject;
                 }
             }
 
             foreach(var gameObject in ResponseGameObjects)
             {
+                AddClickEvent(gameObject);
                 var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
                 GameObjects[gameObjectIndex] = gameObject;
 
@@ -203,8 +217,29 @@ namespace TinyCiv.Client.Code
                     ((Unit)gameObject).Health = HealthValues[gameObject.Id];
                 }
             }
-            AddClickEvents();
+            //AddClickEvents();
             onPropertyChanged?.Invoke();
+        }
+
+        private void AddClickEvent(GameObject gameObject)
+        {
+            if (gameObject.Type == GameObjectType.Empty)
+            {
+                gameObject.LeftAction = () => { Grass_Tile_Click(gameObject.Position); };
+            }
+            else if (gameObject.Type == GameObjectType.StaticWater)
+            {
+                gameObject.LeftAction = () => { Water_Tile_Click(gameObject.Position); };
+            }
+            else if (gameObject.Type == GameObjectType.StaticMountain)
+            {
+                gameObject.LeftAction = () => { Rock_Tile_Click(gameObject.Position); };
+            }
+            else if (gameObject is Unit)
+            {
+                gameObject.LeftAction = () => { Unit_Click(gameObject); };
+                gameObject.RightAction = () => { };
+            }
         }
 
         public void AddClickEvents()

@@ -13,12 +13,13 @@
         <!-- GAME OBJECT TEMPLATE !-->
         <DataTemplate x:Key="GameObjectTemplate">
             <Border BorderThickness="{Binding BorderThickness}" 
-                BorderBrush="{Binding BorderBrush}"
+                BorderBrush="{Binding BorderBrush}"  
+                Background="{Binding Border.BackgroundBrush}"
                 MouseLeftButtonDown="gameObjectLeftDown"
                 MouseRightButtonDown="gameObjectRightDown"
                 Height="30"
                 Width="30"
-                Background="Transparent">
+                    >
                 <Grid>
                     <Image Source="{Binding ImageSource}"/>
                 </Grid>
@@ -27,13 +28,14 @@
 
         <!-- UNIT TEMPLATE !-->
         <DataTemplate x:Key="UnitTemplate">
-            <Border BorderThickness="{Binding BorderThickness}" 
-                BorderBrush="{Binding BorderBrush}"
+            <Border BorderThickness="{Binding Border.BorderThickness}" 
+                BorderBrush="{Binding Border.BorderBrush}"
+                Background="{Binding Border.BackgroundBrush}"
                 MouseLeftButtonDown="gameObjectLeftDown"
                 MouseRightButtonDown="gameObjectRightDown"
                 Height="30"
                 Width="30"
-                Background="Transparent">
+                    >
                 <Grid>
                     <Image Source="{Binding ImageSource}"/>
 

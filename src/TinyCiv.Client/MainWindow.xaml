@@ -23,7 +23,7 @@
             Content="{Binding Game.Value}"/>
 
 
-        <Grid Grid.Column="1">
+        <Grid x:Name="sidePanelGrid" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="100"/>
                 <RowDefinition/>
