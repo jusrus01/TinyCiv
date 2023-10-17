@@ -26,6 +26,7 @@ namespace TinyCiv.Client.Code
         public Resources Resources;
         public List<string> mapImages = new List<string>();
         public List<GameObject> GameObjects = new List<GameObject>();
+        public List<GameObject> DecoyObjects = new List<GameObject>();
         public UnitMenuViewModel UnitMenuVM;
         public UpperMenuViewModel UpperMenuVM;
         private int Rows;
@@ -71,7 +72,9 @@ namespace TinyCiv.Client.Code
             }
             else if (unitUnderPurchase != null) 
             {
+                AddDecoy(unitUnderPurchase.Type, clickedPosition);
                 UnitMenuVM.ExecuteUnitPurchase(clickedPosition);
+                onPropertyChanged?.Invoke();
             }
             else if (buildingUnderPurchase != null 
                 && buildingUnderPurchase.Type != GameObjectType.Port 
@@ -195,11 +198,15 @@ namespace TinyCiv.Client.Code
                 }
             }
 
-            foreach(var gameObject in ResponseGameObjects)
+            ShowDecoys();
+
+            foreach (var gameObject in ResponseGameObjects)
             {
                 AddClickEvent(gameObject);
                 var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
                 GameObjects[gameObjectIndex] = gameObject;
+
+                //RemoveDecoyAt(gameObjectIndex);
 
                 if (gameObject.OpponentId != null)
                 {
@@ -219,6 +226,31 @@ namespace TinyCiv.Client.Code
             }
             //AddClickEvents();
             onPropertyChanged?.Invoke();
+        }
+
+        private void ShowDecoys()
+        {
+            foreach(var go in DecoyObjects)
+            {
+                var goIndex = go.Position.column * Columns + go.Position.row;
+                GameObjects[goIndex] = go;
+            }
+        }
+
+        private void RemoveDecoyAt(int index)
+        {
+            if (DecoyObjects[index] != null)
+            {
+                DecoyObjects.RemoveAt(index);
+            }
+        }
+
+        private void AddDecoy(GameObjectType type, Position position)
+        {
+            var goIndex = position.column * Columns + position.row;
+            var decoy = new GameObject(type, position, CurrentPlayer.Color, 0.5);
+            DecoyObjects.Add(decoy);
+            GameObjects[goIndex] = decoy;
         }
 
         private void AddClickEvent(GameObject gameObject)

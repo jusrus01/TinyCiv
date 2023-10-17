@@ -26,12 +26,39 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         public RelayCommand SelectUnitToBuyCommand => new RelayCommand(SelectUnitToBuy, CanBuy);
         public RelayCommand SelectBuildingToBuyCommand => new RelayCommand(SelectBuildingToBuy, CanBuy);
         public RelayCommand EscapeKeyCommand => new RelayCommand(HandleEscapeKey, CanCancelPurchase);
-        public RelayCommand UndoCommand => new RelayCommand(HandleUndo, CanUndo);
-        
-
+        public RelayCommand UndoCommand => new RelayCommand(HandleUndo, CanUndo);       
         public UnitMenuViewModel()
         {
             UpdateClocks();
+        }
+        public List<UnitModel> UnitList
+        {
+            get
+            {
+                return new List<UnitModel>()
+                    {
+                        new UnitModel(10, 0, 2, 100, "Bonus: Can establish a city", GameObjectType.Colonist, CurrentPlayer.Color),
+                        new UnitModel(40, 20, 2, 50, "Bonus: -", GameObjectType.Warrior, CurrentPlayer.Color),
+                        new UnitModel(60, 30, 3, 100, "Bonus: -", GameObjectType.Cavalry, CurrentPlayer.Color),
+                        new UnitModel(60, 10, 1, 50, "Bonus: Does 5x damage against a city and receives 5x less damage from a city",
+                            GameObjectType.Tarran, CurrentPlayer.Color),
+                    };
+            }
+        }
+        public List<BuildingModel> BuildingList
+        {
+            get
+            {
+                return new List<BuildingModel>()
+                {
+                    new BuildingModel("+2 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Farm),
+                    new BuildingModel("+2 production", "50 prod.", CurrentPlayer.Color, GameObjectType.Mine),
+                    new BuildingModel("+5 production, -1 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Blacksmith),
+                    new BuildingModel("+2 gold", "50 prod.", CurrentPlayer.Color, GameObjectType.Shop),
+                    new BuildingModel("+5 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Bank),
+                    new BuildingModel("+2 production, +1 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Port),
+                };
+            }
         }
 
         private void HandleEscapeKey(object obj)
@@ -76,10 +103,12 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         public async void ExecuteUnitPurchase(Position position)
         {            
             IGameCommand createUnitCommand = new CreateUnitCommand(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value.Type);
-            ObjectsClocks.Add(new ClockModel(SelectedBuyUnit.Value.Name, SelectedBuyUnit.Value.ImagePath, TimeSpan.FromMilliseconds(3500))); // exists ~500ms delay
+            ObjectsClocks.Add(new ClockModel(SelectedBuyUnit.Value.ImagePath, TimeSpan.FromMilliseconds(3500))); // exists ~500ms delay
+
             Mouse.OverrideCursor = Cursors.Arrow;
             IsUnderPurchase.Value = false;
             SelectedBuyUnit.Value = null;
+
             await commandsManager.ExecuteCommandWithTimer(createUnitCommand, 3000);
         }
 
@@ -109,40 +138,14 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         {
             ServerPosition serverPos = new ServerPosition { X = position.row, Y = position.column };
             BuildingType parsedType = (BuildingType)Enum.Parse(typeof(BuildingType), SelectedBuyBuilding.Value.Type.ToString());
-            await ClientSingleton.Instance.serverClient.SendAsync(new CreateBuildingClientEvent(CurrentPlayer.Id, parsedType, serverPos));
+            IGameCommand createBuildingCommand = new CreateBuildingCommand(CurrentPlayer.Id, parsedType, serverPos);
+            ObjectsClocks.Add(new ClockModel(SelectedBuyBuilding.Value.ImagePath, TimeSpan.FromMilliseconds(3500))); // exists ~500ms delay
+
             SelectedBuyBuilding.Value = null;
-            Mouse.OverrideCursor = Cursors.Arrow;
             IsUnderPurchase.Value = false;
-        }
+            Mouse.OverrideCursor = Cursors.Arrow;
 
-        public List<UnitModel> UnitList {
-            get 
-            {
-                return new List<UnitModel>()
-                    {
-                        new UnitModel(10, 0, 2, 100, "Bonus: Can establish a city", GameObjectType.Colonist, CurrentPlayer.Color),
-                        new UnitModel(40, 20, 2, 50, "Bonus: -", GameObjectType.Warrior, CurrentPlayer.Color),
-                        new UnitModel(60, 30, 3, 100, "Bonus: -", GameObjectType.Cavalry, CurrentPlayer.Color),
-                        new UnitModel(60, 10, 1, 50, "Bonus: Does 5x damage against a city and receives 5x less damage from a city",
-                            GameObjectType.Tarran, CurrentPlayer.Color),
-                    };
-            }
-        }
-
-        public List<BuildingModel> BuildingList
-        {
-            get
-            {
-                return new List<BuildingModel>()
-                {
-                    new BuildingModel("+2 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Farm),
-                    new BuildingModel("+2 production", "50 prod.", CurrentPlayer.Color, GameObjectType.Mine),
-                    new BuildingModel("+5 production, -1 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Blacksmith),
-                    new BuildingModel("+2 gold", "50 prod.", CurrentPlayer.Color, GameObjectType.Shop),
-                    new BuildingModel("+5 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Bank),
-                    new BuildingModel("+2 production, +1 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Port),
-                };
-            }
+            await commandsManager.ExecuteCommandWithTimer(createBuildingCommand, 3000);
         }
 
         private void UpdateClocks()

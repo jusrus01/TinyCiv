@@ -4,7 +4,6 @@ namespace TinyCiv.Client.Code.MVVM.Model
 {
     public class ClockModel : ObservableObject
     {
-        public string Name { get; set; }
         public string ImagePath { get; set; }
 
         private TimeSpan remainingTime;
@@ -18,9 +17,8 @@ namespace TinyCiv.Client.Code.MVVM.Model
             }
         }
 
-        public ClockModel(string name, string imagePath, TimeSpan remainingTime)
+        public ClockModel(string imagePath, TimeSpan remainingTime)
         {
-            Name = name;
             ImagePath = imagePath;
             RemainingTime = remainingTime;
         }
