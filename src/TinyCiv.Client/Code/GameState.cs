@@ -50,6 +50,7 @@ namespace TinyCiv.Client.Code
             ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
             ClientSingleton.Instance.serverClient.ListenForInteractableObjectChanges(OnInteractableChange);
             ClientSingleton.Instance.serverClient.ListenForResourcesUpdate(OnResourceUpdate);
+            ClientSingleton.Instance.serverClient.ListenForNewUnitCreation(OnUnitCreation);
         }
 
         private void OnResourceUpdate(ResourcesUpdateServerEvent response)
@@ -170,6 +171,14 @@ namespace TinyCiv.Client.Code
                     }
                 }
             }
+        }
+
+        private void OnUnitCreation(CreateUnitServerEvent response)
+        {
+            var sGameObject = response.CreatedUnit;
+            var unit = TeamFactories[sGameObject.Color].CreateGameObject(sGameObject);
+            var gameObjectIndex = unit.Position.column * Columns + unit.Position.row;
+            GameObjects[gameObjectIndex] = unit;
         }
 
         private void OnMapChange(MapChangeServerEvent response)
