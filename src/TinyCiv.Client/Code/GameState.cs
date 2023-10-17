@@ -273,7 +273,7 @@ namespace TinyCiv.Client.Code
             return position.column * Columns + position.row;
         }
 
-        private void AddClickEvent(GameObject gameObject)
+        public void AddClickEvent(GameObject gameObject)
         {
             if (gameObject.Type == GameObjectType.Empty)
             {

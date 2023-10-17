@@ -196,6 +196,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             };
             var redFactory = new RedGameObjectFactory();
             var tileReplacement = redFactory.CreateGameObject(serverGameObject);
+            gameState.AddClickEvent(tileReplacement);
             gameState.GameObjects[index] = tileReplacement;
             gameState.onPropertyChanged?.Invoke();
         }
