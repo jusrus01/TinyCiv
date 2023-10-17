@@ -24,11 +24,8 @@ namespace TinyCiv.Client.Code
         public ObservableValue<List<Border>> SpriteList { get; } = new ObservableValue<List<Border>>();
         public Action onPropertyChanged;
 
-        public Resources Resources;
         public List<string> mapImages = new List<string>();
         public List<GameObject> GameObjects = new List<GameObject>();
-        public UnitMenuViewModel UnitMenuVM;
-        public UpperMenuViewModel UpperMenuVM;
         private int Rows;
         private int Columns;
 
@@ -53,25 +50,16 @@ namespace TinyCiv.Client.Code
                 ClientSingleton.Instance.WaitForInitialization();
                 ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
                 ClientSingleton.Instance.serverClient.ListenForInteractableObjectChanges(OnInteractableChange);
-                ClientSingleton.Instance.serverClient.ListenForResourcesUpdate(OnResourceUpdate);
                 ClientSingleton.Instance.serverClient.ListenForNewUnitCreation(OnUnitCreation);
             });
             AddListenersThread.Start();
         }
 
-        private void OnResourceUpdate(ResourcesUpdateServerEvent response)
-        {
-            Resources = response.Resources;
-            if(UpperMenuVM != null)
-            {
-                UpperMenuVM.SetResources(Resources);
-            }
-        }
-
         private async void Grass_Tile_Click(Position clickedPosition)
         {
-            var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
-            var unitUnderPurchase = UnitMenuVM.SelectedBuyUnit.Value;
+            var CityMenuVM = HUDManager.cityVM;
+            var buildingUnderPurchase = CityMenuVM.SelectedBuyBuilding.Value;
+            var unitUnderPurchase = CityMenuVM.SelectedBuyUnit.Value;
 
             if (isUnitSelected)
             {
@@ -81,31 +69,35 @@ namespace TinyCiv.Client.Code
             }
             else if (unitUnderPurchase != null) 
             {
-                UnitMenuVM.ExecuteUnitPurchase(clickedPosition);
+                CityMenuVM.ExecuteUnitPurchase(clickedPosition);
             }
             else if (buildingUnderPurchase != null 
                 && buildingUnderPurchase.Type != GameObjectType.Port 
                 && buildingUnderPurchase.Type != GameObjectType.Mine)
             {
-                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
+                CityMenuVM.ExecuteBuildingPurchase(clickedPosition);
             }
         }
 
         private void Water_Tile_Click(Position clickedPosition)
         {
-            var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
+            var CityMenuVM = HUDManager.cityVM;
+
+            var buildingUnderPurchase = CityMenuVM.SelectedBuyBuilding.Value;
             if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Port)
             {
-                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
+                CityMenuVM.ExecuteBuildingPurchase(clickedPosition);
             }
         }
 
         private void Rock_Tile_Click(Position clickedPosition)
         {
-            var buildingUnderPurchase = UnitMenuVM.SelectedBuyBuilding.Value;
+            var CityMenuVM = HUDManager.cityVM;
+
+            var buildingUnderPurchase = CityMenuVM.SelectedBuyBuilding.Value;
             if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Mine)
             {
-                UnitMenuVM.ExecuteBuildingPurchase(clickedPosition);
+                CityMenuVM.ExecuteBuildingPurchase(clickedPosition);
             }
         }
 
@@ -139,7 +131,7 @@ namespace TinyCiv.Client.Code
 
             decoratedObject.ApplyEffects();
 
-            UnitMenuVM.SetCurrentUnit(gameObject);
+            HUDManager.DisplayUnit((Unit)gameObject);
             onPropertyChanged?.Invoke();
         }
 
@@ -147,7 +139,7 @@ namespace TinyCiv.Client.Code
         {
             isUnitSelected = false;
             gameObject.RemoveEffects();
-            UnitMenuVM.UnselectUnit();
+            HUDManager.DisableLowerMenu();
             onPropertyChanged?.Invoke();
         }
 

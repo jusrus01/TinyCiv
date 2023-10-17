@@ -8,24 +8,6 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
     public class GameViewModel : ObservableObject
     {
         public GameState gameState { get; private set; }
-        public UnitMenuViewModel UnitMenuVM 
-        {
-            get { return gameState.UnitMenuVM; }
-            set 
-            { 
-                gameState.UnitMenuVM = value;
-            }
-        }
-
-        public UpperMenuViewModel UpperMenuVM
-        {
-            get { return gameState.UpperMenuVM; }
-            set
-            {
-                gameState.UpperMenuVM = value;
-            }
-        }
-
         
         public string[] MapList { 
             get
