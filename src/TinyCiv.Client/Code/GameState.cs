@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using TinyCiv.Client.Code.MVVM.ViewModel;
 using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.BorderDecorators;
+using System.Threading;
 
 namespace TinyCiv.Client.Code
 {
@@ -47,16 +48,24 @@ namespace TinyCiv.Client.Code
             HealthValues = new Dictionary<Guid, int>();
             Rows = rows;
             Columns = columns;
-            ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
-            ClientSingleton.Instance.serverClient.ListenForInteractableObjectChanges(OnInteractableChange);
-            ClientSingleton.Instance.serverClient.ListenForResourcesUpdate(OnResourceUpdate);
-            ClientSingleton.Instance.serverClient.ListenForNewUnitCreation(OnUnitCreation);
+            Thread AddListenersThread = new Thread(() =>
+            {
+                ClientSingleton.Instance.WaitForInitialization();
+                ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
+                ClientSingleton.Instance.serverClient.ListenForInteractableObjectChanges(OnInteractableChange);
+                ClientSingleton.Instance.serverClient.ListenForResourcesUpdate(OnResourceUpdate);
+                ClientSingleton.Instance.serverClient.ListenForNewUnitCreation(OnUnitCreation);
+            });
+            AddListenersThread.Start();
         }
 
         private void OnResourceUpdate(ResourcesUpdateServerEvent response)
         {
             Resources = response.Resources;
-            UpperMenuVM.SetResources(Resources);
+            if(UpperMenuVM != null)
+            {
+                UpperMenuVM.SetResources(Resources);
+            }
         }
 
         private async void Grass_Tile_Click(Position clickedPosition)

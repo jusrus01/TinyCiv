@@ -48,10 +48,15 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             }
         }
 
-        public void GameStart(GameStartServerEvent response)
+        public GameViewModel()
         {
             gameState = new GameState(Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
             gameState.onPropertyChanged = () => { OnPropertyChanged("GameObjectList"); };
+        }
+
+        public void GameStart(GameStartServerEvent response)
+        {
+            
 
             var goFactory = new MapObjectFactory();
 
@@ -69,5 +74,6 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             OnPropertyChanged("GameObjectList");
             OnPropertyChanged("MapList");
         }
+
     }
 }
