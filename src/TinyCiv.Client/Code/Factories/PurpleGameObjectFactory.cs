@@ -25,6 +25,7 @@ namespace TinyCiv.Client.Code.Factories
             { GameObjectType.Shop, "/Assets/marketPurple.png" },
             { GameObjectType.Bank, "/Assets/bankPurple.png" },
             { GameObjectType.Port, "/Assets/portPurple.png" },
+            { GameObjectType.Empty, "/Assets/EmptyObject.png" },
         };
 
         public override GameObject CreateGameObject(ServerGameObject serverGameObject)
@@ -75,9 +76,13 @@ namespace TinyCiv.Client.Code.Factories
                     var port = GameObject.fromServerGameObject(serverGameObject);
                     port.ImageSource = sources[serverGameObject.Type];
                     return port;
+                case GameObjectType.Empty:
+                    var empty = GameObject.fromServerGameObject(serverGameObject);
+                    empty.ImageSource = sources[serverGameObject.Type];
+                    return empty;
                 default:
                     var go = GameObject.fromServerGameObject(serverGameObject);
-                    go.ImageSource = "";
+                    go.ImageSource = sources[GameObjectType.Empty];
                     return go;
             }
         }

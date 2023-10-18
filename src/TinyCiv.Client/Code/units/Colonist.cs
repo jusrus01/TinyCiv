@@ -8,7 +8,6 @@ namespace TinyCiv.Client.Code.units
 {
     public class Colonist : Unit
     {
-        // What to do here? >.<
         public override int MaxHealth => 0;
         public override int Damage => 0;
         public override int Speed => 2;

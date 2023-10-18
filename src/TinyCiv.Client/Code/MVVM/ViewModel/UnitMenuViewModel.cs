@@ -14,7 +14,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
     {
         public ObservableValue<string> UnitType { get; } = new ObservableValue<string>("EMPTY");
         public ObservableValue<string> ImageSource { get;  } = new ObservableValue<string>();
-        public ObservableValue<bool> IsColonist { get; } = new ObservableValue<bool>(false);
+        public ObservableValue<string> IsColonist { get; } = new ObservableValue<string>("Collapsed");
         public ObservableValue<RelayCommand> SettleDownCommand { get; } = new ObservableValue<RelayCommand>();
 
         private Unit _unitReference;
@@ -28,7 +28,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             if (unit is Colonist)
             {
                 var colonist = (Colonist)unit;
-                IsColonist.Value = true;
+                IsColonist.Value = "Visible";
                 SettleDownCommand.Value = new RelayCommand(o => { colonist.SettleDown(); });
             }
         }
