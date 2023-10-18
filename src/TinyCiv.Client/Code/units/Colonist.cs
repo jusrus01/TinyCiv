@@ -1,4 +1,7 @@
-﻿using TinyCiv.Client.Code.Units;
+﻿using System.Windows;
+using TinyCiv.Client.Code.MVVM;
+using TinyCiv.Client.Code.Units;
+using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.units
@@ -16,6 +19,12 @@ namespace TinyCiv.Client.Code.units
         public Colonist(GameObject go) : base(go)
         {
             Health = MaxHealth;
+        }
+
+        public void SettleDown()
+        {
+            ClientSingleton.Instance.serverClient.SendAsync(new PlaceTownClientEvent(CurrentPlayer.Id));
+            HUDManager.HideLowerMenu();
         }
     }
 }

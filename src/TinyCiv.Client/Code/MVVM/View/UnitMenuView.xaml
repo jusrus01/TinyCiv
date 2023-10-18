@@ -25,6 +25,15 @@
                        FontSize="16"
                        Margin="5"/>
         </StackPanel>
+
+        <StackPanel Grid.Row="1">
+            <Button Content="Settle"
+                    Width="60"
+                    HorizontalAlignment="Left"
+                    Margin="10"
+                    Visibility="{Binding IsColonist.Value}"
+                    Command="{Binding SettleDownCommand.Value}"/>
+        </StackPanel>
         
     </Grid>
 </UserControl>

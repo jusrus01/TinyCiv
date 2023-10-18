@@ -14,6 +14,7 @@ using TinyCiv.Client.Code.MVVM.ViewModel;
 using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.BorderDecorators;
 using System.Threading;
+using TinyCiv.Client.Code.Structures;
 
 namespace TinyCiv.Client.Code
 {
@@ -29,8 +30,8 @@ namespace TinyCiv.Client.Code
         private int Rows;
         private int Columns;
 
-        private bool isUnitSelected = false;
-        private GameObject selectedUnit;
+        public bool isGameObjectSelected = false;
+        private GameObject selectedGameObject;
 
         private Dictionary<TeamColor, AbstractGameObjectFactory> TeamFactories = new Dictionary<TeamColor, AbstractGameObjectFactory>
         {
@@ -61,11 +62,9 @@ namespace TinyCiv.Client.Code
             var buildingUnderPurchase = CityMenuVM.SelectedBuyBuilding.Value;
             var unitUnderPurchase = CityMenuVM.SelectedBuyUnit.Value;
 
-            if (isUnitSelected)
+            if (isGameObjectSelected && selectedGameObject is Unit)
             {
-                var unit = selectedUnit as Unit;
-                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
-                UnselectUnit(unit);
+                await MoveUnit(clickedPosition);
             }
             else if (unitUnderPurchase != null) 
             {
@@ -105,29 +104,70 @@ namespace TinyCiv.Client.Code
         {
             var gameObjectIndex = selectedGameObject.Position.column * Columns + selectedGameObject.Position.row;
 
-            if (!isUnitSelected && GameObjects[gameObjectIndex].OwnerId == CurrentPlayer.Id)
+            if (!isGameObjectSelected && CurrentPlayer.IsOwner(GameObjects[gameObjectIndex]))
             {
                 SelectUnit(selectedGameObject);
             } 
-            else if (isUnitSelected && GameObjects[gameObjectIndex].OwnerId != CurrentPlayer.Id)
+            else if (isGameObjectSelected && !CurrentPlayer.IsOwner(GameObjects[gameObjectIndex]) && selectedGameObject is Unit)
             {
-                await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(selectedUnit.Id, selectedGameObject.Position.row, selectedGameObject.Position.column));
-                UnselectUnit(selectedUnit);
+                await MoveUnit(selectedGameObject.Position);
             }
-            else if (isUnitSelected && selectedGameObject == selectedUnit)
+            else if (isGameObjectSelected && selectedGameObject == this.selectedGameObject)
             {
                 UnselectUnit(selectedGameObject);
             }
         }
 
+        private async void City_Click(GameObject gameObject) 
+        {
+            if (!isGameObjectSelected && CurrentPlayer.IsOwner(gameObject))
+            {
+                SelectCity(gameObject);
+            }
+            else if (isGameObjectSelected && CurrentPlayer.IsOwner(gameObject))
+            {
+                UnselectCity(gameObject);
+            }
+            else if (isGameObjectSelected && selectedGameObject is Unit)
+            {
+                await MoveUnit(gameObject.Position);
+            }
+        }
+
+        private void UnselectCity(GameObject gameObject)
+        {
+            isGameObjectSelected = false;
+            gameObject.RemoveEffects();
+            HUDManager.HideLowerMenu();
+            onPropertyChanged?.Invoke();
+        }
+
+        private void SelectCity(GameObject gameObject)
+        {
+            isGameObjectSelected = true;
+            selectedGameObject = gameObject;
+
+            BorderDecorator decoratedCity = new BorderHighlightDecorator(gameObject, Brushes.DarkSalmon);
+            decoratedCity = new BorderBackgroundDecorator(decoratedCity, Brushes.DarkSalmon);
+            decoratedCity.ApplyEffects();
+            HUDManager.DisplayCityMenu();
+            onPropertyChanged?.Invoke();
+        }
+
+        private async Task MoveUnit(Position clickedPosition)
+        {
+            var unit = selectedGameObject as Unit;
+            await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
+            UnselectUnit(unit);
+        }
+
         private void SelectUnit(GameObject gameObject)
         {
-            isUnitSelected = true;
-            selectedUnit = gameObject;
+            isGameObjectSelected = true;
+            selectedGameObject = gameObject;
 
-            var decoratedObject =
-                new BorderBackgroundDecorator(
-                    new BorderHighlightDecorator(gameObject, Brushes.Aquamarine), Brushes.Aquamarine);
+            BorderDecorator decoratedObject = new BorderHighlightDecorator(gameObject, Brushes.Aquamarine);
+            decoratedObject = new BorderBackgroundDecorator(decoratedObject, Brushes.Aquamarine);
 
             decoratedObject.ApplyEffects();
 
@@ -137,9 +177,9 @@ namespace TinyCiv.Client.Code
 
         private void UnselectUnit(GameObject gameObject)
         {
-            isUnitSelected = false;
+            isGameObjectSelected = false;
             gameObject.RemoveEffects();
-            HUDManager.DisableLowerMenu();
+            HUDManager.HideLowerMenu();
             onPropertyChanged?.Invoke();
         }
 
@@ -159,16 +199,19 @@ namespace TinyCiv.Client.Code
             for(int i = 0; i < GameObjects.Count; i++)
             {
                 var gameObject = GameObjects[i];
-                if (gameObject.Id == response.ObjectId) 
+                if (gameObject.Id == response.ObjectId)
                 {
-                    var unit = (Unit)GameObjects[i];
-                    if (unit != null)
+                    if (GameObjects[i] is Unit)
                     {
-                        unit.Health = response.Health;
-                        
-                        HealthValues[response.ObjectId] = response.Health;
-                        onPropertyChanged?.Invoke();
-                        return;
+                        var unit = (Unit)GameObjects[i];
+                        if (unit != null)
+                        {
+                            unit.Health = response.Health;
+
+                            HealthValues[response.ObjectId] = response.Health;
+                            onPropertyChanged?.Invoke();
+                            return;
+                        }
                     }
                 }
             }
@@ -217,9 +260,12 @@ namespace TinyCiv.Client.Code
                     Task.Run(() => ClientSingleton.Instance.serverClient.SendAsync(new AttackUnitClientEvent(gameObject.Id, gameObject.OpponentId.Value)));
                 }
                 
-                if (isUnitSelected && selectedUnit.Id == gameObject.Id)
+                if (isGameObjectSelected && selectedGameObject.Id == gameObject.Id)
                 {
-                    SelectUnit(gameObject);
+                    if (gameObject is Unit)
+                        SelectUnit(gameObject);
+                    else if (gameObject is City)
+                        SelectCity(gameObject);
                 }
 
                 if (HealthValues.ContainsKey(gameObject.Id))
@@ -248,7 +294,10 @@ namespace TinyCiv.Client.Code
             else if (gameObject is Unit)
             {
                 gameObject.LeftAction = () => { Unit_Click(gameObject); };
-                gameObject.RightAction = () => { };
+            }
+            else if (gameObject is City)
+            {
+                gameObject.LeftAction = () => { City_Click(gameObject); };
             }
         }
 
@@ -256,23 +305,7 @@ namespace TinyCiv.Client.Code
         {
             foreach(var gameObject in GameObjects)
             {
-                if (gameObject.Type == GameObjectType.Empty)
-                {
-                    gameObject.LeftAction = () => { Grass_Tile_Click(gameObject.Position); };
-                }
-                else if (gameObject.Type == GameObjectType.StaticWater)
-                {
-                    gameObject.LeftAction = () => { Water_Tile_Click(gameObject.Position); };
-                }
-                else if (gameObject.Type == GameObjectType.StaticMountain)
-                {
-                    gameObject.LeftAction = () => { Rock_Tile_Click(gameObject.Position); };
-                }
-                else if (gameObject is Unit)
-                {
-                    gameObject.LeftAction = () => { Unit_Click(gameObject); };
-                    gameObject.RightAction = () => { };
-                }
+                AddClickEvent(gameObject);
             }
         }
     }

@@ -47,12 +47,13 @@ namespace TinyCiv.Client.Code
             mainVM.UpperMenu.Value = new UpperMenuViewModel();
         }
 
-        public static void DisableLowerMenu()
+        public static void HideLowerMenu()
         {
             if (mainVM == null)
                 return;
 
             mainVM.LowerMenu.Value = null;
+            mainVM.GameVM.gameState.isGameObjectSelected = false;
         }
     }
 }

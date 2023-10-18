@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TinyCiv.Client.Code.units;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Shared.Game;
+using TinyCiv.Client.Code.Structures;
 
 namespace TinyCiv.Client.Code.Factories
 {
@@ -47,7 +48,7 @@ namespace TinyCiv.Client.Code.Factories
                     tarran.ImageSource = sources[serverGameObject.Type];
                     return tarran;
                 case GameObjectType.City:
-                    var city = GameObject.fromServerGameObject(serverGameObject);
+                    var city = new City(GameObject.fromServerGameObject(serverGameObject));
                     city.ImageSource = sources[serverGameObject.Type];
                     return city;
                 case GameObjectType.Farm:
