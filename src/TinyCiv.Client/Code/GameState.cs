@@ -149,9 +149,9 @@ namespace TinyCiv.Client.Code
             isGameObjectSelected = true;
             selectedGameObject = gameObject;
 
-            //BorderDecorator decoratedCity = new BorderHighlightDecorator(gameObject, Brushes.DarkSalmon);
-            //decoratedCity = new BorderBackgroundDecorator(decoratedCity, Brushes.DarkSalmon);
-            //decoratedCity.ApplyEffects();
+            BorderDecorator decoratedCity = new BorderHighlightDecorator(gameObject, Brushes.DarkSalmon);
+            decoratedCity = new BorderBackgroundDecorator(decoratedCity, Brushes.DarkSalmon);
+            decoratedCity.ApplyEffects();
             HUDManager.DisplayCityMenu();
             onPropertyChanged?.Invoke();
         }
@@ -168,10 +168,10 @@ namespace TinyCiv.Client.Code
             isGameObjectSelected = true;
             selectedGameObject = gameObject;
 
-            //BorderDecorator decoratedObject = new BorderHighlightDecorator(gameObject, Brushes.Aquamarine);
-            //decoratedObject = new BorderBackgroundDecorator(decoratedObject, Brushes.Aquamarine);
+            BorderDecorator decoratedObject = new BorderHighlightDecorator(gameObject, Brushes.Aquamarine);
+            decoratedObject = new BorderBackgroundDecorator(decoratedObject, Brushes.Aquamarine);
 
-            //decoratedObject.ApplyEffects();
+            decoratedObject.ApplyEffects();
 
             HUDManager.DisplayUnit((Unit)gameObject);
             onPropertyChanged?.Invoke();
@@ -189,10 +189,10 @@ namespace TinyCiv.Client.Code
         {
             gameObject.RemoveEffects();
 
-            //BorderDecorator decoratedObject = new BorderHighlightDecorator(gameObject, Brushes.IndianRed);
-            //decoratedObject = new BorderBackgroundDecorator(decoratedObject, Brushes.IndianRed);
+            BorderDecorator decoratedObject = new BorderHighlightDecorator(gameObject, Brushes.IndianRed);
+            decoratedObject = new BorderBackgroundDecorator(decoratedObject, Brushes.IndianRed);
 
-            //decoratedObject.ApplyEffects();
+            decoratedObject.ApplyEffects();
         }
 
         private void OnInteractableChange(InteractableObjectServerEvent response)
@@ -265,8 +265,8 @@ namespace TinyCiv.Client.Code
                 {
                     if (gameObject is Unit)
                         SelectUnit(gameObject);
-                    //else if (gameObject is City)
-                    //    SelectCity(gameObject);
+                    else if (gameObject is City)
+                        SelectCity(gameObject);
                 }
 
                 if (HealthValues.ContainsKey(gameObject.Id))
