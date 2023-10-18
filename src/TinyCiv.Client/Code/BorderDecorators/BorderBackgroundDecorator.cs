@@ -20,9 +20,7 @@ namespace TinyCiv.Client.Code.BorderDecorators
             {
                 Color brushColor = ConvertBrushToColor(_color);
                 var transparentColor = Color.FromArgb(64, brushColor.R, brushColor.G, brushColor.B);
-
                 decoratedBorder.BackgroundBrush = new SolidColorBrush(transparentColor);
-
             }
 
             return decoratedBorder;

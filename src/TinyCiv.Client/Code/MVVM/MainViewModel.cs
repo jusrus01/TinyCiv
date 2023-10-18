@@ -60,7 +60,7 @@ namespace TinyCiv.Client.Code.MVVM
         private void OnGameStart(GameStartServerEvent response)
         {
             GameVM.GameStart(response);
-            HUDManager.DisplayCityMenu();
+            HUDManager.HideLowerMenu();
         }
 
     }

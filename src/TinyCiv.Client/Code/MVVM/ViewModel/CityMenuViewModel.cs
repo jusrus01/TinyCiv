@@ -67,6 +67,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             SelectedBuyUnit.Value = null;
             Mouse.OverrideCursor = Cursors.Arrow;
             IsUnderPurchase.Value = false;
+            HUDManager.HideLowerMenu();
         }
 
         private bool CanBuy(object parameter)
@@ -100,6 +101,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             SelectedBuyBuilding.Value = null;
             Mouse.OverrideCursor = Cursors.Arrow;
             IsUnderPurchase.Value = false;
+            HUDManager.HideLowerMenu();
         }
 
         public List<UnitModel> UnitList

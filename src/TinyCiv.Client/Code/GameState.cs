@@ -51,30 +51,32 @@ namespace TinyCiv.Client.Code
                 ClientSingleton.Instance.WaitForInitialization();
                 ClientSingleton.Instance.serverClient.ListenForMapChange(OnMapChange);
                 ClientSingleton.Instance.serverClient.ListenForInteractableObjectChanges(OnInteractableChange);
-                ClientSingleton.Instance.serverClient.ListenForNewUnitCreation(OnUnitCreation);
+                //ClientSingleton.Instance.serverClient.ListenForNewUnitCreation(OnUnitCreation);
             });
             AddListenersThread.Start();
         }
 
         private async void Grass_Tile_Click(Position clickedPosition)
         {
-            var CityMenuVM = HUDManager.cityVM;
-            var buildingUnderPurchase = CityMenuVM.SelectedBuyBuilding.Value;
-            var unitUnderPurchase = CityMenuVM.SelectedBuyUnit.Value;
-
             if (isGameObjectSelected && selectedGameObject is Unit)
             {
                 await MoveUnit(clickedPosition);
             }
-            else if (unitUnderPurchase != null) 
+            if (isGameObjectSelected && selectedGameObject is City)
             {
-                CityMenuVM.ExecuteUnitPurchase(clickedPosition);
-            }
-            else if (buildingUnderPurchase != null 
-                && buildingUnderPurchase.Type != GameObjectType.Port 
-                && buildingUnderPurchase.Type != GameObjectType.Mine)
-            {
-                CityMenuVM.ExecuteBuildingPurchase(clickedPosition);
+                var CityMenuVM = HUDManager.cityVM;
+                var buildingUnderPurchase = CityMenuVM.SelectedBuyBuilding.Value;
+                var unitUnderPurchase = CityMenuVM.SelectedBuyUnit.Value;
+                if (unitUnderPurchase != null)
+                {
+                    CityMenuVM.ExecuteUnitPurchase(clickedPosition);
+                }
+                else if (buildingUnderPurchase != null
+                    && buildingUnderPurchase.Type != GameObjectType.Port
+                    && buildingUnderPurchase.Type != GameObjectType.Mine)
+                {
+                    CityMenuVM.ExecuteBuildingPurchase(clickedPosition);
+                }
             }
         }
 
@@ -147,9 +149,9 @@ namespace TinyCiv.Client.Code
             isGameObjectSelected = true;
             selectedGameObject = gameObject;
 
-            BorderDecorator decoratedCity = new BorderHighlightDecorator(gameObject, Brushes.DarkSalmon);
-            decoratedCity = new BorderBackgroundDecorator(decoratedCity, Brushes.DarkSalmon);
-            decoratedCity.ApplyEffects();
+            //BorderDecorator decoratedCity = new BorderHighlightDecorator(gameObject, Brushes.DarkSalmon);
+            //decoratedCity = new BorderBackgroundDecorator(decoratedCity, Brushes.DarkSalmon);
+            //decoratedCity.ApplyEffects();
             HUDManager.DisplayCityMenu();
             onPropertyChanged?.Invoke();
         }
@@ -166,10 +168,10 @@ namespace TinyCiv.Client.Code
             isGameObjectSelected = true;
             selectedGameObject = gameObject;
 
-            BorderDecorator decoratedObject = new BorderHighlightDecorator(gameObject, Brushes.Aquamarine);
-            decoratedObject = new BorderBackgroundDecorator(decoratedObject, Brushes.Aquamarine);
+            //BorderDecorator decoratedObject = new BorderHighlightDecorator(gameObject, Brushes.Aquamarine);
+            //decoratedObject = new BorderBackgroundDecorator(decoratedObject, Brushes.Aquamarine);
 
-            decoratedObject.ApplyEffects();
+            //decoratedObject.ApplyEffects();
 
             HUDManager.DisplayUnit((Unit)gameObject);
             onPropertyChanged?.Invoke();
@@ -187,11 +189,10 @@ namespace TinyCiv.Client.Code
         {
             gameObject.RemoveEffects();
 
-            var decoratedObject =
-                new BorderBackgroundDecorator(
-                    new BorderHighlightDecorator(gameObject, Brushes.IndianRed), Brushes.IndianRed);
+            //BorderDecorator decoratedObject = new BorderHighlightDecorator(gameObject, Brushes.IndianRed);
+            //decoratedObject = new BorderBackgroundDecorator(decoratedObject, Brushes.IndianRed);
 
-            decoratedObject.ApplyEffects();
+            //decoratedObject.ApplyEffects();
         }
 
         private void OnInteractableChange(InteractableObjectServerEvent response)
@@ -264,8 +265,8 @@ namespace TinyCiv.Client.Code
                 {
                     if (gameObject is Unit)
                         SelectUnit(gameObject);
-                    else if (gameObject is City)
-                        SelectCity(gameObject);
+                    //else if (gameObject is City)
+                    //    SelectCity(gameObject);
                 }
 
                 if (HealthValues.ContainsKey(gameObject.Id))
