@@ -12,6 +12,7 @@ public interface IGameService
     DisconnectPlayerResponse DisconnectPlayer();
 
     Map StartGame(MapType mapType);
+    Map InitializeColonists();
 
     CreateBuildingResponse? CreateBuilding(CreateBuildingRequest request);
     PlaceTownResponse? PlaceTown(Guid playerId);

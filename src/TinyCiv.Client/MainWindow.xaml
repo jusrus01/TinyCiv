@@ -7,7 +7,7 @@
         xmlns:viewModel="clr-namespace:TinyCiv.Client.Code.MVVM"
         mc:Ignorable="d"
         
-        Title="MainWindow" SizeToContent="WidthAndHeight">
+        Title="Tiny Empires" SizeToContent="WidthAndHeight">
 
     <Window.DataContext>
         <viewModel:MainViewModel/>
@@ -27,6 +27,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="100"/>
                 <RowDefinition/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
             <ContentControl
@@ -36,6 +37,10 @@
             <ContentControl
                 Grid.Row="1"
                 Content="{Binding LowerMenu.Value}"/>
+
+            <ContentControl
+                Grid.Row="2"
+                Content="{Binding ExecutionMenu.Value}"/>
         </Grid>
         
     </Grid>

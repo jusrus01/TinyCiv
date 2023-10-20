@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
+using TinyCiv.Client.Code.Structures;
 using TinyCiv.Client.Code.units;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Shared.Game;
@@ -24,6 +27,7 @@ namespace TinyCiv.Client.Code.Factories
             { GameObjectType.Shop, "/Assets/marketRed.png" },
             { GameObjectType.Bank, "/Assets/bankRed.png" },
             { GameObjectType.Port, "/Assets/portRed.png" },
+            { GameObjectType.Empty, "/Assets/EmptyObject.png" },
         };
 
         public override GameObject CreateGameObject(ServerGameObject serverGameObject)
@@ -47,7 +51,7 @@ namespace TinyCiv.Client.Code.Factories
                     tarran.ImageSource = sources[serverGameObject.Type];
                     return tarran;
                 case GameObjectType.City:
-                    var city = GameObject.fromServerGameObject(serverGameObject);
+                    var city = new City(GameObject.fromServerGameObject(serverGameObject));
                     city.ImageSource = sources[serverGameObject.Type];
                     return city;
                 case GameObjectType.Farm:
@@ -74,9 +78,13 @@ namespace TinyCiv.Client.Code.Factories
                     var port = GameObject.fromServerGameObject(serverGameObject);
                     port.ImageSource = sources[serverGameObject.Type];
                     return port;
+                case GameObjectType.Empty:
+                    var empty = GameObject.fromServerGameObject(serverGameObject);
+                    empty.ImageSource = sources[serverGameObject.Type];
+                    return empty;
                 default:
                     var go = GameObject.fromServerGameObject(serverGameObject);
-                    go.ImageSource = "";
+                    go.ImageSource = sources[GameObjectType.Empty];
                     return go;
             }
         }

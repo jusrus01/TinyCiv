@@ -29,6 +29,7 @@
     <None Remove="Assets\colonistPurple.png" />
     <None Remove="Assets\colonistRed.png" />
     <None Remove="Assets\colonistYellow.png" />
+    <None Remove="Assets\EmptyObject.png" />
     <None Remove="Assets\farmGreen.png" />
     <None Remove="Assets\farmPurple.png" />
     <None Remove="Assets\farmRed.png" />
@@ -87,6 +88,7 @@
     <Resource Include="Assets\colonistPurple.png" />
     <Resource Include="Assets\colonistRed.png" />
     <Resource Include="Assets\colonistYellow.png" />
+    <Resource Include="Assets\EmptyObject.png" />
     <Resource Include="Assets\farmGreen.png" />
     <Resource Include="Assets\farmPurple.png" />
     <Resource Include="Assets\farmRed.png" />

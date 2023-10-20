@@ -20,20 +20,16 @@ namespace TinyCiv.Client.Code.MVVM
     public class MainViewModel
     {
         public GameViewModel GameVM = new GameViewModel();
-        public UpperMenuViewModel UpperMenuVM = new UpperMenuViewModel();
-        public UnitMenuViewModel UnitMenuVM = new UnitMenuViewModel();
 
         public ObservableValue<object> Game { get; } = new ObservableValue<object>();
         public ObservableValue<object> UpperMenu { get; } = new ObservableValue<object>();
         public ObservableValue<object> LowerMenu { get; } = new ObservableValue<object>(new LobbyMenuViewModel());
-
-        public ObservableValue<String> IsUnitStatVisible { get; } = new ObservableValue<string>("Hidden");
-
+        public ObservableValue<object> ExecutionMenu { get; } = new ObservableValue<object>();
 
         public MainViewModel()
         {
             Game.Value = GameVM;
-            //UpperMenu.Value = UpperMenuVM;
+            HUDManager.mainVM = this;
 
             DependencyObject dep = new DependencyObject();
             if (!DesignerProperties.GetIsInDesignMode(dep))
@@ -54,8 +50,9 @@ namespace TinyCiv.Client.Code.MVVM
             if (CurrentPlayer.Instance.player == null)
             {
                 CurrentPlayer.Instance.player = response.Created;
-                CurrentPlayer.Instance.Resources = new Resources{ Industry = Constants.Game.StartingIndustry, Food = Constants.Game.StartingFood, Gold = Constants.Game.StartingGold };
-                UpperMenuVM.PlayerColor.Value = CurrentPlayer.Color;
+                CurrentPlayer.Instance.Resources = new Resources{ Industry = Constants.Game.StartingIndustry, Food = Constants.Game.StartingFood, Gold = Constants.Game.StartingGold };                
+                HUDManager.DisplayUpperMenu();
+                HUDManager.DisplayExecutionQueue();
             }
 
             // If the party is full
@@ -66,16 +63,8 @@ namespace TinyCiv.Client.Code.MVVM
 
         private void OnGameStart(GameStartServerEvent response)
         {
-            UpperMenu.Value = UpperMenuVM;
-
             GameVM.GameStart(response);
-
-            UnitMenuVM.gameState = GameVM.gameState;
-            LowerMenu.Value = UnitMenuVM;
-
-            GameVM.UnitMenuVM = UnitMenuVM;
-            GameVM.UpperMenuVM = UpperMenuVM;
+            HUDManager.HideLowerMenu();            
         }
-
     }
 }

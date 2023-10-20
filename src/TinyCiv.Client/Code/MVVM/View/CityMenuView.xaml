@@ -1,0 +1,145 @@
+﻿<UserControl x:Class="TinyCiv.Client.Code.MVVM.View.CityMenuView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:TinyCiv.Client.Code.MVVM"             
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="200">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    <UserControl.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding EscapeKeyCommand}" />
+    </UserControl.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <!-- Buttons to toggle between Units and Buildings -->
+            <Button Grid.Column="0" Content="Units" Command="{Binding ShowUnitsCommand}" />
+            <Button Grid.Column="1" Content="Buildings" Command="{Binding ShowBuildingsCommand}" />
+        </Grid>
+
+        <!-- Units tab -->
+        <StackPanel Grid.Row="1" Visibility="{Binding IsUnitsListVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ItemsControl ItemsSource="{Binding UnitList}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="LightGray" BorderThickness="1">
+                            <Grid Height="auto" Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20*" />
+                                    <ColumnDefinition Width="80*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
+                                    <Image Grid.Row="0" VerticalAlignment="Center" Source="{Binding ImagePath}"></Image>
+                                    <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="8" Text="{Binding Name}"/>
+                                </Grid>
+                                <Grid Grid.Column="1" Margin="5,0,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="20*" />
+                                            <ColumnDefinition Width="30*"/>
+                                            <ColumnDefinition Width="25*"/>
+                                            <ColumnDefinition Width="25*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0">HP:</TextBlock>
+                                        <TextBlock Grid.Column="1" Text="{Binding Health}" />
+                                        <TextBlock Grid.Column="2">DMG:</TextBlock>
+                                        <TextBlock Grid.Column="3" Text="{Binding Damage}" />
+                                    </Grid>
+                                    <TextBlock Grid.Row="1" TextWrapping="Wrap" FontSize="10" Margin="0,0,0,5" Text="{Binding Description}" />
+                                    <Grid Grid.Row="2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="20*" />
+                                            <ColumnDefinition Width="40*" />
+                                            <ColumnDefinition Width="40*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" FontSize="10" VerticalAlignment="Bottom">Cost:</TextBlock>
+                                        <TextBlock Grid.Column="1" FontSize="10" VerticalAlignment="Bottom" Text="{Binding ProductionPrice}" />
+                                        <Button Grid.Column="2" FontSize="10" 
+                                                Command="{Binding DataContext.SelectUnitToBuyCommand, 
+                                                RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" 
+                                                CommandParameter="{Binding}">Spawn</Button>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
+        <!-- Buildings tab -->
+        <StackPanel Grid.Row="1" Visibility="{Binding IsBuildingsListVisible.Value, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ItemsControl ItemsSource="{Binding BuildingList}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border  BorderBrush="LightGray" BorderThickness="1">
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20*" />
+                                    <ColumnDefinition Width="80*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
+                                    <Image Grid.Row="0" VerticalAlignment="Center" Source="{Binding ImagePath}" />
+                                    <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="8" Text="{Binding Name}" />
+                                </Grid>
+
+                                <Grid Grid.Column="1" Margin="5 0 0 0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" FontSize="10">Production:</TextBlock>
+                                    <TextBlock Grid.Row="1" Margin="0 0 0 5" FontSize="10" Text="{Binding Production}" />
+                                    <Grid Grid.Row="2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="15*" />
+                                            <ColumnDefinition Width="30*"/>
+                                            <ColumnDefinition Width="35*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" FontSize="10" VerticalAlignment="Bottom">Cost:</TextBlock>
+                                        <TextBlock Grid.Column="1" FontSize="10" VerticalAlignment="Bottom" Text="{Binding Cost}"/>
+                                        <Button Grid.Column="2" FontSize="10" 
+                                            Command="{Binding DataContext.SelectBuildingToBuyCommand, 
+                                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" 
+                                            CommandParameter="{Binding}">Build</Button>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
+        <TextBlock Grid.Row="2" Text="Press Esc button to cancel" TextWrapping="Wrap" FontWeight="Bold" Margin="5" FontSize="10"
+                   Visibility="{Binding IsUnderPurchase.Value, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+    </Grid>
+</UserControl>

@@ -12,9 +12,7 @@
     <UserControl.Resources>
         <!-- GAME OBJECT TEMPLATE !-->
         <DataTemplate x:Key="GameObjectTemplate">
-            <Border BorderThickness="{Binding BorderThickness}" 
-                BorderBrush="{Binding BorderBrush}"  
-                Background="{Binding Border.BackgroundBrush}"
+            <Border
                 MouseLeftButtonDown="gameObjectLeftDown"
                 MouseRightButtonDown="gameObjectRightDown"
                 Height="30"
@@ -46,6 +44,23 @@
                                  Margin="3,2"
                                  Opacity="0.8">
                     </ProgressBar>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <!-- CITY TEMPLATE !-->
+        <DataTemplate x:Key="CityTemplate">
+            <Border BorderThickness="{Binding Border.BorderThickness}" 
+                BorderBrush="{Binding Border.BorderBrush}"
+                Background="{Binding Border.BackgroundBrush}"
+                MouseLeftButtonDown="gameObjectLeftDown"
+                MouseRightButtonDown="gameObjectRightDown"
+                Height="30"
+                Width="30"
+                    >
+                <Grid>
+                    <Image Source="{Binding ImageSource}"
+                           Margin="2"/>
                 </Grid>
             </Border>
         </DataTemplate>
