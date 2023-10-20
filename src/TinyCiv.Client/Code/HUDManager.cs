@@ -13,7 +13,7 @@ namespace TinyCiv.Client.Code
     {
         public static MainViewModel mainVM;
         public static CityMenuViewModel cityVM { get; private set; }
-        public static ExecutionQueueViewModel executionVM = new ExecutionQueueViewModel();
+        public static ExecutionQueueViewModel executionVM { get; private set; }
 
         public static void DisplayUnit(Unit unit)
         {
@@ -61,8 +61,8 @@ namespace TinyCiv.Client.Code
         {
             if (mainVM == null) return;
 
-            //cityVM = new CityMenuViewModel(); MANAU KAD REIKES
-            mainVM.ExecutionMenu.Value = new ExecutionQueueViewModel();
+            executionVM = new ExecutionQueueViewModel();
+            mainVM.ExecutionMenu.Value = executionVM;
         }
     }
 }

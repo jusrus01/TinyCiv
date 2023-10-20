@@ -16,19 +16,27 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
     public class ExecutionQueueViewModel : ObservableObject
     {
         public GameState gameState;
+        public Action onPropertyChanged;
         public CommandInvoker CommandInvoker = new CommandInvoker();
+        private DispatcherTimer timer;
 
         public ObservableCollection<ClockModel> ObjectsInQueue { get; } = new ObservableCollection<ClockModel>();
         public RelayCommand UndoCommand => new RelayCommand(HandleUndo, CanUndo);
 
         public ExecutionQueueViewModel()
         {
+            gameState = HUDManager.mainVM.GameVM.gameState;
             UpdateClocks();
-        }          
+        }
+
+        public void AddToQueue(ClockModel model)
+        {
+            ObjectsInQueue.Add(model);
+        }
 
         private void UpdateClocks()
         {
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             timer.Tick += (s, e) =>
             {
                 if (ObjectsInQueue.Count > 0)
@@ -61,17 +69,37 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             Position undoPosition = CommandInvoker.UndoLastCommand().Position;
 
             int index = gameState.PositionToIndex(undoPosition);
+            var tileReplacement = CreateDecoyReplacement(undoPosition);
+
             gameState.DecoyObjects.Remove(index);
-            var serverGameObject = new ServerGameObject
-            {
-                Type = GameObjectType.Empty,
-                Position = new ServerPosition() { X = undoPosition.row, Y = undoPosition.column }
-            };
-            var redFactory = new RedGameObjectFactory();
-            var tileReplacement = redFactory.CreateGameObject(serverGameObject);
             gameState.AddClickEvent(tileReplacement);
             gameState.GameObjects[index] = tileReplacement;
             gameState.onPropertyChanged?.Invoke();
+        }
+
+        private GameObject CreateDecoyReplacement(Position undoPosition)
+        {
+            int index = gameState.PositionToIndex(undoPosition);
+            var currentObject = gameState.GameObjects[index];
+
+            GameObjectType type = GameObjectType.Empty;
+            if (currentObject.Type == GameObjectType.Mine)
+            {
+                type = GameObjectType.StaticMountain;
+            }
+            else if (currentObject.Type == GameObjectType.Port)
+            {
+                type = GameObjectType.StaticWater;
+            }
+            
+            var serverGameObject = new ServerGameObject
+            {
+                Type = type,
+                Position = new ServerPosition() { X = undoPosition.row, Y = undoPosition.column }
+            };
+            var redFactory = new RedGameObjectFactory();
+
+            return redFactory.CreateGameObject(serverGameObject);
         }
     }
 }

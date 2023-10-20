@@ -10,7 +10,6 @@ namespace TinyCiv.Client.Code.Commands
 {
     public class CreateBuildingCommand : IGameCommand
     {
-        private CancellationTokenSource cancellationTokenSource;
         private readonly Guid playerId;
         private readonly BuildingModel buildingModel;
         private readonly ServerPosition serverPosition;

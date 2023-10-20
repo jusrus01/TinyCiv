@@ -65,30 +65,32 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 
         public async void ExecuteUnitPurchase(Position position)
         {
+            var executionVM = HUDManager.executionVM;
             IGameCommand createUnitCommand = new CreateUnitCommand(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value);
-            HUDManager.executionVM.ObjectsInQueue.Add(new ClockModel(SelectedBuyUnit.Value, SelectedBuyUnit.Value.ImagePath, TimeSpan.FromMilliseconds(3500))); // exists ~500ms delay
+            executionVM.AddToQueue(new ClockModel(SelectedBuyUnit.Value, SelectedBuyUnit.Value.ImagePath, TimeSpan.FromMilliseconds(3500))); // exists ~500ms delay
 
             Mouse.OverrideCursor = Cursors.Arrow;
             IsUnderPurchase.Value = false;
             SelectedBuyUnit.Value = null;
             HUDManager.HideLowerMenu();
 
-            await HUDManager.executionVM.CommandInvoker.AddCommandToQueue(createUnitCommand, 3000, position);
+            await executionVM.CommandInvoker.AddCommandToQueue(createUnitCommand, 3000, position);
         }
 
         public async void ExecuteBuildingPurchase(Position position)
         {
+            var executionVM = HUDManager.executionVM;
             ServerPosition serverPos = new ServerPosition { X = position.row, Y = position.column };
 
             IGameCommand createBuildingCommand = new CreateBuildingCommand(CurrentPlayer.Id, SelectedBuyBuilding.Value, serverPos);
-            HUDManager.executionVM.ObjectsInQueue.Add(new ClockModel(SelectedBuyBuilding.Value, SelectedBuyBuilding.Value.ImagePath, TimeSpan.FromMilliseconds(3000))); // exists ~500ms delay
+            executionVM.AddToQueue(new ClockModel(SelectedBuyBuilding.Value, SelectedBuyBuilding.Value.ImagePath, TimeSpan.FromMilliseconds(3000))); // exists ~500ms delay
 
             SelectedBuyBuilding.Value = null;
             IsUnderPurchase.Value = false;
             Mouse.OverrideCursor = Cursors.Arrow;
             HUDManager.HideLowerMenu();
 
-            await HUDManager.executionVM.CommandInvoker.AddCommandToQueue(createBuildingCommand, 3000, position);
+            await executionVM.CommandInvoker.AddCommandToQueue(createBuildingCommand, 3000, position);
         }
 
         private bool CanBuy(object parameter)

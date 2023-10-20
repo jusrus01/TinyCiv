@@ -24,7 +24,7 @@ namespace TinyCiv.Client.Code.MVVM
         public ObservableValue<object> Game { get; } = new ObservableValue<object>();
         public ObservableValue<object> UpperMenu { get; } = new ObservableValue<object>();
         public ObservableValue<object> LowerMenu { get; } = new ObservableValue<object>(new LobbyMenuViewModel());
-        public ObservableValue<object> ExecutionMenu { get; } = new ObservableValue<object>();
+        public ObservableValue<ExecutionQueueViewModel> ExecutionMenu { get; } = new ObservableValue<ExecutionQueueViewModel>();
 
         public MainViewModel()
         {
@@ -64,7 +64,7 @@ namespace TinyCiv.Client.Code.MVVM
         private void OnGameStart(GameStartServerEvent response)
         {
             GameVM.GameStart(response);
-            HUDManager.HideLowerMenu();            
+            HUDManager.HideLowerMenu();       
         }
     }
 }
