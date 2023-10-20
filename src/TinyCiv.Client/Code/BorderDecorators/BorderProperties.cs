@@ -5,8 +5,8 @@ namespace TinyCiv.Client.Code.BorderDecorators
 {
     public class BorderProperties
     {
-        public Thickness BorderThickness { get; set; }
-        public Brush BorderBrush { get; set; }
-        public Brush BackgroundBrush { get; set; }
+        public Thickness BorderThickness { get; set; } = new Thickness(0);
+        public Brush BorderBrush { get; set; } = Brushes.Transparent;
+        public Brush BackgroundBrush { get; set; } = Brushes.Transparent;
     }
 }

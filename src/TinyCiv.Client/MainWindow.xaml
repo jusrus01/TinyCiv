@@ -7,7 +7,7 @@
         xmlns:viewModel="clr-namespace:TinyCiv.Client.Code.MVVM"
         mc:Ignorable="d"
         
-        Title="MainWindow" SizeToContent="WidthAndHeight">
+        Title="Tiny Empires" SizeToContent="WidthAndHeight">
 
     <Window.DataContext>
         <viewModel:MainViewModel/>

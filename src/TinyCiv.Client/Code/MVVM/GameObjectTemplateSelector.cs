@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using TinyCiv.Client.Code.Units;
+using TinyCiv.Client.Code.Structures;
 
 namespace TinyCiv.Client.Code.MVVM
 {
@@ -13,13 +14,16 @@ namespace TinyCiv.Client.Code.MVVM
     {
         public DataTemplate UnitTemplate { get; set; }
         public DataTemplate GameObjectTemplate { get; set; }
+        public DataTemplate CityTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             if (item is Unit)
-            {
                 return UnitTemplate;
-            }
+
+            if (item is City)
+                return CityTemplate;
+
             return GameObjectTemplate;
         }
     }

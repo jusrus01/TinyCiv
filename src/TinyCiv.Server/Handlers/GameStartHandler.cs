@@ -21,9 +21,14 @@ public class GameStartHandler : ClientHandler<StartGameClientEvent>
     protected override bool IgnoreWhen(StartGameClientEvent @event) =>
         _sessionService.IsStarted() || !_sessionService.CanGameStart();
 
-    protected override Task OnHandleAsync(StartGameClientEvent @event)
+    protected override async Task OnHandleAsync(StartGameClientEvent @event)
     {
         Map map = _gameService.StartGame(@event.MapType);
-        return NotifyAllAsync(Constants.Server.SendGameStartToAll, new GameStartServerEvent(map));
+        await NotifyAllAsync(Constants.Server.SendGameStartToAll, new GameStartServerEvent(map))
+            .ConfigureAwait(false);
+
+        map = _gameService.InitializeColonists();
+        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(map))
+            .ConfigureAwait(false);
     }
 }
