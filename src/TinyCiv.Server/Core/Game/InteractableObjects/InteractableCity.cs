@@ -2,16 +2,17 @@ using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Core.Game.InteractableObjects;
 
-public class InteractableColonist : IInteractableObject
+public class InteractableCity : IInteractableObject
 {
-    public int AttackDamage => Constants.Game.Interactable.Colonist.Damage;
+    public int Price => 0;
+    public int AttackDamage => Constants.Game.Interactable.City.Damage;
     public int AttackRateInMilliseconds => Constants.Game.Interactable.AttackIntervalInMilliseconds;
-    public bool IsAbleToCounterAttack => false;
-    public bool IsBuilding => false;
+    public bool IsAbleToCounterAttack => true;
+    public bool IsBuilding => true;
     
-    public int Health { get; set; } = Constants.Game.Interactable.Colonist.InitialHealth;
     public Guid GameObjectReferenceId { get; init; }
-
+    public int Health { get; set; } = Constants.Game.Interactable.City.InitialHealth;
+    
     public void DoDamage(IInteractableObject interactable)
     {
         interactable.Health -= AttackDamage;

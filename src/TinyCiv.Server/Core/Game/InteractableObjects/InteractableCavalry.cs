@@ -8,7 +8,8 @@ public class InteractableCavalry : IInteractableObject
     public int AttackRateInMilliseconds => Constants.Game.Interactable.AttackIntervalInMilliseconds;
     public bool IsAbleToCounterAttack => false;
     public bool IsBuilding => false;
-    
+    public int Price => Constants.Game.Interactable.Cavalry.Price;
+
     public int Health { get; set; } = Constants.Game.Interactable.Cavalry.InitialHealth;
     public Guid GameObjectReferenceId { get; init; }
     

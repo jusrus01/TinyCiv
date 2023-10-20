@@ -1,7 +1,6 @@
 using System.Text.Json;
-using Microsoft.AspNetCore.SignalR;
-using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Handlers;
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Shared.Events.Server;
 
 namespace TinyCiv.Server.Handlers;
@@ -11,13 +10,14 @@ public abstract class ClientHandler<TEvent> : IClientHandler
     private const string HandleMethodName = nameof(HandleAsync);
 
     private readonly ILogger<IClientHandler> _logger;
+    private readonly IPublisher _publisher;
 
-    private IClientProxy? _caller;
-    private IClientProxy? _all;
+    private Subscriber? _caller;
 
-    protected ClientHandler(ILogger<IClientHandler> logger)
+    protected ClientHandler(IPublisher publisher, ILogger<IClientHandler> logger)
     {
         _logger = logger;
+        _publisher = publisher;
     }
     
     public bool CanHandle(string type)
@@ -25,12 +25,11 @@ public abstract class ClientHandler<TEvent> : IClientHandler
         return type == typeof(TEvent).Name;
     }
 
-    public Task HandleAsync(IClientProxy caller, IClientProxy all, string eventContent)
+    public Task HandleAsync(Subscriber subscriber, string eventContent)
     {
         ArgumentNullException.ThrowIfNull(eventContent);
         
-        _caller = caller; // Simplest way to retrieve caller, trying to retrieve from DI is more complicated
-        _all = all;
+        _caller = subscriber; // Simplest way to retrieve caller, trying to retrieve from DI is more complicated
 
         var handlerName = GetType().Name;
 
@@ -55,38 +54,17 @@ public abstract class ClientHandler<TEvent> : IClientHandler
         }
     }
 
-    protected Task NotifyCallerAsync<T>(string methodName, T serverEvent) where T : ServerEvent
+    protected Task NotifyCallerAsync<T>( string methodName, T serverEvent) where T : ServerEvent
     {
         ArgumentNullException.ThrowIfNull(_caller);
         _logger.LogInformation("{handler} is sending event {event_type} to caller", GetType().Name, serverEvent.Type);
-        return InternalNotifyAsync(_caller, methodName, serverEvent);
+        return _publisher.NotifySubscriberAsync(_caller, methodName, serverEvent);
     }
     
     protected Task NotifyAllAsync<T>(string methodName, T serverEvent) where T : ServerEvent
     {
-        ArgumentNullException.ThrowIfNull(_all);
         _logger.LogInformation("{handler} is sending event {event_type} to all", GetType().Name, serverEvent.Type);
-        return InternalNotifyAsync(_all, methodName, serverEvent);
-    }
-
-    // TODO: retry mechanism if after deployment some requests start to fail due to transient issues
-    private Task InternalNotifyAsync<T>(IClientProxy proxy, string methodName, T serverEvent) where T : ServerEvent
-    {
-        return proxy
-            .SendEventAsync(methodName, serverEvent)
-            .ContinueWith(prevTask =>
-            {
-                if (prevTask.Exception == null)
-                {
-                    _logger.LogInformation("{handler} successfully notified client", GetType().Name);
-                }
-                else
-                {
-                    _logger.LogError(prevTask.Exception, "{handler} failed to notify client", GetType().Name);
-                }
-
-                return Task.CompletedTask;
-            });
+        return _publisher.NotifyAllAsync(methodName, serverEvent);
     }
 
     protected virtual bool IgnoreWhen(TEvent @event) => false;
