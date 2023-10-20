@@ -17,6 +17,7 @@ namespace TinyCiv.Client.Code.MVVM.View
             {
                 UnitTemplate = (DataTemplate)Resources["UnitTemplate"],
                 GameObjectTemplate = (DataTemplate)Resources["GameObjectTemplate"],
+                CityTemplate = (DataTemplate)Resources["CityTemplate"],
             };
         }
 

@@ -58,7 +58,11 @@ public class GameService : IGameService
     {
         _sessionService.StartGame();
         var map = _mapService.Initialize(mapType) ?? throw new InvalidOperationException("Something went wrong, unable to initialize map");
+        return map;
+    }
 
+    public Map InitializeColonists()
+    {
         var players = _sessionService.GetPlayers();
 
         foreach (var player in players)
@@ -68,7 +72,7 @@ public class GameService : IGameService
             int y = random.Next(0, Constants.Game.HeightSquareCount);
             var position = new ServerPosition { X = x, Y = y };
 
-            while (_mapService.IsInRange(position, Constants.Game.TownSpaceFromTown, GameObjectType.Colonist) || 
+            while (_mapService.IsInRange(position, Constants.Game.TownSpaceFromTown, GameObjectType.Colonist) ||
                 _mapService.GetUnit(position)!.Type == GameObjectType.StaticWater)
             {
                 x = random.Next(0, Constants.Game.WidthSquareCount);
@@ -78,6 +82,8 @@ public class GameService : IGameService
 
             _mapService.CreateUnit(player.Id, position, GameObjectType.Colonist);
         }
+
+        var map = _mapService.GetMap()!;
 
         return map;
     }

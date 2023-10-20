@@ -25,6 +25,10 @@
                 <view:GameView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type viewModel:CityMenuViewModel}">
+                <view:CityMenuView/>
+            </DataTemplate>
+            
             <mvvm:GameObjectTemplateSelector x:Key="GameObjectTemplateSelector"/>
         </ResourceDictionary>
     </Application.Resources>
