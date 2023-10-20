@@ -214,13 +214,14 @@ namespace TinyCiv.Client.Code
                 }
             }
 
-            ShowDecoys();
-
             foreach (var gameObject in ResponseGameObjects)
             {
                 AddClickEvent(gameObject);
                 var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
-                RemoveDecoyAt(gameObjectIndex);
+                if (gameObject.Type != GameObjectType.StaticMountain && gameObject.Type != GameObjectType.StaticWater)
+                {
+                    RemoveDecoyAt(gameObjectIndex);
+                }
                 GameObjects[gameObjectIndex] = gameObject;
 
                 if (gameObject.OpponentId != null)
@@ -239,7 +240,9 @@ namespace TinyCiv.Client.Code
                     ((Unit)gameObject).Health = HealthValues[gameObject.Id];
                 }
             }
-            //AddClickEvents();
+
+            ShowDecoys();
+
             onPropertyChanged?.Invoke();
         }
 

@@ -8,7 +8,7 @@ using TinyCiv.Client.Code.MVVM.Model;
 
 namespace TinyCiv.Client.Code.Commands
 {
-    public class CommandsManager
+    public class CommandInvoker
     {
         private LinkedList<CommandQueueModel> commandQueue = new LinkedList<CommandQueueModel>();
         private bool isExecuting = false;
@@ -38,10 +38,8 @@ namespace TinyCiv.Client.Code.Commands
                         commandTask.Command.Execute();
                         commandQueue.RemoveFirst();
                     }
-                    else
-                    {
-                        await Task.Delay(TimeSpan.FromSeconds(1));
-                    }
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+                    
                 }
                 catch (OperationCanceledException) { }
 
@@ -56,7 +54,7 @@ namespace TinyCiv.Client.Code.Commands
             }
         }
 
-        public Position UndoLastCommand()
+        public CommandQueueModel UndoLastCommand()
         {
             if (commandQueue.Count > 0)
             {
@@ -64,7 +62,7 @@ namespace TinyCiv.Client.Code.Commands
                 commandQueue.RemoveLast();
                 commandTask.CancellationTokenSource.Cancel();
                 commandTask.CancellationTokenSource.Dispose();
-                return commandTask.Position;
+                return commandTask;
             }
             return null;
         }

@@ -18,7 +18,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
     {
         public GameState gameState;
 
-        private CommandsManager commandsManager = new CommandsManager();
+        private CommandInvoker commandsInvoker = new CommandInvoker();
         public ObservableValue<bool> IsUnitsListVisible { get; } = new ObservableValue<bool>(true);
         public ObservableValue<bool> IsBuildingsListVisible { get; } = new ObservableValue<bool>(false);
         public ObservableValue<bool> IsUnderPurchase { get; } = new ObservableValue<bool>(false);
@@ -114,7 +114,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             IsUnderPurchase.Value = false;
             SelectedBuyUnit.Value = null;
 
-            await commandsManager.AddCommandToQueue(createUnitCommand, 3000, position);
+            await commandsInvoker.AddCommandToQueue(createUnitCommand, 3000, position);
         }
 
         private bool CanBuy(object parameter)
@@ -150,7 +150,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             IsUnderPurchase.Value = false;
             Mouse.OverrideCursor = Cursors.Arrow;
 
-            await commandsManager.AddCommandToQueue(createBuildingCommand, 3000, position);            
+            await commandsInvoker.AddCommandToQueue(createBuildingCommand, 3000, position);            
         }
 
         private void UpdateClocks()
@@ -164,7 +164,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
                     if (objectInQueue.BuyableObject.IsBuyable())
                     {
                         objectInQueue.RemainingTime = objectInQueue.RemainingTime.Subtract(TimeSpan.FromSeconds(1));
-                        if (objectInQueue.RemainingTime <= TimeSpan.Zero)
+                        if (objectInQueue.RemainingTime < TimeSpan.Zero)
                         {
                             ObjectsInQueue.Remove(objectInQueue);
                         }
@@ -185,7 +185,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         private void HandleUndo(object obj)
         {
             ObjectsInQueue.RemoveAt(ObjectsInQueue.Count - 1);
-            Position undoPosition = commandsManager.UndoLastCommand();
+            Position undoPosition = commandsInvoker.UndoLastCommand().Position;
 
             int index = gameState.PositionToIndex(undoPosition);
             gameState.DecoyObjects.Remove(index);
