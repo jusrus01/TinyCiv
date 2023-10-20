@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Input;
-using TinyCiv.Client.Code.Commands;
-using System.Windows.Media;
-using TinyCiv.Client.Code.units;
+﻿using TinyCiv.Client.Code.units;
 using TinyCiv.Client.Code.Units;
-using TinyCiv.Shared.Events.Client;
-using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.MVVM.ViewModel
 {
