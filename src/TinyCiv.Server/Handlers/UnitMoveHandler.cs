@@ -1,26 +1,26 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using TinyCiv.Server.Core.Extensions;
+﻿using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
-using TinyCiv.Server.Enums;
-using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
+using TinyCiv.Server.Dtos.Units;
+using TinyCiv.Server.Enums;
 using TinyCiv.Shared.Game;
+using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Handlers
 {
     public class UnitMoveHandler : ClientHandler<MoveUnitClientEvent>
     {
-        private readonly IMapService _mapService;
+        private readonly IGameService _gameService;
 
-        public UnitMoveHandler(IMapService mapService, ILogger<UnitMoveHandler> logger) : base(logger)
+        public UnitMoveHandler(ILogger<UnitMoveHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
         {
-            _mapService = mapService;
+            _gameService = gameService;
         }
 
         protected override Task OnHandleAsync(MoveUnitClientEvent @event)
         {
-            async void unitMoveCallback(UnitMoveResponse response)
+            async void unitMoveCallback(UnitMoveResponse response, Map? map)
             {
                 switch (response)
                 {
@@ -29,7 +29,7 @@ namespace TinyCiv.Server.Handlers
                             .ConfigureAwait(false);
                         break;
                     case UnitMoveResponse.Moved:
-                        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!))
+                        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(map!))
                             .ConfigureAwait(false);
                         break;
                     case UnitMoveResponse.Stopped:
@@ -40,7 +40,8 @@ namespace TinyCiv.Server.Handlers
             }
 
             ServerPosition targetPosition = new() { X = @event.X, Y = @event.Y };
-            _mapService.MoveUnitAsync(@event.UnitId, targetPosition, unitMoveCallback);
+            var request = new MoveUnitRequest(@event.UnitId, targetPosition, unitMoveCallback);
+            _gameService.MoveUnit(request);
 
             return Task.CompletedTask;
         }

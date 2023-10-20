@@ -1,5 +1,4 @@
-﻿using TinyCiv.Server.Core.Extensions;
-using TinyCiv.Server.Core.Game.Buildings;
+﻿using TinyCiv.Server.Core.Game.Buildings;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Entities;
 using TinyCiv.Server.Enums;
@@ -41,7 +40,7 @@ namespace TinyCiv.Server.Services
 
                 var player = _sessionService.GetPlayer(playerId);
 
-                bool isTownInRange = IsTownInRange(position, Constants.Game.BuildingSpaceFromTown);
+                bool isTownInRange = IsInRange(position, Constants.Game.BuildingSpaceFromTown, GameObjectType.City);
 
                 bool doesEnumExist = Enum.TryParse<GameObjectType>(Enum.GetName(building.BuildingType), out var gameObjectType);
 
@@ -70,25 +69,28 @@ namespace TinyCiv.Server.Services
             }
         }
 
-        private bool IsTownInRange(ServerPosition position, int range)
+        public bool IsInRange(ServerPosition position, int range, GameObjectType type)
         {
-            for (int x = position.X - range; x < position.X + range; x++)
+            lock (_mapChangeLocker)
             {
-                for (int y = position.Y - range; y < position.Y + range; y++)
+                for (int x = position.X - range; x < position.X + range; x++)
                 {
-                    bool isTown = _map!.Objects!
-                        .Where(o => o.Position!.X == x && o.Position.Y == y)
-                        .Where(o => o.Type == GameObjectType.City)
-                        .Any();
-
-                    if (isTown)
+                    for (int y = position.Y - range; y < position.Y + range; y++)
                     {
-                        return true;
+                        bool found = _map!.Objects!
+                            .Where(o => o.Position!.X == x && o.Position.Y == y)
+                            .Where(o => o.Type == type)
+                            .Any();
+
+                        if (found)
+                        {
+                            return true;
+                        }
                     }
                 }
-            }
 
-            return false;
+                return false;
+            }
         }
 
         public ServerGameObject? CreateUnit(Guid playerId, ServerPosition position, GameObjectType type)
@@ -146,6 +148,50 @@ namespace TinyCiv.Server.Services
                 targetTile.Position = unit.Position;
                 unit.Position = target;
                 return true;
+            }
+        }
+
+        public ServerGameObject? PlaceTown(Guid playerId)
+        {
+            lock (_mapChangeLocker)
+            {
+                var colonistObject = _map!.Objects!
+                    .Select((o, i) => new { Value = o, Index = i })
+                    .Where(o => o.Value.Type == GameObjectType.Colonist)
+                    .Where(o => o.Value.OwnerPlayerId == playerId)
+                    .FirstOrDefault();
+
+                if (colonistObject == null)
+                {
+                    return null;
+                }
+
+                if (IsInRange(colonistObject.Value.Position!, Constants.Game.TownSpaceFromTown, GameObjectType.City))
+                {
+                    return null;
+                }
+
+                _map.Objects![colonistObject.Index] = new ServerGameObject
+                {
+                    OwnerPlayerId = playerId,
+                    Id = colonistObject.Value.Id,
+                    Position = colonistObject.Value.Position,
+                    Type = GameObjectType.City,
+                    Color = colonistObject.Value.Color
+                };
+
+                return _map.Objects![colonistObject.Index];
+            }
+        }
+
+        public bool IsTownOwner(Guid playerId)
+        {
+            lock (_mapChangeLocker)
+            {
+                return _map!.Objects!
+                    .Where(o => o.Type == GameObjectType.City)
+                    .Where(o => o.OwnerPlayerId == playerId)
+                    .Any();
             }
         }
 

@@ -1,9 +1,11 @@
 using Serilog;
 using TinyCiv.Server.Core.Handlers;
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Handlers;
 using TinyCiv.Server.Handlers.Lobby;
 using TinyCiv.Server.Hubs;
+using TinyCiv.Server.Publishers;
 using TinyCiv.Server.Services;
 using TinyCiv.Shared.Events.Client;
 using Constants = TinyCiv.Shared.Constants;
@@ -20,6 +22,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog();
 
+builder.Services.AddSingleton<IPublisher, Publisher>();
+
 builder.Services.AddSingleton<IResourceService, ResourceService>();
 builder.Services.AddSingleton<ISessionService, SessionService>();
 builder.Services.AddSingleton<IMapService, MapService>();
@@ -29,6 +33,7 @@ builder.Services.AddSingleton<ICombatService, CombatService>();
 builder.Services.AddScoped<IConnectionIdAccessor, ConnectionIdAccessor>();
 
 builder.Services.AddTransient<IMapReader, LocalFileMapReader>();
+builder.Services.AddTransient<IGameService,  GameService>();
 builder.Services.AddTransient<IMapLoader, MapLoader>();
 
 builder.Services.AddTransient<IClientHandler, UnitMoveHandler>();
@@ -38,6 +43,7 @@ builder.Services.AddTransient<IClientHandler, LeaveLobbyHandler>();
 builder.Services.AddTransient<IClientHandler, GameStartHandler>();
 builder.Services.AddTransient<IClientHandler, UnitAttackHandler>();
 builder.Services.AddTransient<IClientHandler, CreateBuildingHandler>();
+builder.Services.AddTransient<IClientHandler, PlaceTownHandler>();
 
 builder.Services
     .AddSignalR()

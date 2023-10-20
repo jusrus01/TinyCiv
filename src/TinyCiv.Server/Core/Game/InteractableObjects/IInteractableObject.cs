@@ -1,13 +1,13 @@
 namespace TinyCiv.Server.Core.Game.InteractableObjects;
 
-public interface IInteractableObject
+public interface IInteractableObject : IInteractableInfo
 {
-    public Guid GameObjectReferenceId { get; }
-    public int Health { get; set; }
-    public int AttackDamage { get; }
-    public int AttackRateInMilliseconds { get; }
-    public bool IsAbleToCounterAttack { get; }
-    public bool IsBuilding { get; }
+    Guid GameObjectReferenceId { get; }
+    int Health { get; set; }
+    int AttackDamage { get; }
+    int AttackRateInMilliseconds { get; }
+    bool IsAbleToCounterAttack { get; }
+    bool IsBuilding { get; }
 
     // Some interactables have special effects, depending
     // on what is being attacked

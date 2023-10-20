@@ -10,7 +10,7 @@ namespace TinyCiv.Server.Client;
 
 // Client should use this as a singleton,
 // unclear how WPF is used, so allowing creation of client without DI
-public class ServerClient : IServerClient
+public class ServerClient : IServerClient, IAsyncDisposable
 {
     private readonly HubConnection _connection;
     
@@ -153,5 +153,10 @@ public class ServerClient : IServerClient
         }
 
         throw new NotSupportedException();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return _connection.DisposeAsync();
     }
 }
