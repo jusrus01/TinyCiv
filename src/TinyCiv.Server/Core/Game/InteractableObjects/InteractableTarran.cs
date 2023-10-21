@@ -32,7 +32,8 @@ public class InteractableTarran : IInteractableObject
         return new InteractableTarran
         {
             GameObjectReferenceId = GameObjectReferenceId,
-            Health = Health
+            Health = Health,
+            SpawnClonesBeforeDeath = null
         };
     }
 }

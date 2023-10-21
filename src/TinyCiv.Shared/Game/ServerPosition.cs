@@ -28,7 +28,7 @@ public class ServerPosition : IEquatable<ServerPosition>
         return X.GetHashCode() ^ Y.GetHashCode();
     }
 
-    public static bool operator ==(ServerPosition? left, ServerPosition right)
+    public static bool operator ==(ServerPosition left, ServerPosition right)
     {
         return left.X == right.X && left.Y == right.Y;
     }

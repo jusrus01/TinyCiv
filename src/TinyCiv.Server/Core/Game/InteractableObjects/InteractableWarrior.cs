@@ -32,7 +32,8 @@ public class InteractableWarrior : IInteractableObject
         return new InteractableWarrior
         {
             GameObjectReferenceId = GameObjectReferenceId,
-            Health = Health
+            Health = Health,
+            SpawnClonesBeforeDeath = null
         };
     }
 }

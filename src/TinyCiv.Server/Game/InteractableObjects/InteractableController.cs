@@ -13,7 +13,7 @@ namespace TinyCiv.Server.Game.InteractableObjects;
 /// </summary>
 public class InteractableController : IInteractableController
 {
-    private const int ConsiderSpawningClonesAtHealthPercentage = 30;
+    private const int ConsiderSpawningClonesAtHealthPercentage = 40;
     
     private readonly Func<IInteractableObject, Task> _attackStateNotifier;
     private readonly IInteractableObject? _initiator;
@@ -58,6 +58,10 @@ public class InteractableController : IInteractableController
         if (interactable.IsAbleToCounterAttack)
         {
             interactable.DoDamage(_initiator);
+            if (IsCloningApplicable(_initiator))
+            {
+                CreateClones(_initiator);
+            }
             
             counterAttackTask = _attackStateNotifier(_initiator);
         }
@@ -80,13 +84,13 @@ public class InteractableController : IInteractableController
 
     private static bool IsCloningApplicable(IInteractableObject interactable)
     {
-        if (interactable.SpawnClonesBeforeDeath is <= 0)
+        if (interactable.SpawnClonesBeforeDeath is not > 0)
         {
             return false;
         }
 
         var spawnAtHealth = (int)(interactable.InitialHealth * ConsiderSpawningClonesAtHealthPercentage * 0.01);
-        return spawnAtHealth <= interactable.Health && interactable.Health > 0;
+        return spawnAtHealth >= interactable.Health && interactable.Health > 0;
     }
 
     public bool IsAlive()

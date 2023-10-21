@@ -25,7 +25,8 @@ public class InteractableCity : IInteractableObject
         return new InteractableCity
         {
             GameObjectReferenceId = GameObjectReferenceId,
-            Health = Health
+            Health = Health,
+            SpawnClonesBeforeDeath = null
         };
     }
 }

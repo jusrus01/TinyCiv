@@ -28,7 +28,8 @@ public class InteractableCavalry : IInteractableObject
         return new InteractableCavalry
         {
             Health = Health,
-            GameObjectReferenceId = GameObjectReferenceId
+            GameObjectReferenceId = GameObjectReferenceId,
+            SpawnClonesBeforeDeath = null
         };
     }
 }

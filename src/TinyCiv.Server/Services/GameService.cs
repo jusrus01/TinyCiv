@@ -189,15 +189,6 @@ public class GameService : IGameService
         return new AddUnitResponse(unit, map, responseServerEvents.ToArray());
     }
 
-    public async Task TransformClonesToGameObjectsAsync(
-        IEnumerable<IInteractableObject> clones,
-        Func<Map, Task> mapChangeNotifier,
-        Func<IInteractableObject, Task> attackStateNotifier,
-        Func<ServerGameObject, Task> newUnitNotifier)
-    {
-        
-    }
-
     public void AttackUnit(AttackUnitRequest request)
     {
         Task.Run(() => _combatService.InitiateCombatAsync(

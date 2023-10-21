@@ -136,12 +136,12 @@ namespace TinyCiv.Server.Services
 
         public ServerPosition? TryFindClosestAvailablePosition(ServerPosition? target)
         {
-            if (target == null)
+            if (target as object == null)
             {
                 return null;
             }
             
-            const int searchRadiusSquareCount = 3;
+            const int searchRadiusSquareCount = 2;
 
             var startX = target.X - searchRadiusSquareCount;
             var startY = target.Y - searchRadiusSquareCount;

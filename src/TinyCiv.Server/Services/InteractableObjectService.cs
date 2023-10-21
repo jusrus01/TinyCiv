@@ -113,7 +113,7 @@ public class InteractableObjectService : IInteractableObjectService
             }
 
             var position = _mapService.TryFindClosestAvailablePosition(existingUnit.Position);
-            if (position == null)
+            if (position as object == null)
             {
                 continue;
             }
@@ -127,7 +127,8 @@ public class InteractableObjectService : IInteractableObjectService
             // NOTE: client does not use "newUnitNotifier"
             await newUnitNotifier(createdGameObject).ConfigureAwait(false);
             
-            initializedClones.Add(Initialize(createdGameObject));
+            _objects.TryAdd(createdGameObject.Id, clone);
+            initializedClones.Add(clone);
         }
 
         // map update
