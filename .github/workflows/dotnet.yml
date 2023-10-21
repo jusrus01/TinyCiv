@@ -20,7 +20,5 @@ jobs:
               run: dotnet restore
             - name: Build
               run: dotnet build --no-restore
-            # - name: Run ServerClient integration tests
-            #   run: dotnet test --filter TestServerClient --no-build
-            - name: Run other tests
-              run: dotnet test --filter FullyQualifiedName!=TinyCiv.Server.Client.IntegrationTests.TestServerClient --no-build
+            - name: Tests
+              run: ($env:DISABLE_LOGS="YES") | dotnet test --no-build
