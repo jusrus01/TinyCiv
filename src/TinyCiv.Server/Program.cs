@@ -11,7 +11,7 @@ using Constants = TinyCiv.Shared.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var enableLogging = Environment.GetEnvironmentVariable("DISABLE_LOGS") == null;
+var enableLogging = Environment.GetEnvironmentVariable("DISABLE_LOGS") != "YES";
 if (enableLogging)
 {
     Log.Logger = new LoggerConfiguration()

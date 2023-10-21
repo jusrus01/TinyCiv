@@ -32,12 +32,16 @@ public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
     
     protected override Task OnHandleAsync(AttackUnitClientEvent @event)
     {
-        var request = new AttackUnitRequest(@event.AttackerId, @event.OpponentId, MapChangeNotifier, InteractableObjectStateChangeNotifier);
+        var request = new AttackUnitRequest(@event.AttackerId, @event.OpponentId, MapChangeNotifier, InteractableObjectStateChangeNotifier, NewUnitNotifier);
         _gameService.AttackUnit(request);
         return Task.CompletedTask;
         
         Task MapChangeNotifier(Map updatedMap) =>
             NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(updatedMap));
+
+        // NOTE: not used by client
+        Task NewUnitNotifier(ServerGameObject gameObject) =>
+            NotifyAllAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(gameObject));
         
         Task InteractableObjectStateChangeNotifier(IInteractableObject interactableObject) =>
             NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, new InteractableObjectServerEvent(interactableObject.GameObjectReferenceId, interactableObject.Health, interactableObject.AttackDamage));

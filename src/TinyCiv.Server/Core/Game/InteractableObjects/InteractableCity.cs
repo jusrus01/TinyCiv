@@ -9,12 +9,24 @@ public class InteractableCity : IInteractableObject
     public int AttackRateInMilliseconds => Constants.Game.Interactable.AttackIntervalInMilliseconds;
     public bool IsAbleToCounterAttack => true;
     public bool IsBuilding => true;
-    
-    public Guid GameObjectReferenceId { get; init; }
+    public int? SpawnClonesBeforeDeath { get; set; } = null;
+
+    public Guid GameObjectReferenceId { get; set; }
+    public int InitialHealth => Constants.Game.Interactable.City.InitialHealth;
     public int Health { get; set; } = Constants.Game.Interactable.City.InitialHealth;
     
     public void DoDamage(IInteractableObject interactable)
     {
         interactable.Health -= AttackDamage;
+    }
+
+    public IInteractableObject Clone()
+    {
+        return new InteractableCity
+        {
+            GameObjectReferenceId = GameObjectReferenceId,
+            Health = Health,
+            SpawnClonesBeforeDeath = null
+        };
     }
 }

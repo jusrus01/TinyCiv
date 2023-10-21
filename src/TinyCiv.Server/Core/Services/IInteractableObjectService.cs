@@ -10,7 +10,14 @@ public interface IInteractableObjectService
 
     IInteractableObject? Get(Guid id);
 
-    void Remove(Guid id);
+    void RegisterClone(IInteractableObject objClone);
+    IEnumerable<IInteractableObject> FlushClones();
 
-    bool IsAlive(IInteractableObject obj);
+    void Remove(Guid id);
+    
+    Task TransformClonesToGameObjectsAsync(
+        IEnumerable<IInteractableObject> clones,
+        Func<Map, Task> mapChangeNotifier,
+        Func<IInteractableObject, Task> attackStateNotifier,
+        Func<ServerGameObject, Task> newUnitNotifier);
 }

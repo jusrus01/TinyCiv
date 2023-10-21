@@ -1,4 +1,5 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
+using TinyCiv.Server.Core.Game.InteractableObjects;
 using TinyCiv.Server.Dtos.Buildings;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Server;
@@ -21,7 +22,14 @@ public class GameService : IGameService
     private readonly ICombatService _combatService;
     private readonly ILogger<GameService> _logger;
 
-    public GameService(ISessionService sessionService, IConnectionIdAccessor accessor, IResourceService resourceService, IMapService mapService, IInteractableObjectService interactableObjectService, ICombatService combatService, ILogger<GameService> logger)
+    public GameService(
+        ISessionService sessionService,
+        IConnectionIdAccessor accessor,
+        IResourceService resourceService,
+        IMapService mapService,
+        IInteractableObjectService interactableObjectService,
+        ICombatService combatService,
+        ILogger<GameService> logger)
     {
         _sessionService = sessionService;
         _accessor = accessor;
@@ -187,7 +195,8 @@ public class GameService : IGameService
             request.AttackerId, 
             request.OpponentId, 
             request.MapChangeNotifier, 
-            request.InteractableObjectStateChangeNotifier));
+            request.InteractableObjectStateChangeNotifier,
+            request.NewUnitNotifier));
     }
 
     public void MoveUnit(MoveUnitRequest request)

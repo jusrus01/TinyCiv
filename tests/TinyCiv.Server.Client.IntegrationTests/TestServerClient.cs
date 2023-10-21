@@ -699,6 +699,89 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
     }
     
     [Fact]
+    public async Task ListenForInteractableObjectChanges_WhenTownAttackedByTarran_Then_TarranSpawnsClonesAfterReceivingEnoughDamage()
+    {
+        //arrange
+        Guid? playerId = null;
+        _sut.ListenForNewPlayerCreation(resp =>
+        {
+            playerId = resp.Created.Id;
+        });
+        
+        var townHealth = 0;
+        var townAttackDamage = 0;
+        _sut.ListenForInteractableObjectChanges(resp =>
+        {
+            townHealth = resp.Health;
+            townAttackDamage = resp.AttackDamage;
+        });
+
+        Guid? anotherPlayerId = null;
+        var anotherClient = InitializeClient();
+        anotherClient.ListenForNewPlayerCreation(resp =>
+        {
+            anotherPlayerId = resp.Created.Id;
+        });
+        
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync();
+        
+        Map? latestMap = null;
+        _sut.ListenForMapChange(resp =>
+        {
+            latestMap = resp.Map;
+        });
+
+        await _sut.SendAsync(new PlaceTownClientEvent(playerId!.Value));
+        await anotherClient.SendAsync(new PlaceTownClientEvent(anotherPlayerId!.Value));
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 1, 1, GameObjectType.Tarran));
+        await WaitForResponseAsync(10000);
+        
+        var anotherPlayerTown =
+            latestMap!.Objects!.Single(obj => obj.Type == GameObjectType.City && obj.OwnerPlayerId == anotherPlayerId);
+        
+        var attacker = latestMap!.Objects!.Single(obj => obj.Type == GameObjectType.Tarran && obj.OwnerPlayerId == playerId);
+        
+        var afterCombatAttackerHealth = -1;
+        var afterCombatTownHealth = -1;
+        _sut.ListenForInteractableObjectChanges(resp =>
+        {
+            if (resp.ObjectId == attacker.Id)
+            {
+                afterCombatAttackerHealth = resp.Health;
+            }
+            
+            if (resp.ObjectId == anotherPlayerTown.Id)
+            {
+                afterCombatTownHealth = resp.Health;
+            }
+        });
+        
+        //act
+        await _sut.SendAsync(new MoveUnitClientEvent(attacker.Id, anotherPlayerTown.Position!.X,
+            anotherPlayerTown.Position!.Y));
+        await WaitForResponseAsync(20000);
+
+        await _sut.SendAsync(new AttackUnitClientEvent(attacker.Id, anotherPlayerTown.Id));
+        await WaitForResponseAsync(8000);
+        
+        //assert
+        Assert.NotEqual(-1, afterCombatAttackerHealth);
+        Assert.NotEqual(-1, afterCombatTownHealth);
+        
+        Assert.NotEqual(Constants.Game.Interactable.City.InitialHealth, afterCombatTownHealth);
+        Assert.NotEqual(Constants.Game.Interactable.Tarran.InitialHealth, afterCombatAttackerHealth);
+        
+        Assert.True(latestMap.Objects.Count(obj => obj.Type == GameObjectType.Tarran) > 1);
+    }
+    
+    [Fact]
     public async Task ListenForInteractableObjectChanges_WhenUnitDead_Then_ChangedStateReceived()
     {
         //arrange

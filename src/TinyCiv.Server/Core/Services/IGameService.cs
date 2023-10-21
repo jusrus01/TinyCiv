@@ -1,4 +1,5 @@
-﻿using TinyCiv.Server.Dtos.Buildings;
+﻿using TinyCiv.Server.Core.Game.InteractableObjects;
+using TinyCiv.Server.Dtos.Buildings;
 using TinyCiv.Server.Dtos.Players;
 using TinyCiv.Server.Dtos.Towns;
 using TinyCiv.Server.Dtos.Units;
@@ -18,6 +19,7 @@ public interface IGameService
     PlaceTownResponse? PlaceTown(Guid playerId);
 
     AddUnitResponse? AddUnit(AddUnitRequest request);
+
     void AttackUnit(AttackUnitRequest request);
     void MoveUnit(MoveUnitRequest request);
 }
