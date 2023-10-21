@@ -66,7 +66,7 @@ public class GameBoardAnalyzerBackgroundJob : BackgroundService
             {
                 _sessionService.StopGame();
 
-                var winnerId = latestScanResult.Single(result => result.Value?.Count > 0).Key;
+                var winnerId = latestScanResult.FirstOrDefault(result => result.Value?.Count > 0).Key;
                 await _publisher.NotifyAllAsync(Constants.Server.SendVictoryEventToAll, new VictoryServerEvent(winnerId));
                 
                 _logger.LogWarning("Winner found '{player_id}' and everyone notified", winnerId);
@@ -83,11 +83,11 @@ public class GameBoardAnalyzerBackgroundJob : BackgroundService
 
     private Dictionary<Guid, IList<Guid>?> AnalyzeGameBoard()
     {
-        var latestMapState = _mapService.GetMap();
+        var latestMapState = _mapService.GetMapObjects();
 
         var latestScanResults = new Dictionary<Guid, IList<Guid>?>();
 
-        foreach (var obj in latestMapState?.Objects ?? new List<ServerGameObject>())
+        foreach (var obj in latestMapState)
         {
             if (obj.Type is GameObjectType.Colonist or GameObjectType.City)
             {

@@ -1,9 +1,9 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Testing;
-using TinyCiv.Server.Dtos.Units;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Client.Lobby;
+using TinyCiv.Shared.Events.Server;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Client.IntegrationTests;
