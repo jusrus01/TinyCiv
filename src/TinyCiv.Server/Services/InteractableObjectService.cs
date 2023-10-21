@@ -127,6 +127,7 @@ public class InteractableObjectService : IInteractableObjectService
             // NOTE: client does not use "newUnitNotifier"
             await newUnitNotifier(createdGameObject).ConfigureAwait(false);
             
+            clone.GameObjectReferenceId = createdGameObject.Id;
             _objects.TryAdd(createdGameObject.Id, clone);
             initializedClones.Add(clone);
         }
