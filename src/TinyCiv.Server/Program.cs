@@ -7,18 +7,25 @@ using TinyCiv.Server.Handlers.Lobby;
 using TinyCiv.Server.Hubs;
 using TinyCiv.Server.Publishers;
 using TinyCiv.Server.Services;
-using TinyCiv.Shared.Events.Client;
 using Constants = TinyCiv.Shared.Constants;
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .WriteTo.Seq("http://localhost:5341")
-    .Enrich.FromLogContext()
-    .Enrich.WithClientIp()
-    .Enrich.WithCorrelationId()
-    .CreateLogger();
-
 var builder = WebApplication.CreateBuilder(args);
+
+var enableLogging = Environment.GetEnvironmentVariable("DISABLE_LOGS") == null;
+if (enableLogging)
+{
+    Log.Logger = new LoggerConfiguration()
+        .WriteTo.Console()
+        .WriteTo.Seq("http://localhost:5341")
+        .Enrich.FromLogContext()
+        .Enrich.WithClientIp()
+        .Enrich.WithCorrelationId()
+        .CreateLogger();
+}
+else
+{
+    Log.Logger = new LoggerConfiguration().CreateLogger();
+}
 
 builder.Host.UseSerilog();
 
@@ -55,7 +62,7 @@ var app = builder.Build();
 // app.UseAuthorization();
 app.MapHub<ServerHub>(Constants.Server.HubRoute);
 
-Log.Logger.Information("Application up and running");
+Log.Logger.Information($"Application up and running in env: '{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}'");
 app.Run();
 Log.Logger.Information("Application stopped");
 
