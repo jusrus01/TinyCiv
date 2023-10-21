@@ -14,4 +14,10 @@ public interface IInteractableObjectService
     IEnumerable<IInteractableObject> FlushClones();
 
     void Remove(Guid id);
+    
+    Task TransformClonesToGameObjectsAsync(
+        IEnumerable<IInteractableObject> clones,
+        Func<Map, Task> mapChangeNotifier,
+        Func<IInteractableObject, Task> attackStateNotifier,
+        Func<ServerGameObject, Task> newUnitNotifier);
 }

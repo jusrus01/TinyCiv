@@ -39,8 +39,9 @@ public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
         Task MapChangeNotifier(Map updatedMap) =>
             NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(updatedMap));
 
+        // NOTE: not used by client
         Task NewUnitNotifier(ServerGameObject gameObject) =>
-            NotifyCallerAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(gameObject));
+            NotifyAllAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(gameObject));
         
         Task InteractableObjectStateChangeNotifier(IInteractableObject interactableObject) =>
             NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, new InteractableObjectServerEvent(interactableObject.GameObjectReferenceId, interactableObject.Health, interactableObject.AttackDamage));

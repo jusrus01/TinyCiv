@@ -10,16 +10,14 @@ public class CombatService : ICombatService
 {
     private readonly IMapService _mapService;
     private readonly IInteractableObjectService _interactableObjectService;
-    private readonly IGameService _gameService;
 
     private readonly ConcurrentDictionary<Guid, Guid> _combatParticipants;
     private readonly object _combatLocker;
 
-    public CombatService(IMapService mapService, IInteractableObjectService interactableObjectService, IGameService gameService)
+    public CombatService(IMapService mapService, IInteractableObjectService interactableObjectService)
     {
         _mapService = mapService;
         _interactableObjectService = interactableObjectService;
-        _gameService = gameService;
         
         _combatParticipants = new ConcurrentDictionary<Guid, Guid>();
         _combatLocker = new object();
@@ -120,8 +118,8 @@ public class CombatService : ICombatService
                         // if clones exists, then let the TransformToGameObjectsAsync handle map updates 
                         if (clones?.Any() ?? false)
                         {
-                            _gameService
-                                .TransformToGameObjectsAsync(clones, mapChangeNotifier, attackStateNotifier, newUnitNotifier)
+                            _interactableObjectService
+                                .TransformClonesToGameObjectsAsync(clones, mapChangeNotifier, attackStateNotifier, newUnitNotifier)
                                 .GetAwaiter()
                                 .GetResult();
                         }

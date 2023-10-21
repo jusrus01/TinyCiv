@@ -189,17 +189,13 @@ public class GameService : IGameService
         return new AddUnitResponse(unit, map, responseServerEvents.ToArray());
     }
 
-    public Task TransformToGameObjectsAsync(
-        IEnumerable<IInteractableObject> interactables,
+    public async Task TransformClonesToGameObjectsAsync(
+        IEnumerable<IInteractableObject> clones,
         Func<Map, Task> mapChangeNotifier,
         Func<IInteractableObject, Task> attackStateNotifier,
         Func<ServerGameObject, Task> newUnitNotifier)
     {
-        // unit is already created when we invoke "interactable object changes"
         
-        // unit new update - not used
-        // map update
-        // only then - interactable update
     }
 
     public void AttackUnit(AttackUnitRequest request)

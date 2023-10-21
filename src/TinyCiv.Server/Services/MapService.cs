@@ -134,6 +134,54 @@ namespace TinyCiv.Server.Services
             }
         }
 
+        public ServerPosition? TryFindClosestAvailablePosition(ServerPosition? target)
+        {
+            if (target == null)
+            {
+                return null;
+            }
+            
+            const int searchRadiusSquareCount = 3;
+
+            var startX = target.X - searchRadiusSquareCount;
+            var startY = target.Y - searchRadiusSquareCount;
+            
+            var leftMostPoint = new ServerPosition
+            {
+                X = startX < 0 ? 0 : startX,
+                Y = startY < 0 ? 0 : startY
+            };
+            
+            lock (_mapChangeLocker)
+            {
+                for (var x = leftMostPoint.X; x < leftMostPoint.X + searchRadiusSquareCount; x++)
+                {
+                    if (x >= Constants.Game.WidthSquareCount)
+                    {
+                        break;
+                    }
+                    
+                    for (var y = leftMostPoint.Y; y < leftMostPoint.Y + searchRadiusSquareCount; y++)
+                    {
+                        if (y >= Constants.Game.HeightSquareCount)
+                        {
+                            break;
+                        }
+
+                        var position = new ServerPosition { X = x, Y = y };
+                        var tile = GetTileAtPosition(position);
+
+                        if (tile.Type == GameObjectType.Empty)
+                        {
+                            return position;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
         private bool MoveUnit(Guid unitId, ServerPosition target)
         {
             lock (_mapChangeLocker)

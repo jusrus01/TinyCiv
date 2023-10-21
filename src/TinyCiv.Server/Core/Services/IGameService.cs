@@ -19,12 +19,7 @@ public interface IGameService
     PlaceTownResponse? PlaceTown(Guid playerId);
 
     AddUnitResponse? AddUnit(AddUnitRequest request);
-    Task TransformToGameObjectsAsync(
-        IEnumerable<IInteractableObject> interactables,
-        Func<Map, Task> mapChangeNotifier,
-        Func<IInteractableObject, Task> attackStateNotifier,
-        Func<ServerGameObject, Task> newUnitNotifier);
-        
+
     void AttackUnit(AttackUnitRequest request);
     void MoveUnit(MoveUnitRequest request);
 }
