@@ -10,8 +10,10 @@ public class InteractableWarrior : IInteractableObject
     public bool IsBuilding => false;
     public int Price => Constants.Game.Interactable.Warrior.Price;
 
+    public int? SpawnClonesBeforeDeath { get; set; } = null;
+    public int InitialHealth => Constants.Game.Interactable.Warrior.InitialHealth;
     public int Health { get; set; } = Constants.Game.Interactable.Warrior.InitialHealth;
-    public Guid GameObjectReferenceId { get; init; }
+    public Guid GameObjectReferenceId { get; set; }
 
     public void DoDamage(IInteractableObject interactable)
     {
@@ -23,5 +25,14 @@ public class InteractableWarrior : IInteractableObject
         {
             interactable.Health -= AttackDamage;
         }
+    }
+
+    public IInteractableObject Clone()
+    {
+        return new InteractableWarrior
+        {
+            GameObjectReferenceId = GameObjectReferenceId,
+            Health = Health
+        };
     }
 }

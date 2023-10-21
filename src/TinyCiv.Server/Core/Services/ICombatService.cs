@@ -9,5 +9,6 @@ public interface ICombatService
         Guid attackerId,
         Guid opponentId,
         Func<Map, Task> mapChangeNotifier,
-        Func<IInteractableObject, Task> attackStateNotifier);
+        Func<IInteractableObject, Task> attackStateNotifier,
+        Func<ServerGameObject, Task> newUnitNotifier);
 }

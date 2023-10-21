@@ -36,6 +36,7 @@ public static class Constants
                 public const int Damage = 10;
                 public const int BuildingAttackMultiplier = 5;
                 public const int Price = 50;
+                public const int SpawnClonesBeforeDeath = 3;
             }
         }
         

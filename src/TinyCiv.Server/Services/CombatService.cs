@@ -10,22 +10,27 @@ public class CombatService : ICombatService
 {
     private readonly IMapService _mapService;
     private readonly IInteractableObjectService _interactableObjectService;
+    private readonly IGameService _gameService;
 
     private readonly ConcurrentDictionary<Guid, Guid> _combatParticipants;
     private readonly object _combatLocker;
 
-    public CombatService(IMapService mapService, IInteractableObjectService interactableObjectService)
+    public CombatService(IMapService mapService, IInteractableObjectService interactableObjectService, IGameService gameService)
     {
         _mapService = mapService;
         _interactableObjectService = interactableObjectService;
+        _gameService = gameService;
+        
         _combatParticipants = new ConcurrentDictionary<Guid, Guid>();
         _combatLocker = new object();
     }
     
     public Task InitiateCombatAsync(
         Guid attackerId,
-        Guid opponentId, Func<Map, Task> mapChangeNotifier,
-        Func<IInteractableObject, Task> attackStateNotifier)
+        Guid opponentId,
+        Func<Map, Task> mapChangeNotifier,
+        Func<IInteractableObject, Task> attackStateNotifier,
+        Func<ServerGameObject, Task> newUnitNotifier)
     {
         if (_combatParticipants.ContainsKey(attackerId))
         {
@@ -54,9 +59,8 @@ public class CombatService : ICombatService
 
         return Task.Run(async () =>
         {
-            IInteractableController attackerController = new InteractableController(attackerInteractableObject, attackStateNotifier);
-            IInteractableController objectUnderAttackController =
-                new InteractableController(interactableUnderAttackObject, attackStateNotifier);
+            IInteractableController attackerController = new InteractableController(attackerInteractableObject, _interactableObjectService, attackStateNotifier);
+            IInteractableController objectUnderAttackController = new InteractableController(interactableUnderAttackObject, _interactableObjectService, attackStateNotifier);
             
             var isCombatActive = true;
             while (isCombatActive)
@@ -97,10 +101,11 @@ public class CombatService : ICombatService
                     {
                         return Task.CompletedTask;
                     }
-
+                    
                     attackerController.Attack(interactableUnderAttackObject);
 
-                    var isAfterAttackAlive = _interactableObjectService.IsAlive(interactableUnderAttackObject);
+
+                    var isAfterAttackAlive = objectUnderAttackController.IsAlive();
                     if (!isAfterAttackAlive)
                     {
                         _combatParticipants.Remove(opponentId, out _);
@@ -110,7 +115,20 @@ public class CombatService : ICombatService
 
                     if (!isAfterAttackAlive || !isAttackerAlive || !isObjectUnderAttackAlive)
                     {
-                        mapChangeNotifier(_mapService.GetMap() ?? throw new Exception()).GetAwaiter().GetResult();
+                        var clones = _interactableObjectService.FlushClones()?.ToList();
+
+                        // if clones exists, then let the TransformToGameObjectsAsync handle map updates 
+                        if (clones?.Any() ?? false)
+                        {
+                            _gameService
+                                .TransformToGameObjectsAsync(clones, mapChangeNotifier, attackStateNotifier, newUnitNotifier)
+                                .GetAwaiter()
+                                .GetResult();
+                        }
+                        else
+                        {
+                            mapChangeNotifier(_mapService.GetMap() ?? throw new Exception()).GetAwaiter().GetResult();
+                        }
                     }
                 }
             }

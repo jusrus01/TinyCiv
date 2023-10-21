@@ -9,6 +9,9 @@ namespace TinyCiv.Server.Services;
 public class InteractableObjectService : IInteractableObjectService
 {
     private readonly ILogger<InteractableObjectService> _logger;
+    
+    private readonly ConcurrentDictionary<Guid, IInteractableObject> _clonedObjects = new();
+    
     private readonly ConcurrentDictionary<Guid, IInteractableObject> _objects = new();
 
     public InteractableObjectService(ILogger<InteractableObjectService> logger)
@@ -67,13 +70,24 @@ public class InteractableObjectService : IInteractableObjectService
         return obj;
     }
 
+    public void RegisterClone(IInteractableObject objClone)
+    {
+        _clonedObjects.TryAdd(Guid.NewGuid(), objClone);
+    }
+
+    public IEnumerable<IInteractableObject> FlushClones()
+    {
+        var clones = _clonedObjects
+            .Select(clone => clone.Value)
+            .ToList();
+        
+        _clonedObjects.Clear();
+
+        return clones;
+    }
+
     public void Remove(Guid id)
     {
         _objects.Remove(id, out _);
-    }
-
-    public bool IsAlive(IInteractableObject obj)
-    {
-        return obj.Health > 0;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
+using TinyCiv.Server.Core.Game.InteractableObjects;
 using TinyCiv.Server.Dtos.Buildings;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Server;
@@ -21,7 +22,14 @@ public class GameService : IGameService
     private readonly ICombatService _combatService;
     private readonly ILogger<GameService> _logger;
 
-    public GameService(ISessionService sessionService, IConnectionIdAccessor accessor, IResourceService resourceService, IMapService mapService, IInteractableObjectService interactableObjectService, ICombatService combatService, ILogger<GameService> logger)
+    public GameService(
+        ISessionService sessionService,
+        IConnectionIdAccessor accessor,
+        IResourceService resourceService,
+        IMapService mapService,
+        IInteractableObjectService interactableObjectService,
+        ICombatService combatService,
+        ILogger<GameService> logger)
     {
         _sessionService = sessionService;
         _accessor = accessor;
@@ -181,13 +189,27 @@ public class GameService : IGameService
         return new AddUnitResponse(unit, map, responseServerEvents.ToArray());
     }
 
+    public Task TransformToGameObjectsAsync(
+        IEnumerable<IInteractableObject> interactables,
+        Func<Map, Task> mapChangeNotifier,
+        Func<IInteractableObject, Task> attackStateNotifier,
+        Func<ServerGameObject, Task> newUnitNotifier)
+    {
+        // unit is already created when we invoke "interactable object changes"
+        
+        // unit new update - not used
+        // map update
+        // only then - interactable update
+    }
+
     public void AttackUnit(AttackUnitRequest request)
     {
         Task.Run(() => _combatService.InitiateCombatAsync(
             request.AttackerId, 
             request.OpponentId, 
             request.MapChangeNotifier, 
-            request.InteractableObjectStateChangeNotifier));
+            request.InteractableObjectStateChangeNotifier,
+            request.NewUnitNotifier));
     }
 
     public void MoveUnit(MoveUnitRequest request)
