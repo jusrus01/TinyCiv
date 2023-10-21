@@ -1,5 +1,4 @@
-﻿using TinyCiv.Server.Core.Game.InteractableObjects;
-using TinyCiv.Server.Dtos.Buildings;
+﻿using TinyCiv.Server.Dtos.Buildings;
 using TinyCiv.Server.Dtos.Players;
 using TinyCiv.Server.Dtos.Towns;
 using TinyCiv.Server.Dtos.Units;

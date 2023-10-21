@@ -63,7 +63,33 @@ public class SessionService : ISessionService
 
     public List<Player> GetPlayers()
     {
-        return _players;
+        lock (_playerLocker)
+        {
+            return _players;
+        }
+    }
+
+    public List<Guid> GetPlayerIds()
+    {
+        lock (_playerLocker)
+        {
+            return _players.Select(i => i.Id).ToList();
+        }
+    }
+
+    public Player? RemovePlayer(Guid playerId)
+    {
+        lock (_playerLocker)
+        {
+            var player = _players.SingleOrDefault(player => player.Id == playerId);
+            if (player == null)
+            {
+                return null;
+            }
+            
+            _players.Remove(player);
+            return player;
+        }
     }
 
     public void RemovePlayerByConnectionId(string connectionId)
@@ -88,6 +114,11 @@ public class SessionService : ISessionService
     public void StartGame()
     {
         _isGameStarted = true;
+    }
+
+    public void StopGame()
+    {
+        _isGameStarted = false;
     }
 
     public bool IsLobbyFull()
