@@ -36,42 +36,49 @@ public class GameBoardAnalyzerBackgroundJob : BackgroundService
         {
             await Task.Delay(CheckDelayInMilliseconds, stoppingToken);
 
-            if (!_sessionService.IsStarted())
+            try
             {
-                continue;
-            }
+                if (!_sessionService.IsStarted())
+                {
+                    continue;
+                }
 
-            if (!_startedAnalyzing)
-            {
-                await Task.Delay(ColdStartInMilliseconds, stoppingToken);
-                _startedAnalyzing = true;
-            }
+                if (!_startedAnalyzing)
+                {
+                    await Task.Delay(ColdStartInMilliseconds, stoppingToken);
+                    _startedAnalyzing = true;
+                }
 
-            var latestScanResult = AnalyzeGameBoard();
+                var latestScanResult = AnalyzeGameBoard();
             
-            var playersToRemove = latestScanResult
-                .Where(result => result.Value?.Count == 0)
-                .Select(result => result.Key)
-                .ToList();
-            foreach (var playerId in playersToRemove.Union(_sessionService.GetPlayerIds().Where(i => !latestScanResult.Keys.Contains(i))))
-            {
-                _sessionService.RemovePlayer(playerId);
+                var playersToRemove = latestScanResult
+                    .Where(result => result.Value?.Count == 0)
+                    .Select(result => result.Key)
+                    .ToList();
+                foreach (var playerId in playersToRemove.Union(_sessionService.GetPlayerIds().Where(i => !latestScanResult.Keys.Contains(i))))
+                {
+                    _sessionService.RemovePlayer(playerId);
                 
-                await _publisher.NotifyAllAsync(Constants.Server.SendDefeatEventToAll, new DefeatServerEvent(playerId));
+                    await _publisher.NotifyAllAsync(Constants.Server.SendDefeatEventToAll, new DefeatServerEvent(playerId));
                 
-                _logger.LogWarning("Loser found '{player_id}' and everyone notified", playerId);
-            }
+                    _logger.LogWarning("Loser found '{player_id}' and everyone notified", playerId);
+                }
             
-            if (IsSinglePlayerLeftWithRequiredResources(latestScanResult))
-            {
-                _sessionService.StopGame();
+                if (IsSinglePlayerLeftWithRequiredResources(latestScanResult))
+                {
+                    _sessionService.StopGame();
 
-                var winnerId = latestScanResult.FirstOrDefault(result => result.Value?.Count > 0).Key;
-                await _publisher.NotifyAllAsync(Constants.Server.SendVictoryEventToAll, new VictoryServerEvent(winnerId));
+                    var winnerId = latestScanResult.FirstOrDefault(result => result.Value?.Count > 0).Key;
+                    await _publisher.NotifyAllAsync(Constants.Server.SendVictoryEventToAll, new VictoryServerEvent(winnerId));
                 
-                _logger.LogWarning("Winner found '{player_id}' and everyone notified", winnerId);
+                    _logger.LogWarning("Winner found '{player_id}' and everyone notified", winnerId);
                 
-                return;
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error occured while analyzing game board. Will try again in {delay}ms", CheckDelayInMilliseconds);
             }
         }
     }
@@ -89,7 +96,7 @@ public class GameBoardAnalyzerBackgroundJob : BackgroundService
 
         foreach (var obj in latestMapState)
         {
-            if (obj.Type is GameObjectType.Colonist or GameObjectType.City)
+            if (obj.Type is GameObjectType.Colonist or GameObjectType.City) 
             {
                 if (!latestScanResults.ContainsKey(obj.OwnerPlayerId))
                 {
