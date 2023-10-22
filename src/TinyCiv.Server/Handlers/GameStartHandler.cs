@@ -10,12 +10,10 @@ namespace TinyCiv.Server.Handlers;
 public class GameStartHandler : ClientHandler<StartGameClientEvent>
 {
     private readonly ISessionService _sessionService;
-    private readonly IGameService _gameService;
 
-    public GameStartHandler(ISessionService sessionService, ILogger<GameStartHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
+    public GameStartHandler(ISessionService sessionService, ILogger<GameStartHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, gameService, logger)
     {
         _sessionService = sessionService;
-        _gameService = gameService;
     }
 
     protected override bool IgnoreWhen(StartGameClientEvent @event) =>
@@ -23,11 +21,11 @@ public class GameStartHandler : ClientHandler<StartGameClientEvent>
 
     protected override async Task OnHandleAsync(StartGameClientEvent @event)
     {
-        Map map = _gameService.StartGame(@event.MapType);
+        Map map = GameService.StartGame(@event.MapType);
         await NotifyAllAsync(Constants.Server.SendGameStartToAll, new GameStartServerEvent(map))
             .ConfigureAwait(false);
 
-        map = _gameService.InitializeColonists();
+        map = GameService.InitializeColonists();
         await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(map))
             .ConfigureAwait(false);
     }

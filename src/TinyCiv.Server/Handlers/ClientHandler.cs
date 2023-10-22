@@ -1,6 +1,7 @@
 using System.Text.Json;
 using TinyCiv.Server.Core.Handlers;
 using TinyCiv.Server.Core.Publishers;
+using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Server;
 
 namespace TinyCiv.Server.Handlers;
@@ -12,12 +13,16 @@ public abstract class ClientHandler<TEvent> : IClientHandler
     private readonly ILogger<IClientHandler> _logger;
     private readonly IPublisher _publisher;
 
+    protected readonly IGameService GameService;
+
     private Subscriber? _caller;
 
-    protected ClientHandler(IPublisher publisher, ILogger<IClientHandler> logger)
+    protected ClientHandler(IPublisher publisher, IGameService gameService, ILogger<IClientHandler> logger)
     {
         _logger = logger;
         _publisher = publisher;
+
+        GameService = gameService;
     }
     
     public bool CanHandle(string type)

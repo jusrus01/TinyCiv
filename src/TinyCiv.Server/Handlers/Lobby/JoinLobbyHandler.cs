@@ -9,12 +9,10 @@ namespace TinyCiv.Server.Handlers.Lobby;
 public class JoinLobbyHandler : ClientHandler<JoinLobbyClientEvent>
 {
     private readonly ISessionService _sessionService;
-    private readonly IGameService _gameService;
 
-    public JoinLobbyHandler(ISessionService sessionService, ILogger<JoinLobbyHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
+    public JoinLobbyHandler(ISessionService sessionService, ILogger<JoinLobbyHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, gameService, logger)
     {
         _sessionService = sessionService;
-        _gameService = gameService;
     }
 
     protected override bool IgnoreWhen(JoinLobbyClientEvent @event) =>
@@ -22,7 +20,7 @@ public class JoinLobbyHandler : ClientHandler<JoinLobbyClientEvent>
 
     protected override async Task OnHandleAsync(JoinLobbyClientEvent @event)
     {
-        var response = _gameService.ConnectPlayer();
+        var response = GameService.ConnectPlayer();
 
         if (response == null) return;
 

@@ -13,7 +13,6 @@ namespace TinyCiv.Server.Handlers;
 public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
 {
     private readonly ISessionService _sessionService;
-    private readonly IGameService _gameService;
 
     public UnitAttackHandler(
         ISessionService sessionService,
@@ -21,10 +20,9 @@ public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
         IGameService gameService,
         IPublisher publisher)
         :
-        base(publisher, logger)
+        base(publisher, gameService, logger)
     {
         _sessionService = sessionService;
-        _gameService = gameService;
     }
 
     protected override bool IgnoreWhen(AttackUnitClientEvent @event) =>
@@ -33,7 +31,7 @@ public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
     protected override Task OnHandleAsync(AttackUnitClientEvent @event)
     {
         var request = new AttackUnitRequest(@event.AttackerId, @event.OpponentId, MapChangeNotifier, InteractableObjectStateChangeNotifier, NewUnitNotifier);
-        _gameService.AttackUnit(request);
+        GameService.AttackUnit(request);
         return Task.CompletedTask;
         
         Task MapChangeNotifier(Map updatedMap) =>

@@ -11,16 +11,13 @@ namespace TinyCiv.Server.Handlers
 {
     public class UnitMoveHandler : ClientHandler<MoveUnitClientEvent>
     {
-        private readonly IGameService _gameService;
-
-        public UnitMoveHandler(ILogger<UnitMoveHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
+        public UnitMoveHandler(ILogger<UnitMoveHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, gameService, logger)
         {
-            _gameService = gameService;
         }
 
         protected override Task OnHandleAsync(MoveUnitClientEvent @event)
         {
-            async void unitMoveCallback(UnitMoveResponse response, Map? map)
+            async void UnitMoveCallback(UnitMoveResponse response, Map? map)
             {
                 switch (response)
                 {
@@ -40,8 +37,8 @@ namespace TinyCiv.Server.Handlers
             }
 
             ServerPosition targetPosition = new() { X = @event.X, Y = @event.Y };
-            var request = new MoveUnitRequest(@event.UnitId, targetPosition, unitMoveCallback);
-            _gameService.MoveUnit(request);
+            var request = new MoveUnitRequest(@event.UnitId, targetPosition, UnitMoveCallback);
+            GameService.MoveUnit(request);
 
             return Task.CompletedTask;
         }
