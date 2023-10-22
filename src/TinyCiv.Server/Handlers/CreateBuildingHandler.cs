@@ -12,27 +12,20 @@ namespace TinyCiv.Server.Handlers;
 
 public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
 {
-    private readonly IMapService _mapService;
-    private readonly IResourceService _resourceService;
-    private readonly IGameService _gameService;
-
-    public CreateBuildingHandler(ILogger<IClientHandler> logger, IMapService mapService, IResourceService resourceService, IGameService gameService, IPublisher publisher) : base(publisher, logger)
+    public CreateBuildingHandler(ILogger<IClientHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, gameService, logger)
     {
-        _mapService = mapService;
-        _resourceService = resourceService;
-        _gameService = gameService;
     }
 
     protected override async Task OnHandleAsync(CreateBuildingClientEvent @event)
     {
-        async void resourceUpdateCallback(Resources resources)
+        async void ResourceUpdateCallback(Resources resources)
         {
             await NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, new ResourcesUpdateServerEvent(resources))
                 .ConfigureAwait(false);
         }
 
-        var request = new CreateBuildingRequest(@event.PlayerId, @event.BuildingType, @event.Position, resourceUpdateCallback);
-        var response = _gameService.CreateBuilding(request);
+        var request = new CreateBuildingRequest(@event.PlayerId, @event.BuildingType, @event.Position, ResourceUpdateCallback);
+        var response = GameService.CreateBuilding(request);
 
         if (response == null) return;
 

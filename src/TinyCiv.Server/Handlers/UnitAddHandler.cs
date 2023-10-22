@@ -10,19 +10,16 @@ namespace TinyCiv.Server.Handlers;
 
 public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
 {
-    private readonly IGameService _gameService;
-
     public UnitAddHandler(ILogger<UnitAddHandler> logger, IGameService gameService, IPublisher publisher) : base(
-        publisher, logger)
+        publisher, gameService, logger)
     {
-        _gameService = gameService;
     }
 
     protected override async Task OnHandleAsync(CreateUnitClientEvent @event)
     {
         var position = new ServerPosition { X = @event.X, Y = @event.Y };
         var request = new AddUnitRequest(@event.PlayerId, position, @event.UnitType);
-        var response = _gameService.AddUnit(request);
+        var response = GameService.AddUnit(request);
 
         if (response == null)
         {

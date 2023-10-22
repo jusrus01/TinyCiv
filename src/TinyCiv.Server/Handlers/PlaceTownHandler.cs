@@ -9,11 +9,8 @@ namespace TinyCiv.Server.Handlers;
 
 public class PlaceTownHandler : ClientHandler<PlaceTownClientEvent>
 {
-    private readonly IGameService _gameService;
-    
-    public PlaceTownHandler(ILogger<IClientHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, logger)
+    public PlaceTownHandler(ILogger<IClientHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, gameService, logger)
     {
-        _gameService = gameService;
     }
 
     protected override async Task OnHandleAsync(PlaceTownClientEvent @event)
@@ -22,7 +19,7 @@ public class PlaceTownHandler : ClientHandler<PlaceTownClientEvent>
         // Also, if game ends after town is destroyed, then it does not matter :)
         
         // For now allowing town creation after it was destroyed.
-        var townResponse = _gameService.PlaceTown(@event.PlayerId);
+        var townResponse = GameService.PlaceTown(@event.PlayerId);
         if (townResponse?.Map == null)
         {
             return;

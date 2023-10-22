@@ -10,7 +10,6 @@ namespace TinyCiv.Server.Handlers.Lobby;
 public class LeaveLobbyHandler : ClientHandler<LeaveLobbyClientEvent>
 {
     private readonly ISessionService _sessionService;
-    private readonly IGameService _gameService;
 
     public LeaveLobbyHandler(
         ISessionService sessionService,
@@ -18,10 +17,9 @@ public class LeaveLobbyHandler : ClientHandler<LeaveLobbyClientEvent>
         IGameService gameService,
         IPublisher publisher)
         :
-        base(publisher, logger)
+        base(publisher, gameService, logger)
     {
         _sessionService = sessionService;
-        _gameService = gameService;
     }
 
     // Do not allow leaving once the game starts.
@@ -30,7 +28,7 @@ public class LeaveLobbyHandler : ClientHandler<LeaveLobbyClientEvent>
 
     protected override Task OnHandleAsync(LeaveLobbyClientEvent @event)
     {
-        var response = _gameService.DisconnectPlayer();
+        var response = GameService.DisconnectPlayer();
 
         if (!response.CanGameStart)
         {
