@@ -13,6 +13,7 @@ using TinyCiv.Client.Code.Units;
 using System.Threading;
 using System.ComponentModel;
 using TinyCiv.Shared.Events.Client.Lobby;
+using TinyCiv.Shared;
 
 namespace TinyCiv.Client.Code.MVVM
 {
@@ -23,6 +24,7 @@ namespace TinyCiv.Client.Code.MVVM
         public ObservableValue<object> Game { get; } = new ObservableValue<object>();
         public ObservableValue<object> UpperMenu { get; } = new ObservableValue<object>();
         public ObservableValue<object> LowerMenu { get; } = new ObservableValue<object>(new LobbyMenuViewModel());
+        public ObservableValue<ExecutionQueueViewModel> ExecutionMenu { get; } = new ObservableValue<ExecutionQueueViewModel>();
 
         public MainViewModel()
         {
@@ -48,7 +50,9 @@ namespace TinyCiv.Client.Code.MVVM
             if (CurrentPlayer.Instance.player == null)
             {
                 CurrentPlayer.Instance.player = response.Created;
+                CurrentPlayer.Instance.Resources = new Resources{ Industry = Constants.Game.StartingIndustry, Food = Constants.Game.StartingFood, Gold = Constants.Game.StartingGold };                
                 HUDManager.DisplayUpperMenu();
+                HUDManager.DisplayExecutionQueue();
             }
 
             // If the party is full
@@ -60,8 +64,7 @@ namespace TinyCiv.Client.Code.MVVM
         private void OnGameStart(GameStartServerEvent response)
         {
             GameVM.GameStart(response);
-            HUDManager.HideLowerMenu();
+            HUDManager.HideLowerMenu();       
         }
-
     }
 }

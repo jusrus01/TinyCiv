@@ -1,16 +1,16 @@
 ﻿using TinyCiv.Client.Code.Factories;
 using TinyCiv.Shared.Game;
 
-namespace TinyCiv.Client.Code.MVVM
+namespace TinyCiv.Client.Code.MVVM.Model
 {
-    public class UnitModel
+    public class UnitModel : IBuyable
     {
         public int Health { get; }
         public int Damage { get; }
         public int Speed { get; }
         public int ProductionPrice { get; }
         public string Description { get; }
-        public string ImagePath {  get; }
+        public string ImagePath { get; }
         public GameObjectType Type { get; }
         public TeamColor Color { get; }
         public string Name { get; }
@@ -26,6 +26,11 @@ namespace TinyCiv.Client.Code.MVVM
             Color = color;
             ImagePath = AbstractGameObjectFactory.getGameObjectImage(color, type);
             Name = type.ToString();
+        }
+
+        public bool IsBuyable()
+        {
+            return CurrentPlayer.Instance.Resources.Industry >= ProductionPrice;
         }
     }
 }

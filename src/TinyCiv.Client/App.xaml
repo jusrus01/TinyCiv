@@ -28,7 +28,11 @@
             <DataTemplate DataType="{x:Type viewModel:CityMenuViewModel}">
                 <view:CityMenuView/>
             </DataTemplate>
-            
+
+            <DataTemplate DataType="{x:Type viewModel:ExecutionQueueViewModel}">
+                <view:ExecutionQueueView/>
+            </DataTemplate>
+
             <mvvm:GameObjectTemplateSelector x:Key="GameObjectTemplateSelector"/>
         </ResourceDictionary>
     </Application.Resources>

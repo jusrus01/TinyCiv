@@ -23,6 +23,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             Gold.Value = resources.Gold;
             Industry.Value = resources.Industry;
             Food.Value = resources.Food;
+            CurrentPlayer.Instance.Resources = response.Resources;
         }
     }
 }

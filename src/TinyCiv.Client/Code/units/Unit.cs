@@ -1,4 +1,8 @@
-﻿namespace TinyCiv.Client.Code.Units;
+﻿using System.Threading.Tasks;
+using TinyCiv.Client.Code.MVVM;
+using TinyCiv.Shared.Events.Client;
+
+namespace TinyCiv.Client.Code.Units;
 
 public abstract class Unit : GameObject
 {
@@ -18,5 +22,10 @@ public abstract class Unit : GameObject
     protected Unit(GameObject go) : base(go.Type, go.Position, go.OwnerId, go.Id, go.Color, go.OpponentId)
     {
 
+    }
+
+    public async Task MoveTo(Position position)
+    {
+        await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(Id, position.row, position.column));
     }
 }

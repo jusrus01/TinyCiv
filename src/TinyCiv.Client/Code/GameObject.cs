@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using TinyCiv.Client.Code.BorderDecorators;
+using TinyCiv.Client.Code.Factories;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
@@ -20,11 +21,6 @@ namespace TinyCiv.Client.Code
 
         public string ImageSource { get; set; }
         public BorderProperties Border {  get; set; }
-
-        //public Border Border { get; set; }
-        //public Thickness BorderThickness { get; set; }
-        //public Brush BorderBrush { get; set; }
-        //public Brush BackgroundBrush { get; set; }
         public Action LeftAction { get; set; }
         public Action RightAction { get; set; }
        
@@ -38,6 +34,17 @@ namespace TinyCiv.Client.Code
             Color = color;
             OpponentId = opponentId;
             Border = new BorderProperties();
+            Border.Opacity = 1;
+        }
+
+        public GameObject(GameObjectType type, Position position, TeamColor color, double Opacity = 1)
+        {
+            Type = type;
+            Position = position;
+            Color = color;
+            ImageSource = AbstractGameObjectFactory.getGameObjectImage(Color, Type);
+            Border = new BorderProperties();
+            Border.Opacity = Opacity;
         }
 
         protected GameObject() { }
@@ -53,6 +60,7 @@ namespace TinyCiv.Client.Code
             go.OpponentId = serverGameObject.OpponentId;
             go.Border = new BorderProperties();
             go.Border.BackgroundBrush = Brushes.Transparent;
+            go.Border.Opacity = 1;
             return go;
         }
 
