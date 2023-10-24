@@ -10,22 +10,21 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
 {
-    public class GameObject : BorderObject
+    public abstract class GameObject : BorderObject
     {
-        public GameObjectType Type { get; private set; }
+        public virtual GameObjectType Type { get; private set; }
         public override Position Position { get; set; }
-        public Guid OwnerId { get; private set; }
-        public Guid Id { get; private set; }
-        public TeamColor Color { get; private set; }
-        public Guid? OpponentId { get; private set; }
+        public Guid OwnerId { get; set; }
+        public Guid Id { get; set; }
+        public TeamColor Color { get; set; }
+        public Guid? OpponentId { get; set; }
 
         public string ImageSource { get; set; }
         public BorderProperties Border {  get; set; }
         public Action LeftAction { get; set; }
-        public Action RightAction { get; set; }
-       
+        public Action RightAction { get; set; }       
 
-        public GameObject(GameObjectType type, Position position, Guid ownerId, Guid id, TeamColor color, Guid? opponentId)
+        protected GameObject(GameObjectType type, Position position, Guid ownerId, Guid id, TeamColor color, Guid? opponentId) : this()
         {
             Type = type;
             Position = position;
@@ -33,21 +32,22 @@ namespace TinyCiv.Client.Code
             Id = id;
             Color = color;
             OpponentId = opponentId;
-            Border = new BorderProperties();
             Border.Opacity = 1;
         }
 
-        public GameObject(GameObjectType type, Position position, TeamColor color, double Opacity = 1)
+        protected GameObject(GameObjectType type, Position position, TeamColor color, double Opacity = 1) : this()
         {
             Type = type;
             Position = position;
             Color = color;
             ImageSource = AbstractGameObjectFactory.getGameObjectImage(Color, Type);
-            Border = new BorderProperties();
             Border.Opacity = Opacity;
         }
 
-        protected GameObject() { }
+        protected GameObject() 
+        {
+            Border = new BorderProperties();
+        }
 
         public static GameObject fromServerGameObject(ServerGameObject serverGameObject)
         {

@@ -37,9 +37,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         }
 
         public void GameStart(GameStartServerEvent response)
-        {
-            
-
+        {           
             var goFactory = new MapObjectFactory();
 
             gameState.GameObjects = response.Map.Objects

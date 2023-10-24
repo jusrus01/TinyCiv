@@ -4,15 +4,33 @@ namespace TinyCiv.Client.Code.Units;
 
 public class Cavalry : Unit
 {
-    public override int MaxHealth => Shared.Constants.Game.Interactable.Cavalry.InitialHealth;
-    public override int Damage => Shared.Constants.Game.Interactable.Cavalry.Damage;
-    public override int Speed => 3;
-    public override int ProductionPrice => 100;
-    public override int ExpReward => 60;
-    public override string Description => null;
+    private const int InitialMaxHealth = Shared.Constants.Game.Interactable.Cavalry.InitialHealth;
+    private const int InitialDamage = Shared.Constants.Game.Interactable.Cavalry.Damage;
+    private const int InitialSpeed = 3;
+    private const int InitialProductionPrice = 100;
+    private const int InitialExpReward = 60;
+    private const string InitialDescription = null;
 
-    public Cavalry(GameObject gameObject) : base(gameObject)
+    public override GameObjectType Type => GameObjectType.Cavalry;
+
+    public Cavalry() : base()
     {
+        InitializeDefaults();
+    }
+
+    public Cavalry(GameObject go) : base(go)
+    {
+        InitializeDefaults();
+    }
+
+    private void InitializeDefaults()
+    {
+        MaxHealth = InitialMaxHealth;
+        Damage = InitialDamage;
+        Speed = InitialSpeed;
+        ProductionPrice = InitialProductionPrice;
+        ExpReward = InitialExpReward;
+        Description = InitialDescription;
         Health = MaxHealth;
     }
 }

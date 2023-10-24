@@ -15,6 +15,7 @@ using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.BorderDecorators;
 using System.Threading;
 using TinyCiv.Client.Code.Structures;
+using TinyCiv.Client.Code.BorderDecoratorBuilders;
 
 namespace TinyCiv.Client.Code
 {
@@ -171,6 +172,7 @@ namespace TinyCiv.Client.Code
 
             BorderDecorator decoratedCity = new BorderHighlightDecorator(gameObject, Brushes.DarkSalmon);
             decoratedCity = new BorderBackgroundDecorator(decoratedCity, Brushes.DarkSalmon);
+
             decoratedCity.ApplyEffects();
             HUDManager.DisplayCityMenu();
             onPropertyChanged?.Invoke();

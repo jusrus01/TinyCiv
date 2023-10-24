@@ -7,17 +7,14 @@ namespace TinyCiv.Client.Code.Units;
 public abstract class Unit : GameObject
 {
     public int Health { get; set; }
-    public virtual int MaxHealth { get; }
-    public virtual int Damage { get; }
-    public virtual int Speed { get; }
-    public virtual int ProductionPrice { get; }
-    public virtual int ExpReward { get; }
-    public virtual string Description { get; }
+    public int MaxHealth { get; set; }
+    public int Damage { get; set; }
+    public int Speed { get; set; }
+    public int ProductionPrice { get; set; }
+    public int ExpReward { get; set; }
+    public string Description { get; set; }
 
-    protected Unit(Unit unit) : base(unit.Type, unit.Position, unit.OwnerId, unit.Id, unit.Color, unit.OpponentId)
-    {
-        Health = unit.Health;
-    }
+    protected Unit() : base() { }
 
     protected Unit(GameObject go) : base(go.Type, go.Position, go.OwnerId, go.Id, go.Color, go.OpponentId)
     {

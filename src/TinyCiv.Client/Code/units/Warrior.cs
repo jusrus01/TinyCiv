@@ -4,15 +4,33 @@ namespace TinyCiv.Client.Code.Units
 {
     public class Warrior : Unit
     {
-        public override int MaxHealth => Shared.Constants.Game.Interactable.Warrior.InitialHealth;
-        public override int Damage => Shared.Constants.Game.Interactable.Warrior.Damage;
-        public override int Speed => 2;
-        public override int ProductionPrice => 50;
-        public override int ExpReward => 50;
+        private const int InitialMaxHealth = Shared.Constants.Game.Interactable.Warrior.InitialHealth;
+        private const int InitialDamage = Shared.Constants.Game.Interactable.Warrior.Damage;
+        private const int InitialSpeed = 2;
+        private const int InitialProductionPrice = 50;
+        private const int InitialExpReward = 50;
+
+        public override GameObjectType Type => GameObjectType.Warrior;
+
+        public Warrior() : base()
+        {
+            InitializeDefaults();
+        }
 
         public Warrior(GameObject go) : base(go)
         {
+            InitializeDefaults();
+        }
+
+        private void InitializeDefaults()
+        {
+            MaxHealth = InitialMaxHealth;
+            Damage = InitialDamage;
+            Speed = InitialSpeed;
+            ProductionPrice = InitialProductionPrice;
+            ExpReward = InitialExpReward;
             Health = MaxHealth;
         }
     }
+
 }
