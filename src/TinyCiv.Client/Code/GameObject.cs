@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -12,42 +13,44 @@ namespace TinyCiv.Client.Code
 {
     public class GameObject : BorderObject
     {
-        public GameObjectType Type { get; private set; }
+        public virtual GameObjectType Type { get; private set; }
         public override Position Position { get; set; }
-        public Guid OwnerId { get; private set; }
-        public Guid Id { get; private set; }
-        public TeamColor Color { get; private set; }
-        public Guid? OpponentId { get; private set; }
+        public Guid OwnerId { get; set; }
+        public Guid Id { get; set; }
+        public TeamColor Color { get; set; }
+        public Guid? OpponentId { get; set; }
 
         public string ImageSource { get; set; }
         public BorderProperties Border {  get; set; }
         public Action LeftAction { get; set; }
-        public Action RightAction { get; set; }
-       
+        public Action RightAction { get; set; }       
 
-        public GameObject(GameObjectType type, Position position, Guid ownerId, Guid id, TeamColor color, Guid? opponentId)
+        public GameObject(GameObjectType type, Position position, Guid ownerId, Guid id, TeamColor color, Guid? opponentId) 
+            : this(type, position, color)
         {
-            Type = type;
-            Position = position;
-            OwnerId = ownerId;
             Id = id;
-            Color = color;
+            OwnerId = ownerId;
             OpponentId = opponentId;
-            Border = new BorderProperties();
-            Border.Opacity = 1;
         }
 
-        public GameObject(GameObjectType type, Position position, TeamColor color, double Opacity = 1)
+        public GameObject(GameObjectType type, Position position, TeamColor color, double Opacity = 1) 
+            : this(color, position, AbstractGameObjectFactory.getGameObjectImage(color, type))
         {
             Type = type;
-            Position = position;
-            Color = color;
-            ImageSource = AbstractGameObjectFactory.getGameObjectImage(Color, Type);
-            Border = new BorderProperties();
             Border.Opacity = Opacity;
         }
 
-        protected GameObject() { }
+        public GameObject(TeamColor color, Position position, string imageSource) : this()
+        {
+            Color = color;
+            Position = position;
+            ImageSource = imageSource;
+        }
+
+        protected GameObject() 
+        {
+            Border = new BorderProperties();
+        }
 
         public static GameObject fromServerGameObject(ServerGameObject serverGameObject)
         {

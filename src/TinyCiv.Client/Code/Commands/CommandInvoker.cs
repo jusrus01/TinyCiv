@@ -59,12 +59,17 @@ namespace TinyCiv.Client.Code.Commands
             if (commandQueue.Count > 0)
             {
                 var commandTask = commandQueue.Last();
-                commandQueue.RemoveLast();
                 commandTask.CancellationTokenSource.Cancel();
                 commandTask.CancellationTokenSource.Dispose();
+                commandQueue.RemoveLast();
                 return commandTask;
             }
             return null;
+        }
+
+        public int GetCommandCount()
+        {
+            return commandQueue.Count;
         }
     }
 }
