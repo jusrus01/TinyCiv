@@ -94,5 +94,11 @@ namespace TinyCiv.Client.Code.UnitBuilder
         {
             return cavalry;
         }
+
+        public IUnitBuilder SetImage(string imageSource)
+        {
+            cavalry.ImageSource = imageSource;
+            return this;
+        }
     }
 }

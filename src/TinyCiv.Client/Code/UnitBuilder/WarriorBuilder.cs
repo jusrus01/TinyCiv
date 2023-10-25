@@ -1,5 +1,6 @@
 ﻿using System;
 using TinyCiv.Client.Code.BorderDecorators;
+using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Shared.Game;
 
@@ -80,6 +81,15 @@ namespace TinyCiv.Client.Code.UnitBuilder
         public IUnitBuilder SetBorderProperties(BorderProperties borderProperties)
         {
             warrior.Border = borderProperties;
+            return this;
+        }
+
+        public IUnitBuilder SetImage(string imageSource)
+        {
+            if (imageSource == null)
+                warrior.ImageSource = AbstractGameObjectFactory.getGameObjectImage(warrior.Color, warrior.Type);
+            else warrior.ImageSource = imageSource;
+
             return this;
         }
     }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using TinyCiv.Client.Code.Units;
@@ -15,7 +14,7 @@ using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.BorderDecorators;
 using System.Threading;
 using TinyCiv.Client.Code.Structures;
-using TinyCiv.Client.Code.BorderDecoratorBuilders;
+using TinyCiv.Client.Code.UnitBuilder;
 
 namespace TinyCiv.Client.Code
 {
@@ -326,6 +325,7 @@ namespace TinyCiv.Client.Code
         private void AddDecoy(GameObjectType type, Position position)
         {
             var goIndex = position.column * Columns + position.row;
+            //var decoy = TeamFactories[CurrentPlayer.Color].CreateObjectDecoy(type, position);
             var decoy = new GameObject(type, position, CurrentPlayer.Color, 0.5);
             DecoyObjects.Add(goIndex, decoy);
             GameObjects[goIndex] = decoy;

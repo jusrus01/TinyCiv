@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TinyCiv.Client.Code.Structures;
+using TinyCiv.Client.Code.UnitBuilder;
 using TinyCiv.Client.Code.units;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Shared.Game;
@@ -84,6 +86,27 @@ namespace TinyCiv.Client.Code.Factories
                     var go = GameObject.fromServerGameObject(serverGameObject);
                     go.ImageSource = sources[GameObjectType.Empty];
                     return go;
+            }
+        }
+
+        public override GameObject CreateObjectDecoy(GameObjectType type, Position position)
+        {
+            switch (type)
+            {
+                case GameObjectType.Warrior:
+                    unitDirector.SetBuilder(new WarriorBuilder());
+                    return unitDirector.ConstructUnitDecoyFor(new GameObject(TeamColor.Green, position, sources[type]));
+                case GameObjectType.Colonist:
+                    unitDirector.SetBuilder(new ColonistBuilder());
+                    return unitDirector.ConstructUnitDecoyFor(new GameObject(TeamColor.Green, position, sources[type]));
+                case GameObjectType.Cavalry:
+                    unitDirector.SetBuilder(new CavalryBuilder());
+                    return unitDirector.ConstructUnitDecoyFor(new GameObject(TeamColor.Green, position, sources[type]));
+                case GameObjectType.Tarran:
+                    unitDirector.SetBuilder(new TarranBuilder());
+                    return unitDirector.ConstructUnitDecoyFor(new GameObject(TeamColor.Green, position, sources[type]));
+                default:
+                    return new GameObject(type, position, CurrentPlayer.Color, 0.5);
             }
         }
     }

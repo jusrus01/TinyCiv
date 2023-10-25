@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TinyCiv.Client.Code.BorderDecorators;
 using TinyCiv.Client.Code.units;
 using TinyCiv.Client.Code.Units;
@@ -130,6 +126,12 @@ namespace TinyCiv.Client.Code.UnitBuilder
         public Unit Build()
         {
             return colonist;
+        }
+
+        public IUnitBuilder SetImage(string imageSource)
+        {
+            colonist.ImageSource = imageSource;
+            return this;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -10,7 +11,7 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code
 {
-    public abstract class GameObject : BorderObject
+    public class GameObject : BorderObject
     {
         public virtual GameObjectType Type { get; private set; }
         public override Position Position { get; set; }
@@ -24,24 +25,26 @@ namespace TinyCiv.Client.Code
         public Action LeftAction { get; set; }
         public Action RightAction { get; set; }       
 
-        protected GameObject(GameObjectType type, Position position, Guid ownerId, Guid id, TeamColor color, Guid? opponentId) : this()
+        public GameObject(GameObjectType type, Position position, Guid ownerId, Guid id, TeamColor color, Guid? opponentId) 
+            : this(type, position, color)
         {
-            Type = type;
-            Position = position;
-            OwnerId = ownerId;
             Id = id;
-            Color = color;
+            OwnerId = ownerId;
             OpponentId = opponentId;
-            Border.Opacity = 1;
         }
 
-        protected GameObject(GameObjectType type, Position position, TeamColor color, double Opacity = 1) : this()
+        public GameObject(GameObjectType type, Position position, TeamColor color, double Opacity = 1) 
+            : this(color, position, AbstractGameObjectFactory.getGameObjectImage(color, type))
         {
             Type = type;
-            Position = position;
-            Color = color;
-            ImageSource = AbstractGameObjectFactory.getGameObjectImage(Color, Type);
             Border.Opacity = Opacity;
+        }
+
+        public GameObject(TeamColor color, Position position, string imageSource) : this()
+        {
+            Color = color;
+            Position = position;
+            ImageSource = imageSource;
         }
 
         protected GameObject() 

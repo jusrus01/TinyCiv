@@ -91,5 +91,11 @@ namespace TinyCiv.Client.Code.UnitBuilder
         {
             return tarran;
         }
+
+        public IUnitBuilder SetImage(string imageSource)
+        {
+            tarran.ImageSource = imageSource;
+            return this;
+        }
     }
 }
