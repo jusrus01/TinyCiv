@@ -66,5 +66,10 @@ namespace TinyCiv.Client.Code.Commands
             }
             return null;
         }
+
+        public int GetCommandCount()
+        {
+            return commandQueue.Count;
+        }
     }
 }

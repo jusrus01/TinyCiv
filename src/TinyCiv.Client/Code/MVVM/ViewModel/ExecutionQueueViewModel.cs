@@ -53,6 +53,11 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
                         }
                     }
                 }
+                
+                if (ObjectsInQueue.Count > CommandInvoker.GetCommandCount()) 
+                {
+                    ObjectsInQueue.RemoveAt(0);
+                }
 
                 CommandManager.InvalidateRequerySuggested();
             };
