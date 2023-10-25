@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TinyCiv.Client.Code.BorderDecorators;
+using TinyCiv.Client.Code.Factories;
+using TinyCiv.Client.Code.units;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Shared.Game;
 
@@ -97,7 +99,10 @@ namespace TinyCiv.Client.Code.UnitBuilder
 
         public IUnitBuilder SetImage(string imageSource)
         {
-            cavalry.ImageSource = imageSource;
+            if (imageSource == null)
+                cavalry.ImageSource = AbstractGameObjectFactory.getGameObjectImage(cavalry.Color, cavalry.Type);
+            else cavalry.ImageSource = imageSource;
+
             return this;
         }
     }

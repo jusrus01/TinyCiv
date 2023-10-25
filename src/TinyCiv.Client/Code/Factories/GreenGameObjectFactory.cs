@@ -35,21 +35,34 @@ namespace TinyCiv.Client.Code.Factories
             switch (serverGameObject.Type)
             {
                 case GameObjectType.Warrior:
-                    var warrior = new Warrior(GameObject.fromServerGameObject(serverGameObject));
-                    warrior.ImageSource = sources[serverGameObject.Type];
-                    return warrior;
+                    unitDirector.SetBuilder(new WarriorBuilder());
+                    return unitDirector.ConstructUnit(serverGameObject);
+
+                    //var warrior = new Warrior(GameObject.fromServerGameObject(serverGameObject));
+                    //warrior.ImageSource = sources[serverGameObject.Type];
+                    //return warrior;
                 case GameObjectType.Colonist:
-                    var colonist = new Colonist(GameObject.fromServerGameObject(serverGameObject));
-                    colonist.ImageSource = sources[serverGameObject.Type];
-                    return colonist;
+                    unitDirector.SetBuilder(new ColonistBuilder());
+                    return unitDirector.ConstructUnit(serverGameObject);
+
+                    //var colonist = new Colonist(GameObject.fromServerGameObject(serverGameObject));
+                    //colonist.ImageSource = sources[serverGameObject.Type];
+                    //return colonist;
                 case GameObjectType.Cavalry:
-                    var cavalry = new Cavalry(GameObject.fromServerGameObject(serverGameObject));
-                    cavalry.ImageSource = sources[serverGameObject.Type];
-                    return cavalry;
+                    unitDirector.SetBuilder(new CavalryBuilder());
+                    
+                    return unitDirector.ConstructUnit(serverGameObject);
+
+                    //var cavalry = new Cavalry(GameObject.fromServerGameObject(serverGameObject));
+                    //cavalry.ImageSource = sources[serverGameObject.Type];
+                    //return cavalry;
                 case GameObjectType.Tarran:
-                    var tarran = new Tarran(GameObject.fromServerGameObject(serverGameObject));
-                    tarran.ImageSource = sources[serverGameObject.Type];
-                    return tarran;
+                    unitDirector.SetBuilder(new TarranBuilder());
+                    return unitDirector.ConstructUnit(serverGameObject);
+
+                    //var tarran = new Tarran(GameObject.fromServerGameObject(serverGameObject));
+                    //tarran.ImageSource = sources[serverGameObject.Type];
+                    //return tarran;
                 case GameObjectType.City:
                     var city = new City(GameObject.fromServerGameObject(serverGameObject));
                     city.ImageSource = sources[serverGameObject.Type];

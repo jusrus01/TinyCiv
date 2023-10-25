@@ -325,8 +325,8 @@ namespace TinyCiv.Client.Code
         private void AddDecoy(GameObjectType type, Position position)
         {
             var goIndex = position.column * Columns + position.row;
-            //var decoy = TeamFactories[CurrentPlayer.Color].CreateObjectDecoy(type, position);
-            var decoy = new GameObject(type, position, CurrentPlayer.Color, 0.5);
+            var decoy = TeamFactories[CurrentPlayer.Color].CreateObjectDecoy(type, position);
+            //var decoy = new GameObject(type, position, CurrentPlayer.Color, 0.5);
             DecoyObjects.Add(goIndex, decoy);
             GameObjects[goIndex] = decoy;
         }

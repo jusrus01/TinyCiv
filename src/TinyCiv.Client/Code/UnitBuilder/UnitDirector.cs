@@ -37,6 +37,7 @@ namespace TinyCiv.Client.Code.UnitBuilder
                 .SetPosition(rawObject.Position)
                 .SetColor(rawObject.Color)
                 .SetImage(rawObject.ImageSource)
+                .SetMaxHealth(-1) // hides the healthbar
                 .SetBorderProperties(new BorderPropertiesBuilder()
                     .SetBackgroundBrush(Brushes.Transparent)
                     .SetBorderThickness(new Thickness(0))

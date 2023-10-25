@@ -1,8 +1,10 @@
 ﻿using System;
 using TinyCiv.Client.Code.BorderDecorators;
+using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.units;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Shared.Game;
+using static TinyCiv.Shared.Constants.Game.Interactable;
 
 namespace TinyCiv.Client.Code.UnitBuilder
 {
@@ -130,7 +132,10 @@ namespace TinyCiv.Client.Code.UnitBuilder
 
         public IUnitBuilder SetImage(string imageSource)
         {
-            colonist.ImageSource = imageSource;
+            if (imageSource == null)
+                colonist.ImageSource = AbstractGameObjectFactory.getGameObjectImage(colonist.Color, colonist.Type);
+            else colonist.ImageSource = imageSource;
+
             return this;
         }
     }

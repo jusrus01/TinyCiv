@@ -1,5 +1,6 @@
 ﻿using System;
 using TinyCiv.Client.Code.BorderDecorators;
+using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.units;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Shared.Game;
@@ -94,7 +95,10 @@ namespace TinyCiv.Client.Code.UnitBuilder
 
         public IUnitBuilder SetImage(string imageSource)
         {
-            tarran.ImageSource = imageSource;
+            if (imageSource == null)
+                tarran.ImageSource = AbstractGameObjectFactory.getGameObjectImage(tarran.Color, tarran.Type);
+            else tarran.ImageSource = imageSource;
+
             return this;
         }
     }
