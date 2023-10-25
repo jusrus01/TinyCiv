@@ -9,14 +9,14 @@ public class BuildingModel : IBuyable
     public string ImagePath { get; }
     public string Name { get; }
     public string Production { get; }
-    public int Cost { get; }
+    public int IndustryCost { get; }
     public TeamColor Color { get; }
     public GameObjectType Type { get; }
 
     public BuildingModel(string production, int cost, TeamColor color, GameObjectType type)
     {
         Production = production;
-        Cost = cost;
+        IndustryCost = cost;
         Color = color;
         Type = type;
         Name = type.ToString();
@@ -25,6 +25,6 @@ public class BuildingModel : IBuyable
 
     public bool IsBuyable()
     {
-        return CurrentPlayer.Instance.Resources.Industry >= Cost;
+        return CurrentPlayer.Instance.Resources.Industry >= IndustryCost;
     }
 }

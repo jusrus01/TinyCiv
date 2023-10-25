@@ -11,25 +11,27 @@ namespace TinyCiv.Client.Code.Commands
     public class CreateBuildingCommand : IGameCommand
     {
         private readonly Guid playerId;
-        private readonly BuildingModel buildingModel;
         private readonly ServerPosition serverPosition;
+        private readonly GameObjectType buildingType;
+        private readonly int industryCost;
 
         public CreateBuildingCommand(Guid playerId, BuildingModel buildingModel, ServerPosition serverPosition)
         {
             this.playerId = playerId;
-            this.buildingModel = buildingModel;
             this.serverPosition = serverPosition;
+            buildingType = buildingModel.Type;
+            industryCost = buildingModel.IndustryCost;
         }
 
         public async void Execute()
         {
-            BuildingType parsedType = (BuildingType)Enum.Parse(typeof(BuildingType), buildingModel.Type.ToString());
+            BuildingType parsedType = (BuildingType)Enum.Parse(typeof(BuildingType), buildingType.ToString());
             await ClientSingleton.Instance.serverClient.SendAsync(new CreateBuildingClientEvent(playerId, parsedType, serverPosition));
         }
 
         public bool CanExecute()
         {
-            return CurrentPlayer.Instance.Resources.Industry >= buildingModel.Cost;
+            return CurrentPlayer.Instance.Resources.Industry >= industryCost;
         }
     }
 }
