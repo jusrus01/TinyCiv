@@ -15,4 +15,6 @@ public interface IServerClient
     void ListenForResourcesUpdate(Action<ResourcesUpdateServerEvent> callback);
     void ListenForLobbyState(Action<LobbyStateServerEvent> callback);
     void ListenForInteractableObjectChanges(Action<InteractableObjectServerEvent> callback);
+    void ListenForVictoryEvent(Action<VictoryServerEvent> callback);
+    void ListenForDefeatEvent(Action<DefeatServerEvent> callback);
 }

@@ -1,4 +1,5 @@
 using Serilog;
+using TinyCiv.Server.BackgroundJobs;
 using TinyCiv.Server.Core.Handlers;
 using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
@@ -51,6 +52,8 @@ builder.Services.AddTransient<IClientHandler, GameStartHandler>();
 builder.Services.AddTransient<IClientHandler, UnitAttackHandler>();
 builder.Services.AddTransient<IClientHandler, CreateBuildingHandler>();
 builder.Services.AddTransient<IClientHandler, PlaceTownHandler>();
+
+builder.Services.AddHostedService<GameBoardAnalyzerBackgroundJob>();
 
 builder.Services
     .AddSignalR()

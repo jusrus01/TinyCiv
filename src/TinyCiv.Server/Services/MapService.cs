@@ -429,6 +429,14 @@ namespace TinyCiv.Server.Services
             }
         }
 
+        public IList<ServerGameObject> GetMapObjects()
+        {
+            lock (_mapChangeLocker)
+            {
+                return _map?.Objects?.Select(i => i)?.ToList() ?? new List<ServerGameObject>();
+            }
+        }
+
         public Map? Initialize(MapType mapType)
         {
             lock (_mapChangeLocker)

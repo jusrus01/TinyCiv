@@ -91,6 +91,16 @@ public class ServerClient : IServerClient, IAsyncDisposable
         Listen(Constants.Server.SendInteractableObjectChangesToAll, callback);
     }
 
+    public void ListenForVictoryEvent(Action<VictoryServerEvent> callback)
+    {
+        Listen(Constants.Server.SendVictoryEventToAll, callback);
+    }
+
+    public void ListenForDefeatEvent(Action<DefeatServerEvent> callback)
+    {
+        Listen(Constants.Server.SendDefeatEventToAll, callback);
+    }
+
     private void Listen<T>(string methodName, Action<T> callback) where T : ServerEvent
     {
         _connection.On<string, string>(
@@ -148,6 +158,16 @@ public class ServerClient : IServerClient, IAsyncDisposable
         if (type == nameof(InteractableObjectServerEvent))
         {
             return JsonSerializer.Deserialize<InteractableObjectServerEvent>(content)!;
+        }
+
+        if (type == nameof(VictoryServerEvent))
+        {
+            return JsonSerializer.Deserialize<VictoryServerEvent>(content)!;
+        }
+        
+        if (type == nameof(DefeatServerEvent))
+        {
+            return JsonSerializer.Deserialize<DefeatServerEvent>(content)!;
         }
 
         throw new NotSupportedException();

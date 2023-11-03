@@ -84,6 +84,8 @@ public static class Constants
         public const string SendLobbyStateToAll = nameof(SendLobbyStateToAll);
         public const string SendGameStartToAll = nameof(SendGameStartToAll);
         public const string SendMapChangeToAll = nameof(SendMapChangeToAll);
+        public const string SendVictoryEventToAll = nameof(SendVictoryEventToAll);
+        public const string SendDefeatEventToAll = nameof(SendDefeatEventToAll);
     }
 
     public static class Assets

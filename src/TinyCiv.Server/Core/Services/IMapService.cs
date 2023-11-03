@@ -22,4 +22,5 @@ public interface IMapService
 
     Map? Initialize(MapType mapType);
     Map? GetMap();
+    IList<ServerGameObject> GetMapObjects();
 }
