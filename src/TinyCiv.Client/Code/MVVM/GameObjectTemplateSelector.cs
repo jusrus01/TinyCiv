@@ -18,7 +18,7 @@ namespace TinyCiv.Client.Code.MVVM
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if (item is Unit)
+            if (item is Unit unit && unit.MaxHealth >= 0)
                 return UnitTemplate;
 
             if (item is City)

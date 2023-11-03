@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace TinyCiv.Client.Code.MVVM.View
 {
     /// <summary>
-    /// Interaction logic for CityMenuView.xaml
+    /// Interaction logic for ExecutionQueueView.xaml
     /// </summary>
-    public partial class CityMenuView : UserControl
+    public partial class ExecutionQueueView : UserControl
     {
-        public CityMenuView()
+        public ExecutionQueueView()
         {
             InitializeComponent();
         }

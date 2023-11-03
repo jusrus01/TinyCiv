@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using TinyCiv.Client.Code.Commands;
+using TinyCiv.Client.Code.MVVM.Model;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Game;
 
@@ -63,11 +65,32 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 
         public async void ExecuteUnitPurchase(Position position)
         {
-            await ClientSingleton.Instance.serverClient.SendAsync(new CreateUnitClientEvent(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value.Type));
-            SelectedBuyUnit.Value = null;
+            var executionVM = HUDManager.executionVM;
+            IGameCommand createUnitCommand = new CreateUnitCommand(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value);
+            executionVM.AddToQueue(new ClockModel(SelectedBuyUnit.Value, SelectedBuyUnit.Value.ImagePath, TimeSpan.FromMilliseconds(5000))); // exists ~500ms delay
+
             Mouse.OverrideCursor = Cursors.Arrow;
             IsUnderPurchase.Value = false;
+            SelectedBuyUnit.Value = null;
             HUDManager.HideLowerMenu();
+
+            await executionVM.CommandInvoker.AddCommandToQueue(createUnitCommand, 5000, position);
+        }
+
+        public async void ExecuteBuildingPurchase(Position position)
+        {
+            var executionVM = HUDManager.executionVM;
+            ServerPosition serverPos = new ServerPosition { X = position.row, Y = position.column };
+
+            IGameCommand createBuildingCommand = new CreateBuildingCommand(CurrentPlayer.Id, SelectedBuyBuilding.Value, serverPos);
+            executionVM.AddToQueue(new ClockModel(SelectedBuyBuilding.Value, SelectedBuyBuilding.Value.ImagePath, TimeSpan.FromMilliseconds(5000)));
+
+            SelectedBuyBuilding.Value = null;
+            IsUnderPurchase.Value = false;
+            Mouse.OverrideCursor = Cursors.Arrow;
+            HUDManager.HideLowerMenu();
+
+            await executionVM.CommandInvoker.AddCommandToQueue(createBuildingCommand, 5000, position);
         }
 
         private bool CanBuy(object parameter)
@@ -92,18 +115,6 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             }
         }
 
-        // NO COMMAND HANDLER ON THE BUILD BUTTON
-        public async void ExecuteBuildingPurchase(Position position)
-        {
-            ServerPosition serverPos = new ServerPosition { X = position.row, Y = position.column };
-            BuildingType parsedType = (BuildingType)Enum.Parse(typeof(BuildingType), SelectedBuyBuilding.Value.Type.ToString());
-            await ClientSingleton.Instance.serverClient.SendAsync(new CreateBuildingClientEvent(CurrentPlayer.Id, parsedType, serverPos));
-            SelectedBuyBuilding.Value = null;
-            Mouse.OverrideCursor = Cursors.Arrow;
-            IsUnderPurchase.Value = false;
-            HUDManager.HideLowerMenu();
-        }
-
         public List<UnitModel> UnitList
         {
             get
@@ -125,12 +136,12 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             {
                 return new List<BuildingModel>()
                 {
-                    new BuildingModel("+2 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Farm),
-                    new BuildingModel("+2 production", "50 prod.", CurrentPlayer.Color, GameObjectType.Mine),
-                    new BuildingModel("+5 production, -1 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Blacksmith),
-                    new BuildingModel("+2 gold", "50 prod.", CurrentPlayer.Color, GameObjectType.Shop),
-                    new BuildingModel("+5 gold", "100 prod.", CurrentPlayer.Color, GameObjectType.Bank),
-                    new BuildingModel("+2 production, +1 food", "50 prod.", CurrentPlayer.Color, GameObjectType.Port),
+                    new BuildingModel("+2 food", 50, CurrentPlayer.Color, GameObjectType.Farm),
+                    new BuildingModel("+2 production", 50, CurrentPlayer.Color, GameObjectType.Mine),
+                    new BuildingModel("+5 production, -1 gold", 100, CurrentPlayer.Color, GameObjectType.Blacksmith),
+                    new BuildingModel("+2 gold", 50, CurrentPlayer.Color, GameObjectType.Shop),
+                    new BuildingModel("+5 gold", 100, CurrentPlayer.Color, GameObjectType.Bank),
+                    new BuildingModel("+2 production, +1 food", 100, CurrentPlayer.Color, GameObjectType.Port),
                 };
             }
         }

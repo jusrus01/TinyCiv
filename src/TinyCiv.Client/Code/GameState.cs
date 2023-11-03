@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using TinyCiv.Client.Code.Units;
@@ -15,6 +14,7 @@ using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.BorderDecorators;
 using System.Threading;
 using TinyCiv.Client.Code.Structures;
+using TinyCiv.Client.Code.UnitBuilder;
 
 namespace TinyCiv.Client.Code
 {
@@ -27,9 +27,11 @@ namespace TinyCiv.Client.Code
 
         public List<string> mapImages = new List<string>();
         public List<GameObject> GameObjects = new List<GameObject>();
+        public Dictionary<int, GameObject> DecoyObjects = new();
+        public UnitMenuViewModel UnitMenuVM;
+        public UpperMenuViewModel UpperMenuVM;
         private int Rows;
         private int Columns;
-
         public bool isGameObjectSelected = false;
         private GameObject selectedGameObject;
 
@@ -46,6 +48,8 @@ namespace TinyCiv.Client.Code
             HealthValues = new Dictionary<Guid, int>();
             Rows = rows;
             Columns = columns;
+
+            GameObjects = new List<GameObject>(Rows*Columns);
             Thread AddListenersThread = new Thread(() =>
             {
                 ClientSingleton.Instance.WaitForInitialization();
@@ -69,13 +73,13 @@ namespace TinyCiv.Client.Code
                 var unitUnderPurchase = CityMenuVM.SelectedBuyUnit.Value;
                 if (unitUnderPurchase != null)
                 {
-                    CityMenuVM.ExecuteUnitPurchase(clickedPosition);
+                    InvokeUnitSpawnProcess(clickedPosition);
                 }
                 else if (buildingUnderPurchase != null
                     && buildingUnderPurchase.Type != GameObjectType.Port
                     && buildingUnderPurchase.Type != GameObjectType.Mine)
                 {
-                    CityMenuVM.ExecuteBuildingPurchase(clickedPosition);
+                    InvokeBuildingProcess(clickedPosition);
                 }
             }
         }
@@ -87,7 +91,7 @@ namespace TinyCiv.Client.Code
             var buildingUnderPurchase = CityMenuVM.SelectedBuyBuilding.Value;
             if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Port)
             {
-                CityMenuVM.ExecuteBuildingPurchase(clickedPosition);
+                InvokeBuildingProcess(clickedPosition);
             }
         }
 
@@ -98,8 +102,24 @@ namespace TinyCiv.Client.Code
             var buildingUnderPurchase = CityMenuVM.SelectedBuyBuilding.Value;
             if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Mine)
             {
-                CityMenuVM.ExecuteBuildingPurchase(clickedPosition);
+                InvokeBuildingProcess(clickedPosition);
             }
+        }
+
+        private void InvokeBuildingProcess(Position position)
+        {
+            var buildingUnderPurchase = HUDManager.cityVM.SelectedBuyBuilding.Value;
+            AddDecoy(buildingUnderPurchase.Type, position);
+            HUDManager.cityVM.ExecuteBuildingPurchase(position);
+            onPropertyChanged?.Invoke();
+        }
+
+        private void InvokeUnitSpawnProcess(Position position)
+        {
+            var unitUnderPurchase = HUDManager.cityVM.SelectedBuyUnit.Value;
+            AddDecoy(unitUnderPurchase.Type, position);
+            HUDManager.cityVM.ExecuteUnitPurchase(position);
+            onPropertyChanged?.Invoke();
         }
 
         private async void Unit_Click(GameObject selectedGameObject)
@@ -151,6 +171,7 @@ namespace TinyCiv.Client.Code
 
             BorderDecorator decoratedCity = new BorderHighlightDecorator(gameObject, Brushes.DarkSalmon);
             decoratedCity = new BorderBackgroundDecorator(decoratedCity, Brushes.DarkSalmon);
+
             decoratedCity.ApplyEffects();
             HUDManager.DisplayCityMenu();
             onPropertyChanged?.Invoke();
@@ -159,7 +180,7 @@ namespace TinyCiv.Client.Code
         private async Task MoveUnit(Position clickedPosition)
         {
             var unit = selectedGameObject as Unit;
-            await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(unit.Id, clickedPosition.row, clickedPosition.column));
+            await unit.MoveTo(clickedPosition);
             UnselectUnit(unit);
         }
 
@@ -249,10 +270,14 @@ namespace TinyCiv.Client.Code
                 }
             }
 
-            foreach(var gameObject in ResponseGameObjects)
+            foreach (var gameObject in ResponseGameObjects)
             {
                 AddClickEvent(gameObject);
                 var gameObjectIndex = gameObject.Position.column * Columns + gameObject.Position.row;
+                if (gameObject.Type != GameObjectType.StaticMountain && gameObject.Type != GameObjectType.StaticWater)
+                {
+                    RemoveDecoyAt(gameObjectIndex);
+                }
                 GameObjects[gameObjectIndex] = gameObject;
 
                 if (gameObject.OpponentId != null)
@@ -274,11 +299,44 @@ namespace TinyCiv.Client.Code
                     ((Unit)gameObject).Health = HealthValues[gameObject.Id];
                 }
             }
-            //AddClickEvents();
+
+            ShowDecoys();
+
             onPropertyChanged?.Invoke();
         }
 
-        private void AddClickEvent(GameObject gameObject)
+        private void ShowDecoys()
+        {
+            foreach (var go in DecoyObjects.Values)
+            {
+                var goIndex = go.Position.column * Columns + go.Position.row;
+                GameObjects[goIndex] = go;
+            }
+        }
+
+        private void RemoveDecoyAt(int index)
+        {
+            if (DecoyObjects.ContainsKey(index))
+            {
+                DecoyObjects.Remove(index);
+            }
+        }
+
+        private void AddDecoy(GameObjectType type, Position position)
+        {
+            var goIndex = position.column * Columns + position.row;
+            var decoy = TeamFactories[CurrentPlayer.Color].CreateObjectDecoy(type, position);
+            //var decoy = new GameObject(type, position, CurrentPlayer.Color, 0.5);
+            DecoyObjects.Add(goIndex, decoy);
+            GameObjects[goIndex] = decoy;
+        }
+
+        public int PositionToIndex(Position position)
+        {
+            return position.column * Columns + position.row;
+        }
+
+        public void AddClickEvent(GameObject gameObject)
         {
             if (gameObject.Type == GameObjectType.Empty)
             {

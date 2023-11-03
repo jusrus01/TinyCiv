@@ -8,15 +8,33 @@ namespace TinyCiv.Client.Code.units
 {
     public class Colonist : Unit
     {
-        public override int MaxHealth => 0;
-        public override int Damage => 0;
-        public override int Speed => 2;
-        public override int ProductionPrice => 100;
-        public override int ExpReward => 10;
-        public override string Description => "Can create a new city";
+        private const int InitialMaxHealth = 0;
+        private const int InitialDamage = 0;
+        private const int InitialSpeed = 2;
+        private const int InitialProductionPrice = 100;
+        private const int InitialExpReward = 10;
+        private const string InitialDescription = "Can create a new city";
+
+        public override GameObjectType Type => GameObjectType.Colonist;
+
+        public Colonist() : base()
+        {
+            InitializeDefaults();
+        }
 
         public Colonist(GameObject go) : base(go)
         {
+            InitializeDefaults();
+        }
+
+        private void InitializeDefaults()
+        {
+            MaxHealth = InitialMaxHealth;
+            Damage = InitialDamage;
+            Speed = InitialSpeed;
+            ProductionPrice = InitialProductionPrice;
+            ExpReward = InitialExpReward;
+            Description = InitialDescription;
             Health = MaxHealth;
         }
 

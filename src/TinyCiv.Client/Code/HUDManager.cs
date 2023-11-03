@@ -13,6 +13,7 @@ namespace TinyCiv.Client.Code
     {
         public static MainViewModel mainVM;
         public static CityMenuViewModel cityVM { get; private set; }
+        public static ExecutionQueueViewModel executionVM { get; private set; }
 
         public static void DisplayUnit(Unit unit)
         {
@@ -54,6 +55,14 @@ namespace TinyCiv.Client.Code
 
             mainVM.LowerMenu.Value = null;
             mainVM.GameVM.gameState.isGameObjectSelected = false;
+        }
+
+        public static void DisplayExecutionQueue()
+        {
+            if (mainVM == null) return;
+
+            executionVM = new ExecutionQueueViewModel();
+            mainVM.ExecutionMenu.Value = executionVM;
         }
     }
 }
