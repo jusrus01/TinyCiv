@@ -98,7 +98,6 @@ public class InteractableObjectService : IInteractableObjectService
         Func<IInteractableObject, Task> attackStateNotifier,
         Func<ServerGameObject, Task> newUnitNotifier)
     {
-        ArgumentNullException.ThrowIfNull(clones);
         // interactables should have unchanged reference to existing game objects.
         // otherwise, the clone should not be created as it is - dead already
 
