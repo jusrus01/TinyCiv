@@ -12,7 +12,7 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.Factories
 {
-    internal class GreenGameObjectFactory : AbstractGameObjectFactory
+    public class GreenGameObjectFactory : AbstractGameObjectFactory
     {
         public static Dictionary<GameObjectType, string> sources = new Dictionary<GameObjectType, string> 
         {
@@ -91,10 +91,6 @@ namespace TinyCiv.Client.Code.Factories
                     var port = GameObject.fromServerGameObject(serverGameObject);
                     port.ImageSource = sources[serverGameObject.Type];
                     return port;
-                case GameObjectType.Empty:
-                    var empty = GameObject.fromServerGameObject(serverGameObject);
-                    empty.ImageSource = sources[serverGameObject.Type];
-                    return empty;
                 default:
                     var go = GameObject.fromServerGameObject(serverGameObject);
                     go.ImageSource = sources[GameObjectType.Empty];
@@ -119,7 +115,7 @@ namespace TinyCiv.Client.Code.Factories
                     unitDirector.SetBuilder(new TarranBuilder());
                     return unitDirector.ConstructUnitDecoyFor(new GameObject(TeamColor.Green, position, sources[type]));
                 default:
-                    return new GameObject(type, position, CurrentPlayer.Color, 0.5);
+                    return new GameObject(type, position, TeamColor.Green, 0.5);
             }
         }
     }
