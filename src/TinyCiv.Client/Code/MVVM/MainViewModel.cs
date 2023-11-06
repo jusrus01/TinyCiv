@@ -39,6 +39,8 @@ namespace TinyCiv.Client.Code.MVVM
                     ClientSingleton.Instance.WaitForInitialization();
                     ClientSingleton.Instance.serverClient.ListenForNewPlayerCreation(OnPlayerJoin);
                     ClientSingleton.Instance.serverClient.ListenForGameStart(OnGameStart);
+                    ClientSingleton.Instance.serverClient.ListenForVictoryEvent(OnVictory);
+                    ClientSingleton.Instance.serverClient.ListenForDefeatEvent(OnDefeat);
                     ClientSingleton.Instance.serverClient.SendAsync(new JoinLobbyClientEvent()).Wait();
                 });
                 playerConnectionThread.Start();
@@ -65,6 +67,18 @@ namespace TinyCiv.Client.Code.MVVM
         {
             GameVM.GameStart(response);
             HUDManager.HideLowerMenu();       
+        }
+
+        private void OnVictory(VictoryServerEvent response)
+        {
+            if (response.PlayerId == CurrentPlayer.Id)
+                HUDManager.FinishGameVictory();
+        }
+
+        private void OnDefeat(DefeatServerEvent response)
+        {
+            if (response.PlayerId == CurrentPlayer.Id)
+                HUDManager.FinishGameDefeat();
         }
     }
 }

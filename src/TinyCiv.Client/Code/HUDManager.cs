@@ -64,5 +64,19 @@ namespace TinyCiv.Client.Code
             executionVM = new ExecutionQueueViewModel();
             mainVM.ExecutionMenu.Value = executionVM;
         }
+
+        public static void FinishGameVictory()
+        {
+            if (mainVM == null) return;
+
+            mainVM.Game.Value = new GameOverViewModel("VICTORY");
+        }
+
+        public static void FinishGameDefeat()
+        {
+            if (mainVM == null) return;
+
+            mainVM.Game.Value = new GameOverViewModel("DEFEAT");
+        }
     }
 }

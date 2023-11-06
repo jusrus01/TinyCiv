@@ -33,6 +33,10 @@
                 <view:ExecutionQueueView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type viewModel:GameOverViewModel}">
+                <view:GameOverView/>
+            </DataTemplate>
+            
             <mvvm:GameObjectTemplateSelector x:Key="GameObjectTemplateSelector"/>
         </ResourceDictionary>
     </Application.Resources>
