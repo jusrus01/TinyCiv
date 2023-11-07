@@ -6,6 +6,7 @@ using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Dtos.Buildings;
 using TinyCiv.Server.Core.Game.Buildings;
 using Microsoft.Extensions.Logging.Abstractions;
+using TinyCiv.Server.Core.Game.InteractableObjects;
 
 namespace TinyCiv.Server.Tests.Services;
 
@@ -33,12 +34,13 @@ public class TestResourceService
             NullLogger<GameService>.Instance);
 
         _playerId = Guid.NewGuid();
-        _sut.InitializeResources(_playerId);
     }
 
     [Fact]
     public void InitializeResources_Then_Returns()
     {
+        _sut.InitializeResources(_playerId);
+
         var resources = _sut.GetResources(_playerId);
 
         Assert.Equal(Constants.Game.StartingFood, resources.Food);
@@ -64,6 +66,8 @@ public class TestResourceService
     [Theory, MemberData(nameof(AddResources_TestData))]
     public void AddResources_Then_Returns(List<(ResourceType, int)> resourcesToAdd)
     {
+        _sut.InitializeResources(_playerId);
+
         resourcesToAdd.ForEach(p => _sut.AddResources(_playerId, p.Item1, p.Item2));
 
         int totalGoldToAdd = resourcesToAdd.Where(r => r.Item1 == ResourceType.Gold).Sum(r => r.Item2);
@@ -87,8 +91,10 @@ public class TestResourceService
     }
 
     [Theory, MemberData(nameof(AddBuilding_TestData))]
-    public void AddBuilding_Then_GeneratesResources(BuildingType buildingType, int price)
+    public void AddBuilding_RemovesResources(BuildingType buildingType, int price)
     {
+        _sut.InitializeResources(_playerId);
+
         _mapServiceMock
             .Setup(m => m.IsTownOwner(It.IsAny<Guid>()))
             .Returns(true);
@@ -106,5 +112,41 @@ public class TestResourceService
         }
 
         Assert.Equal(Constants.Game.StartingIndustry - price, createBuildingResponse.Resources.Industry);
+    }
+
+    [Fact]
+    public void BuyInteractable_ResourcesNotInitialized_ReturnsNull()
+    {
+        var response = _sut.BuyInteractable(_playerId, new InteractableWarrior());
+
+        Assert.Null(response);
+    }
+
+    [Fact]
+    public void CancelInteractablePayment_ResourcesNotInitialized_DoesntThrowException()
+    {
+        try
+        {
+            _sut.CancelInteractablePayment(_playerId, new InteractableWarrior());
+        }
+        catch (Exception)
+        {
+            Assert.Fail("CancelInteractablePayment failed - Resources are not initialized");
+        }
+    }
+
+    [Fact]
+    public void CancelInteractablePayment_IntercatableIsNull_DoesntThrowException()
+    {
+        _sut.InitializeResources(_playerId);
+
+        try
+        {
+            _sut.CancelInteractablePayment(_playerId, null);
+        }
+        catch (Exception)
+        {
+            Assert.Fail("CancelInteractablePayment failed - Interactable is null");
+        }
     }
 }
