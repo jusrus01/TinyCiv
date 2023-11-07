@@ -7,9 +7,9 @@ using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Services;
 
-class AStar
+public class AStar
 {
-    public class IntComparer : IComparer<int>
+    private class IntComparer : IComparer<int>
     {
         public int Compare(int x, int y)
         {
@@ -75,7 +75,7 @@ class AStar
         return path;
     }
 
-    private static int HeuristicCostEstimate(ServerPosition start, ServerPosition end)
+    public static int HeuristicCostEstimate(ServerPosition start, ServerPosition end)
     {
         return Math.Abs(start.X - end.X) + Math.Abs(start.Y - end.Y); // Manhattan distance
     }

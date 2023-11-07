@@ -35,7 +35,7 @@ namespace TinyCiv.Client.Code
         public bool isGameObjectSelected = false;
         private GameObject selectedGameObject;
 
-        private Dictionary<TeamColor, AbstractGameObjectFactory> TeamFactories = new Dictionary<TeamColor, AbstractGameObjectFactory>
+        private Dictionary<TeamColor, AbstractGameObjectFactory> TeamFactories = new()
         {
             {TeamColor.Red,    new RedGameObjectFactory() },
             {TeamColor.Green,  new GreenGameObjectFactory() },
