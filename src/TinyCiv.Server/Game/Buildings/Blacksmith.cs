@@ -5,13 +5,8 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings
 {
-    public class Blacksmith : IBuilding
+    public class Blacksmith : ConstantSpeedBuilding
     {
-        public int Price { get; }
-        public BuildingType BuildingType { get; }
-        public GameObjectType TileType { get; }
-        public int IntervalMs { get; set; }
-
         public Blacksmith()
         {
             Price = Constants.Game.BlacksmithPrice;
@@ -20,7 +15,7 @@ namespace TinyCiv.Server.Game.Buildings
             IntervalMs = Constants.Game.BlacksmithInterval;
         }
 
-        public void Trigger(Guid playerId, IResourceService resourceService)
+        protected override void UpdateResources(Guid playerId, IResourceService resourceService)
         {
             var playerResources = resourceService.GetResources(playerId);
             if (playerResources.Gold < 1)

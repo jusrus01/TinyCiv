@@ -10,5 +10,5 @@ public interface IBuilding
     GameObjectType TileType { get; }
     int IntervalMs { get; set; }
 
-    void Trigger(Guid playerId, IResourceService resourceService);
+    Task Trigger(Guid playerId, IResourceService resourceService);
 }
