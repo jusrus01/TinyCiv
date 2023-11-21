@@ -37,8 +37,7 @@ public class ResourceService : IResourceService
         {
             while (true)
             {
-                await Task.Delay(building.IntervalMs);
-                building.Trigger(playerId, this);
+                await building.Trigger(playerId, this);
 
                 var playerResources = _resources
                     .Where(r => r.PlayerId == playerId)

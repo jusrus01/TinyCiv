@@ -5,13 +5,8 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings
 {
-    public class Mine : IBuilding
+    public class Mine : ConstantSpeedBuilding
     {
-        public int Price { get; }
-        public BuildingType BuildingType { get; }
-        public GameObjectType TileType { get; }
-        public int IntervalMs { get; set; }
-
         public Mine()
         {
             Price = Constants.Game.MinePrice;
@@ -20,7 +15,7 @@ namespace TinyCiv.Server.Game.Buildings
             IntervalMs = Constants.Game.MineInterval;
         }
 
-        public void Trigger(Guid playerId, IResourceService resourceService)
+        protected override void UpdateResources(Guid playerId, IResourceService resourceService)
         {
             int amount = new Random().Next(1, 5);
             resourceService.AddResources(playerId, ResourceType.Industry, amount);

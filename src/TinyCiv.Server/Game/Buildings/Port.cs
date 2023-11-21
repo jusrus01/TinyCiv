@@ -5,13 +5,8 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings
 {
-    public class Port : IBuilding
+    public class Port : ConstantSpeedBuilding
     {
-        public int Price { get; }
-        public BuildingType BuildingType { get; }
-        public GameObjectType TileType { get; }
-        public int IntervalMs { get; set; }
-
         public Port()
         {
             Price = Constants.Game.PortPrice;
@@ -20,7 +15,7 @@ namespace TinyCiv.Server.Game.Buildings
             IntervalMs = Constants.Game.PortInterval;
         }
 
-        public void Trigger(Guid playerId, IResourceService resourceService)
+        protected override void UpdateResources(Guid playerId, IResourceService resourceService)
         {
             resourceService.AddResources(playerId, ResourceType.Food, 1);
             resourceService.AddResources(playerId, ResourceType.Industry, 2);
