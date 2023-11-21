@@ -41,10 +41,10 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         yield return new object[] { new JoinLobbyClientEvent() };
         yield return new object[] { new CreateUnitClientEvent(Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), 0, 0) };
-        yield return new object[] { new MoveUnitClientEvent(Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), 0, 0) };
+        yield return new object[] { new MoveUnitClientEvent(Guid.NewGuid(), Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), 0, 0) };
         yield return new object[] { new StartGameClientEvent() };
         yield return new object[] { new LeaveLobbyClientEvent() };
-        yield return new object[] { new AttackUnitClientEvent(Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7")) };
+        yield return new object[] { new AttackUnitClientEvent(Guid.NewGuid(), Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7")) };
         yield return new object[] { new CreateBuildingClientEvent(Guid.NewGuid(), BuildingType.Blacksmith, new ServerPosition { X = 0, Y = 0 }) };
         yield return new object[] { new PlaceTownClientEvent(Guid.NewGuid()) };
     }
@@ -683,11 +683,11 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         });
         
         //act
-        await _sut.SendAsync(new MoveUnitClientEvent(attacker.Id, anotherPlayerTown.Position!.X,
+        await _sut.SendAsync(new MoveUnitClientEvent(attacker.OwnerPlayerId, attacker.Id, anotherPlayerTown.Position!.X,
             anotherPlayerTown.Position!.Y));
         await WaitForResponseAsync(20000);
 
-        await _sut.SendAsync(new AttackUnitClientEvent(attacker.Id, anotherPlayerTown.Id));
+        await _sut.SendAsync(new AttackUnitClientEvent(attacker.OwnerPlayerId, attacker.Id, anotherPlayerTown.Id));
         await WaitForResponseAsync(8000);
         
         //assert
@@ -764,11 +764,11 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         });
         
         //act
-        await _sut.SendAsync(new MoveUnitClientEvent(attacker.Id, anotherPlayerTown.Position!.X,
+        await _sut.SendAsync(new MoveUnitClientEvent(attacker.OwnerPlayerId, attacker.Id, anotherPlayerTown.Position!.X,
             anotherPlayerTown.Position!.Y));
         await WaitForResponseAsync(20000);
 
-        await _sut.SendAsync(new AttackUnitClientEvent(attacker.Id, anotherPlayerTown.Id));
+        await _sut.SendAsync(new AttackUnitClientEvent(attacker.OwnerPlayerId, attacker.Id, anotherPlayerTown.Id));
         await WaitForResponseAsync(8000);
         
         //assert
@@ -844,10 +844,10 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await anotherClient.SendAsync(new CreateUnitClientEvent(playerId2!.Value, 1, 2, GameObjectType.Warrior));
         await WaitForResponseAsync();
 
-        await _sut.SendAsync(new MoveUnitClientEvent(player1GameObject!.Id, 1, 2));
+        await _sut.SendAsync(new MoveUnitClientEvent(player1GameObject!.OwnerPlayerId, player1GameObject!.Id, 1, 2));
         await WaitForResponseAsync(5000);
 
-        await anotherClient.SendAsync(new AttackUnitClientEvent(player2GameObject!.Id, player1GameObject!.Id));
+        await anotherClient.SendAsync(new AttackUnitClientEvent(player2GameObject!.OwnerPlayerId, player2GameObject!.Id, player1GameObject!.Id));
         await WaitForResponseAsync(5000);
 
         //assert

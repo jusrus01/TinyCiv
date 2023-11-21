@@ -1,7 +1,9 @@
 using System.Text.Json;
 using TinyCiv.Server.Core.Handlers;
+using TinyCiv.Server.Core.Middlewares;
 using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
+using TinyCiv.Server.Middleware;
 using TinyCiv.Shared.Events.Server;
 
 namespace TinyCiv.Server.Handlers;
@@ -24,7 +26,7 @@ public abstract class ClientHandler<TEvent> : IClientHandler
 
         GameService = gameService;
     }
-    
+
     public bool CanHandle(string type)
     {
         return type == typeof(TEvent).Name;
@@ -44,6 +46,22 @@ public abstract class ClientHandler<TEvent> : IClientHandler
         if (IgnoreWhen(@event))
         {
             _logger.LogWarning("{handler}.{method_name}: ignored event data {@data}", handlerName, HandleMethodName, @event);
+            return Task.CompletedTask;
+        }
+
+        var loggerMiddleware = new LoggerMiddleware<TEvent>(_logger);
+        var authorizationMiddleware = new AuthorizationMiddleware<TEvent>(GameService.GetMapService());
+        var inputValidationMiddleware = new InputValidationMiddleware<TEvent>();
+        var logicValidationMiddleware = new LogicValidationMiddleware<TEvent>(GameService.GetMapService());
+        inputValidationMiddleware.SetNext(logicValidationMiddleware);
+        authorizationMiddleware.SetNext(inputValidationMiddleware);
+        loggerMiddleware.SetNext(authorizationMiddleware);
+
+        bool result = loggerMiddleware.Handle(@event);
+
+        if (result == false)
+        {
+            _logger.LogInformation("{handler}.{method_name}: failed to process event in middlewares '{@data}'", handlerName, HandleMethodName, @event);
             return Task.CompletedTask;
         }
 

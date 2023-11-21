@@ -21,4 +21,7 @@ public interface IGameService
 
     void AttackUnit(AttackUnitRequest request);
     void MoveUnit(MoveUnitRequest request);
+
+    public IMapService GetMapService();
+    public ISessionService GetSessionService();
 }

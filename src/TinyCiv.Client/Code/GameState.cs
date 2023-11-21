@@ -283,7 +283,7 @@ namespace TinyCiv.Client.Code
                 if (gameObject.OpponentId != null)
                 {
                     ShowCombatState(gameObject);
-                    Task.Run(() => ClientSingleton.Instance.serverClient.SendAsync(new AttackUnitClientEvent(gameObject.Id, gameObject.OpponentId.Value)));
+                    Task.Run(() => ClientSingleton.Instance.serverClient.SendAsync(new AttackUnitClientEvent(gameObject.OwnerId, gameObject.Id, gameObject.OpponentId.Value)));
                 }
                 
                 if (isGameObjectSelected && selectedGameObject.Id == gameObject.Id)
