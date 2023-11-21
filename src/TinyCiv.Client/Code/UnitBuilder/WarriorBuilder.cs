@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Controls;
 using TinyCiv.Client.Code.BorderDecorators;
 using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.Units;
@@ -84,7 +85,7 @@ namespace TinyCiv.Client.Code.UnitBuilder
             return this;
         }
 
-        public IUnitBuilder SetImage(string imageSource)
+        public IUnitBuilder SetImage(Image imageSource)
         {
             if (imageSource == null)
                 warrior.ImageSource = AbstractGameObjectFactory.getGameObjectImage(warrior.Color, warrior.Type);

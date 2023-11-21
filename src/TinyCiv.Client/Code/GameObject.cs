@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TinyCiv.Client.Code.BorderDecorators;
 using TinyCiv.Client.Code.Factories;
@@ -20,7 +21,19 @@ namespace TinyCiv.Client.Code
         public TeamColor Color { get; set; }
         public Guid? OpponentId { get; set; }
 
-        public string ImageSource { get; set; }
+        public IntrinsicGameobject intrinsic { get; set; }
+
+        public Image ImageSource
+        {
+            get
+            {
+                return intrinsic.Image; 
+            }
+            set
+            {
+                intrinsic.Image = value;
+            }
+        }
         public BorderProperties Border {  get; set; }
         public Action LeftAction { get; set; }
         public Action RightAction { get; set; }       
@@ -31,6 +44,7 @@ namespace TinyCiv.Client.Code
             Id = id;
             OwnerId = ownerId;
             OpponentId = opponentId;
+            intrinsic = new IntrinsicGameobject();
         }
 
         public GameObject(GameObjectType type, Position position, TeamColor color, double Opacity = 1) 
@@ -38,18 +52,21 @@ namespace TinyCiv.Client.Code
         {
             Type = type;
             Border.Opacity = Opacity;
+            intrinsic = new IntrinsicGameobject();
         }
 
-        public GameObject(TeamColor color, Position position, string imageSource) : this()
+        public GameObject(TeamColor color, Position position, Image image) : this()
         {
             Color = color;
             Position = position;
-            ImageSource = imageSource;
+            intrinsic = new IntrinsicGameobject();
+            intrinsic.Image = image;
         }
 
         protected GameObject() 
         {
             Border = new BorderProperties();
+            intrinsic = new IntrinsicGameobject();
         }
 
         public static GameObject fromServerGameObject(ServerGameObject serverGameObject)

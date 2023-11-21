@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using TinyCiv.Client.Code.BorderDecorators;
 using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.units;
@@ -97,7 +98,7 @@ namespace TinyCiv.Client.Code.UnitBuilder
             return cavalry;
         }
 
-        public IUnitBuilder SetImage(string imageSource)
+        public IUnitBuilder SetImage(Image imageSource)
         {
             if (imageSource == null)
                 cavalry.ImageSource = AbstractGameObjectFactory.getGameObjectImage(cavalry.Color, cavalry.Type);

@@ -1,4 +1,5 @@
-﻿using TinyCiv.Client.Code.Factories;
+﻿using System.Windows.Controls;
+using TinyCiv.Client.Code.Factories;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Client.Code.MVVM.Model
@@ -10,7 +11,7 @@ namespace TinyCiv.Client.Code.MVVM.Model
         public int Speed { get; }
         public int GoldPrice { get; }
         public string Description { get; }
-        public string ImagePath { get; }
+        public Image ImagePath { get; }
         public GameObjectType Type { get; }
         public TeamColor Color { get; }
         public string Name { get; }

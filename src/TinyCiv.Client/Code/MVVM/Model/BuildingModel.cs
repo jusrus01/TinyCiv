@@ -1,4 +1,5 @@
-﻿using System.Windows.Navigation;
+﻿using System.Windows.Controls;
+using System.Windows.Navigation;
 using TinyCiv.Client.Code.Factories;
 using TinyCiv.Shared.Game;
 
@@ -6,7 +7,7 @@ namespace TinyCiv.Client.Code.MVVM.Model;
 
 public class BuildingModel : IBuyable
 {
-    public string ImagePath { get; }
+    public Image ImagePath { get; }
     public string Name { get; }
     public string Production { get; }
     public int IndustryCost { get; }
