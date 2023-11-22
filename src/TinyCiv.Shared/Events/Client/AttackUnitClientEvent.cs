@@ -1,3 +1,3 @@
 namespace TinyCiv.Shared.Events.Client;
 
-public record AttackUnitClientEvent(Guid AttackerId, Guid OpponentId) : ClientEvent;
+public record AttackUnitClientEvent(Guid? PlayerId, Guid? AttackerId, Guid? OpponentId) : ClientEvent;

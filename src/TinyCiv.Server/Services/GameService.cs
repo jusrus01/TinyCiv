@@ -214,4 +214,14 @@ public class GameService : IGameService
 
         _mapService.MoveUnitAsync(request.UnitId, request.Position, onUnitMoved);
     }
+
+    public IMapService GetMapService()
+    {
+        return _mapService;
+    }
+
+    public ISessionService GetSessionService()
+    {
+        return _sessionService;
+    }
 }
