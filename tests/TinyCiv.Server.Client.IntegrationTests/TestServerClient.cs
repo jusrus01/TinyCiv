@@ -386,10 +386,10 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         var anotherClient = InitializeClient();
         await anotherClient.SendAsync(new JoinLobbyClientEvent());
 
-        Guid playerId = Guid.Empty;
+        List<Guid> playerIds = new();
         _sut.ListenForNewPlayerCreation((player) =>
         {
-            playerId = player.Created.Id;
+            playerIds.Add(player.Created.Id);
         });
 
         Resources? playerResources = new();
@@ -398,19 +398,35 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
             playerResources = resources.Resources;
         });
 
+        bool colonistsSetup = false;
+        ServerGameObject mainColonist = new();
+        ServerGameObject secondColonist = new();
         List<ServerPosition> colonistPositions = new();
-        _sut.ListenForGameStart(map =>
-        {
-            var positions = map.Map.Objects!
-                .Where(o => o.Type == GameObjectType.Colonist)
-                .Select(o => o.Position)!;
-
-            colonistPositions.AddRange(positions!);
-        });
 
         int changeCount = 0;
         _sut.ListenForMapChange(map =>
         {
+            if (colonistsSetup == false)
+            {
+                var colonists = map.Map.Objects!
+                    .Where(o => o.Type == GameObjectType.Colonist);
+
+                if (colonists.Count() == 2)
+                {
+                    mainColonist = colonists
+                        .Where(c => c.OwnerPlayerId == playerIds[0])
+                        .First();
+
+                    secondColonist = colonists
+                        .Where(c => c.OwnerPlayerId == playerIds[1])
+                        .First();
+
+                    colonistPositions.AddRange(colonists!.Select(c => c.Position)!);
+
+                    colonistsSetup = true;
+                }
+            }
+
             if (changeCount == 3)
             {
                 int bankCount = map.Map.Objects!
@@ -430,42 +446,33 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await anotherClient.SendAsync(new StartGameClientEvent());
         await WaitForResponseAsync();
 
-        await _sut.SendAsync(new PlaceTownClientEvent(playerId));
+        await _sut.SendAsync(new MoveUnitClientEvent(secondColonist.Id, 0, 0));
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new PlaceTownClientEvent(playerIds[0]));
         await WaitForResponseAsync();
 
         // build blacksmith building (+5 Industry, -1 Gold)
-        await _sut.SendAsync(new CreateBuildingClientEvent(playerId, BuildingType.Blacksmith, findFreeTile()));
+        var blacksmithPos = new ServerPosition { X = mainColonist.Position!.X, Y = mainColonist.Position!.Y - 1 };
+        await _sut.SendAsync(new CreateBuildingClientEvent(playerIds[0], BuildingType.Blacksmith, blacksmithPos));
         await WaitForResponseAsync(6500);
 
         Assert.True(playerResources!.Industry == 105);
 
         // build bank building (+5 gold)
-        await _sut.SendAsync(new CreateBuildingClientEvent(playerId, BuildingType.Bank, findFreeTile()));
+        var bankPos = new ServerPosition { X = mainColonist.Position!.X + 1, Y = mainColonist.Position!.Y };
+        await _sut.SendAsync(new CreateBuildingClientEvent(playerIds[0], BuildingType.Bank, bankPos));
         await WaitForResponseAsync(3500);
 
         // player should have atleast one gold from mine
         Assert.True(playerResources!.Gold == 54);
 
         // build bank building (+5 gold) (should not be able to build, because doesn't have enough Industry points)
-        await _sut.SendAsync(new CreateBuildingClientEvent(playerId, BuildingType.Bank, findFreeTile()));
+        var bankPos2 = new ServerPosition { X = mainColonist.Position!.X - 1, Y = mainColonist.Position!.Y };
+        await _sut.SendAsync(new CreateBuildingClientEvent(playerIds[0], BuildingType.Bank, bankPos2));
         await WaitForResponseAsync();
-
-        ServerPosition findFreeTile()
-        {
-            var random = new Random();
-            int x = random.Next(0, Constants.Game.WidthSquareCount);
-            int y = random.Next(0, Constants.Game.HeightSquareCount);
-
-            while (colonistPositions.Where(p => p.X == x && p.Y == y).Any())
-            {
-                x = random.Next(0, Constants.Game.WidthSquareCount);
-                y = random.Next(0, Constants.Game.HeightSquareCount);
-            }
-            
-            return new ServerPosition { X = x, Y = y };
-        }
     }
-    
+
     [Fact]
     public async Task ListenForResourcesUpdate_When_UnitBought_Then_GoldChanged()
     {
@@ -504,24 +511,24 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         await _sut.SendAsync(new CreateUnitClientEvent(playerId, 1, 1, GameObjectType.Warrior));
         await WaitForResponseAsync();
-        
+
         Assert.Equal(Constants.Game.Interactable.Warrior.Damage, warriorAttackDamage);
         Assert.Equal(Constants.Game.StartingGold - Constants.Game.Interactable.Warrior.Price, playerResources.Gold);
     }
-    
+
     [Fact]
     public async Task ListenForResourcesUpdate_When_UnitFailsToBeAdded_Then_GoldRemainsTheSame()
     {
         // arrange
         var anotherClient = InitializeClient();
         await anotherClient.SendAsync(new JoinLobbyClientEvent());
-        
+
         Guid anotherPlayerId = Guid.Empty;
         anotherClient.ListenForNewPlayerCreation(player =>
         {
             anotherPlayerId = player.Created.Id;
         });
-        
+
         Guid playerId = Guid.Empty;
         _sut.ListenForNewPlayerCreation(player =>
         {
@@ -536,10 +543,10 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         var warriorAttackDamage = 0;
         var skipFirst = true;
-        
+
         const int skipCityTimes = 2;
         var citySkipped = 0;
-        
+
         _sut.ListenForInteractableObjectChanges(response =>
         {
             if (skipFirst)
@@ -553,7 +560,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
                 citySkipped++;
                 return;
             }
-            
+
             warriorAttackDamage = response.AttackDamage;
         });
 
@@ -568,13 +575,13 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await _sut.SendAsync(new PlaceTownClientEvent(playerId));
         await anotherClient.SendAsync(new PlaceTownClientEvent(anotherPlayerId));
         await WaitForResponseAsync();
-        
+
         await anotherClient.SendAsync(new CreateUnitClientEvent(anotherPlayerId, 1, 1, GameObjectType.Warrior));
         await WaitForResponseAsync();
-        
+
         await _sut.SendAsync(new CreateUnitClientEvent(playerId, 1, 1, GameObjectType.Warrior));
         await WaitForResponseAsync();
-        
+
         Assert.Equal(0, warriorAttackDamage);
         Assert.Equal(Constants.Game.StartingGold, playerResources.Gold);
     }
@@ -591,7 +598,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         {
             playerId = resp.Created.Id;
         });
-        
+
         var townHealth = 0;
         var townAttackDamage = 0;
         _sut.ListenForInteractableObjectChanges(resp =>
@@ -607,7 +614,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         await _sut.SendAsync(new StartGameClientEvent());
         await WaitForResponseAsync(1000);
-        
+
         //act
         await _sut.SendAsync(new PlaceTownClientEvent(playerId!.Value));
         await WaitForResponseAsync();
@@ -616,7 +623,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         Assert.Equal(Constants.Game.Interactable.City.InitialHealth, townHealth);
         Assert.Equal(Constants.Game.Interactable.City.Damage, townAttackDamage);
     }
-    
+
     [Fact]
     public async Task ListenForInteractableObjectChanges_WhenTownAttacked_Then_AttackerAndTownHasHealthDecreased()
     {
@@ -626,7 +633,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         {
             playerId = resp.Created.Id;
         });
-        
+
         var townHealth = 0;
         var townAttackDamage = 0;
         _sut.ListenForInteractableObjectChanges(resp =>
@@ -641,14 +648,14 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         {
             anotherPlayerId = resp.Created.Id;
         });
-        
+
         await anotherClient.SendAsync(new JoinLobbyClientEvent());
         await _sut.SendAsync(new JoinLobbyClientEvent());
         await WaitForResponseAsync();
 
         await _sut.SendAsync(new StartGameClientEvent());
         await WaitForResponseAsync();
-        
+
         Map? latestMap = null;
         _sut.ListenForMapChange(resp =>
         {
@@ -661,12 +668,12 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 1, 1, GameObjectType.Warrior));
         await WaitForResponseAsync(10000);
-        
+
         var anotherPlayerTown =
             latestMap!.Objects!.Single(obj => obj.Type == GameObjectType.City && obj.OwnerPlayerId == anotherPlayerId);
-        
+
         var attacker = latestMap!.Objects!.Single(obj => obj.Type == GameObjectType.Warrior && obj.OwnerPlayerId == playerId);
-        
+
         var afterCombatAttackerHealth = -1;
         var afterCombatTownHealth = -1;
         _sut.ListenForInteractableObjectChanges(resp =>
@@ -675,13 +682,13 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
             {
                 afterCombatAttackerHealth = resp.Health;
             }
-            
+
             if (resp.ObjectId == anotherPlayerTown.Id)
             {
                 afterCombatTownHealth = resp.Health;
             }
         });
-        
+
         //act
         await _sut.SendAsync(new MoveUnitClientEvent(attacker.OwnerPlayerId, attacker.Id, anotherPlayerTown.Position!.X,
             anotherPlayerTown.Position!.Y));
@@ -689,15 +696,15 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         await _sut.SendAsync(new AttackUnitClientEvent(attacker.OwnerPlayerId, attacker.Id, anotherPlayerTown.Id));
         await WaitForResponseAsync(8000);
-        
+
         //assert
         Assert.NotEqual(-1, afterCombatAttackerHealth);
         Assert.NotEqual(-1, afterCombatTownHealth);
-        
+
         Assert.NotEqual(Constants.Game.Interactable.City.InitialHealth, afterCombatTownHealth);
         Assert.NotEqual(Constants.Game.Interactable.Warrior.InitialHealth, afterCombatAttackerHealth);
     }
-    
+
     [Fact]
     public async Task ListenForInteractableObjectChanges_WhenTownAttackedByTarran_Then_TarranSpawnsClonesAfterReceivingEnoughDamage()
     {
@@ -707,7 +714,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         {
             playerId = resp.Created.Id;
         });
-        
+
         var townHealth = 0;
         var townAttackDamage = 0;
         _sut.ListenForInteractableObjectChanges(resp =>
@@ -722,14 +729,14 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         {
             anotherPlayerId = resp.Created.Id;
         });
-        
+
         await anotherClient.SendAsync(new JoinLobbyClientEvent());
         await _sut.SendAsync(new JoinLobbyClientEvent());
         await WaitForResponseAsync();
 
         await _sut.SendAsync(new StartGameClientEvent());
         await WaitForResponseAsync();
-        
+
         Map? latestMap = null;
         _sut.ListenForMapChange(resp =>
         {
@@ -742,12 +749,12 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 1, 1, GameObjectType.Tarran));
         await WaitForResponseAsync(10000);
-        
+
         var anotherPlayerTown =
             latestMap!.Objects!.Single(obj => obj.Type == GameObjectType.City && obj.OwnerPlayerId == anotherPlayerId);
-        
+
         var attacker = latestMap!.Objects!.Single(obj => obj.Type == GameObjectType.Tarran && obj.OwnerPlayerId == playerId);
-        
+
         var afterCombatAttackerHealth = -1;
         var afterCombatTownHealth = -1;
         _sut.ListenForInteractableObjectChanges(resp =>
@@ -756,13 +763,13 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
             {
                 afterCombatAttackerHealth = resp.Health;
             }
-            
+
             if (resp.ObjectId == anotherPlayerTown.Id)
             {
                 afterCombatTownHealth = resp.Health;
             }
         });
-        
+
         //act
         await _sut.SendAsync(new MoveUnitClientEvent(attacker.OwnerPlayerId, attacker.Id, anotherPlayerTown.Position!.X,
             anotherPlayerTown.Position!.Y));
@@ -770,17 +777,17 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         await _sut.SendAsync(new AttackUnitClientEvent(attacker.OwnerPlayerId, attacker.Id, anotherPlayerTown.Id));
         await WaitForResponseAsync(8000);
-        
+
         //assert
         Assert.NotEqual(-1, afterCombatAttackerHealth);
         Assert.NotEqual(-1, afterCombatTownHealth);
-        
+
         Assert.NotEqual(Constants.Game.Interactable.City.InitialHealth, afterCombatTownHealth);
         Assert.NotEqual(Constants.Game.Interactable.Tarran.InitialHealth, afterCombatAttackerHealth);
-        
+
         Assert.True(latestMap.Objects.Count(obj => obj.Type == GameObjectType.Tarran) > 1);
     }
-    
+
     [Fact]
     public async Task ListenForInteractableObjectChanges_WhenUnitDead_Then_ChangedStateReceived()
     {
@@ -872,7 +879,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
     {
         //arrange
         var skipFirst = type != GameObjectType.City;
-        
+
         var anotherClient = InitializeClient();
 
         Guid? playerId = null;
@@ -892,7 +899,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
                 skipFirst = false;
                 return;
             }
-            
+
             receivedAttackDamage = resp.AttackDamage;
             receivedInitialHealth = resp.Health;
         });
@@ -907,7 +914,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         await _sut.SendAsync(new PlaceTownClientEvent(playerId!.Value));
         await WaitForResponseAsync(1000);
-        
+
         //act
         await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 1, 1, type));
         await WaitForResponseAsync();
@@ -985,7 +992,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await _sut.SendAsync(new PlaceTownClientEvent(playerId2!.Value));
         await WaitForResponseAsync();
     }
-    
+
     #endregion
 
     #region Helpers
