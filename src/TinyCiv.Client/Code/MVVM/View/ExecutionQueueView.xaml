@@ -34,7 +34,7 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <Image Grid.Row="0" VerticalAlignment="Center" Source="{Binding ImagePath}" />
+                            <Image Grid.Row="0" VerticalAlignment="Center" Source="{Binding ImagePath.Source}" />
                             <TextBlock Grid.Row="1" Margin="0,5,0,0" HorizontalAlignment="Center" Text="{Binding RemainingTime.Seconds}" />
                         </Grid>
                     </Border>

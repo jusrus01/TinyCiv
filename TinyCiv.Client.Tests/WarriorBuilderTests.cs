@@ -32,7 +32,6 @@ namespace TinyCiv.Client.Tests
             var productionPrice = 60;
             var speed = 3;
             var borderProperties = new BorderProperties { BackgroundBrush = Brushes.Blue };
-            var imageSource = "warrior_image.png";
 
             // Act
             var warrior = builder
@@ -48,7 +47,6 @@ namespace TinyCiv.Client.Tests
                 .SetProductionPrice(productionPrice)
                 .SetSpeed(speed)
                 .SetBorderProperties(borderProperties)
-                .SetImage(imageSource)
                 .Build();
 
             // Assert
@@ -65,24 +63,6 @@ namespace TinyCiv.Client.Tests
             Assert.Equal(productionPrice, warrior.ProductionPrice);
             Assert.Equal(speed, warrior.Speed);
             Assert.Equal(borderProperties, warrior.Border);
-            Assert.Equal(imageSource, warrior.ImageSource);
-        }
-
-        [Fact]
-        public void Build_DefaultImageSource_UsesDefaultImageWhenImageSourceIsNull()
-        {
-            // Arrange
-            var builder = new WarriorBuilder();
-            string imageSource = null;
-
-            // Act
-            var warrior = builder.SetImage(imageSource).Build();
-
-            // Assert
-            Assert.NotNull(warrior);
-            Assert.Equal(
-                AbstractGameObjectFactory.getGameObjectImage(warrior.Color, warrior.Type),
-                warrior.ImageSource);
         }
     }
 }

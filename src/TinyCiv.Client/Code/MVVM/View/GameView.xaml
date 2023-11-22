@@ -13,13 +13,16 @@
         <!-- GAME OBJECT TEMPLATE !-->
         <DataTemplate x:Key="GameObjectTemplate">
             <Border
+                BorderThickness="{Binding Border.BorderThickness}" 
+                BorderBrush="{Binding Border.BorderBrush}"
+                Background="{Binding Border.BackgroundBrush}"
                 MouseLeftButtonDown="gameObjectLeftDown"
                 MouseRightButtonDown="gameObjectRightDown"
                 Height="30"
                 Width="30"
                     >
                 <Grid>
-                    <Image Source="{Binding ImageSource}" Opacity="{Binding Border.Opacity}"/>
+                    <Image Source="{Binding ImageSource.Source}" Opacity="{Binding Border.Opacity}"/>
                 </Grid>
             </Border>
         </DataTemplate>
@@ -35,7 +38,7 @@
                 Width="30"
                     >
                 <Grid>
-                    <Image Source="{Binding ImageSource}" />
+                    <Image Source="{Binding ImageSource.Source}" />
 
                     <ProgressBar Height="3"
                                  Value="{Binding Health, Mode=OneWay}"
@@ -59,7 +62,7 @@
                 Width="30"
                     >
                 <Grid>
-                    <Image Source="{Binding ImageSource}"
+                    <Image Source="{Binding ImageSource.Source}"
                            Margin="2"/>
                 </Grid>
             </Border>

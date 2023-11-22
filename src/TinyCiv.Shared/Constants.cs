@@ -48,7 +48,7 @@ public static class Constants
 
         public const int MovementSpeedMs = 500;
 
-        public const int BuildingSpaceFromTown = 2;
+        public const int BuildingSpaceFromTown = 3;
         public const int TownSpaceFromTown = 5;
 
         public const int FarmInterval = 5000;

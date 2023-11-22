@@ -1,4 +1,5 @@
-﻿using TinyCiv.Client.Code.units;
+﻿using System.Windows.Controls;
+using TinyCiv.Client.Code.units;
 using TinyCiv.Client.Code.Units;
 
 namespace TinyCiv.Client.Code.MVVM.ViewModel
@@ -6,7 +7,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
     public class UnitMenuViewModel : ObservableObject
     {
         public ObservableValue<string> UnitType { get; } = new ObservableValue<string>("EMPTY");
-        public ObservableValue<string> ImageSource { get;  } = new ObservableValue<string>();
+        public ObservableValue<Image> ImageSource { get;  } = new ObservableValue<Image>();
         public ObservableValue<string> IsColonist { get; } = new ObservableValue<string>("Collapsed");
         public ObservableValue<RelayCommand> SettleDownCommand { get; } = new ObservableValue<RelayCommand>();
 
@@ -17,7 +18,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
             _unitReference = unit;
 
             UnitType.Value = unit.Type.ToString();
-            ImageSource.Value = unit.ImageSource.ToString();
+            ImageSource.Value = unit.ImageSource;
             if (unit is Colonist)
             {
                 var colonist = (Colonist)unit;

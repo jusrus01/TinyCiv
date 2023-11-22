@@ -446,7 +446,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await anotherClient.SendAsync(new StartGameClientEvent());
         await WaitForResponseAsync();
 
-        await _sut.SendAsync(new MoveUnitClientEvent(secondColonist.Id, 0, 0));
+        await _sut.SendAsync(new MoveUnitClientEvent(playerIds[1], secondColonist.Id, 0, 0));
         await WaitForResponseAsync();
 
         await _sut.SendAsync(new PlaceTownClientEvent(playerIds[0]));

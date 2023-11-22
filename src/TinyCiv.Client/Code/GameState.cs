@@ -108,14 +108,35 @@ namespace TinyCiv.Client.Code
 
         private void InvokeBuildingProcess(Position position)
         {
+            if (!InRangeOfCity(position)) return;
             var buildingUnderPurchase = HUDManager.cityVM.SelectedBuyBuilding.Value;
             AddDecoy(buildingUnderPurchase.Type, position);
             HUDManager.cityVM.ExecuteBuildingPurchase(position);
             onPropertyChanged?.Invoke();
         }
 
+        private bool InRangeOfCity(Position clickPosition)
+        {
+            Position cityPosition = GetCityPosition();
+            var difference = cityPosition - clickPosition;
+            if (Math.Abs(difference.row) >= Shared.Constants.Game.BuildingSpaceFromTown ||
+                Math.Abs(difference.column) >= Shared.Constants.Game.BuildingSpaceFromTown)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private Position GetCityPosition()
+        {
+            if (selectedGameObject is City && CurrentPlayer.IsOwner(selectedGameObject))
+                return selectedGameObject.Position;
+            return GameObjects.Where(go => CurrentPlayer.IsOwner(go) && go.Type == GameObjectType.City).FirstOrDefault().Position;
+        }
+
         private void InvokeUnitSpawnProcess(Position position)
         {
+            if (!InRangeOfCity(position)) return;
             var unitUnderPurchase = HUDManager.cityVM.SelectedBuyUnit.Value;
             AddDecoy(unitUnderPurchase.Type, position);
             HUDManager.cityVM.ExecuteUnitPurchase(position);
@@ -159,6 +180,7 @@ namespace TinyCiv.Client.Code
         private void UnselectCity(GameObject gameObject)
         {
             isGameObjectSelected = false;
+            (gameObject as City).RemoveHighlight();
             gameObject.RemoveEffects();
             HUDManager.HideLowerMenu();
             onPropertyChanged?.Invoke();
@@ -171,6 +193,9 @@ namespace TinyCiv.Client.Code
 
             BorderDecorator decoratedCity = new BorderHighlightDecorator(gameObject, Brushes.DarkSalmon);
             decoratedCity = new BorderBackgroundDecorator(decoratedCity, Brushes.DarkSalmon);
+            decoratedCity = new BorderAreaDecorator(decoratedCity, Shared.Constants.Game.BuildingSpaceFromTown, GameObjects);
+
+            (gameObject as City).HighlightedArea = (decoratedCity as BorderAreaDecorator).highlightedGameObjects;
 
             decoratedCity.ApplyEffects();
             HUDManager.DisplayCityMenu();

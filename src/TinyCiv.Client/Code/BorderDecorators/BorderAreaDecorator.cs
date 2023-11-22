@@ -8,7 +8,7 @@ namespace TinyCiv.Client.Code.BorderDecorators
     {
         private double nearbyDistance;
         private List<GameObject> gameObjects;
-        private List<GameObject> highlightedGameObjects;
+        public List<GameObject> highlightedGameObjects;
 
         public BorderAreaDecorator(BorderObject decoratedObject, double nearbyDistance, List<GameObject> gameObjects) : base(decoratedObject)
         {
@@ -24,17 +24,11 @@ namespace TinyCiv.Client.Code.BorderDecorators
 
             if (decoratedPosition != null)
             {
-                double squareLeft = decoratedPosition.column - nearbyDistance;
-                double squareTop = decoratedPosition.row - nearbyDistance;
-                double squareRight = decoratedPosition.column + nearbyDistance;
-                double squareBottom = decoratedPosition.row + nearbyDistance;
-
                 foreach (var gameObject in gameObjects)
                 {
-                    if (gameObject.Position.column >= squareLeft &&
-                        gameObject.Position.column <= squareRight &&
-                        gameObject.Position.row >= squareTop &&
-                        gameObject.Position.row <= squareBottom)
+                    var difference = gameObject.Position - decoratedPosition;
+                    if (Math.Abs(difference.row) < nearbyDistance &&
+                        Math.Abs(difference.column) < nearbyDistance)
                     {
                         if (gameObject.Border != null)
                         {
@@ -44,7 +38,6 @@ namespace TinyCiv.Client.Code.BorderDecorators
                     }
                 }
             }
-
             return borderProperties;
         }
 

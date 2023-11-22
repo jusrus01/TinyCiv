@@ -46,7 +46,7 @@
                                         <RowDefinition />
                                         <RowDefinition Height="auto" />
                                     </Grid.RowDefinitions>
-                                    <Image Grid.Row="0" VerticalAlignment="Center" Source="{Binding ImagePath}"></Image>
+                                    <Image Grid.Row="0" VerticalAlignment="Center" Source="{Binding ImagePath.Source}"></Image>
                                     <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="8" Text="{Binding Name}"/>
                                 </Grid>
                                 <Grid Grid.Column="1" Margin="5,0,0,0">
@@ -105,7 +105,7 @@
                                         <RowDefinition />
                                         <RowDefinition Height="auto" />
                                     </Grid.RowDefinitions>
-                                    <Image Grid.Row="0" VerticalAlignment="Center" Source="{Binding ImagePath}" />
+                                    <Image Grid.Row="0" VerticalAlignment="Center" Source="{Binding ImagePath.Source}" />
                                     <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="8" Text="{Binding Name}" />
                                 </Grid>
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using TinyCiv.Client.Code.UnitBuilder;
 using TinyCiv.Shared.Game;
 
@@ -14,18 +15,22 @@ namespace TinyCiv.Client.Code.Factories
         public abstract GameObject CreateGameObject(ServerGameObject serverGameObject);
         public abstract GameObject CreateObjectDecoy(GameObjectType type, Position position);
 
-        public static string getGameObjectImage(TeamColor color, GameObjectType type)
+        public static Image getGameObjectImage(TeamColor color, GameObjectType type)
         {
             switch (color)
             {
                 case TeamColor.Red:
-                    return RedGameObjectFactory.sources[type];
+                    RedGameObjectFactory.LoadImage(type);
+                    return RedGameObjectFactory.images[type];
                 case TeamColor.Green:
-                    return GreenGameObjectFactory.sources[type];
+                    GreenGameObjectFactory.LoadImage(type);
+                    return GreenGameObjectFactory.images[type];
                 case TeamColor.Yellow:
-                    return YellowGameObjectFactory.sources[type];
+                    YellowGameObjectFactory.LoadImage(type);
+                    return YellowGameObjectFactory.images[type];
                 case TeamColor.Purple:
-                    return PurpleGameObjectFactory.sources[type];
+                    PurpleGameObjectFactory.LoadImage(type);
+                    return PurpleGameObjectFactory.images[type];
                 default:
                     return null;
             }

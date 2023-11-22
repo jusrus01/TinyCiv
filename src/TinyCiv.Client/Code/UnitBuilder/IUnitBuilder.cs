@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Controls;
 using TinyCiv.Client.Code.BorderDecorators;
 using TinyCiv.Client.Code.Units;
 using TinyCiv.Shared.Game;
@@ -15,7 +16,7 @@ public interface IUnitBuilder
     IUnitBuilder SetDescription(string description);
 
     // Common GameObject properties
-    IUnitBuilder SetImage(string imageSource = null);
+    IUnitBuilder SetImage(Image imageSource = null);
     IUnitBuilder SetPosition(Position position);
     IUnitBuilder SetOwnerId(Guid ownerId);
     IUnitBuilder SetId(Guid id);

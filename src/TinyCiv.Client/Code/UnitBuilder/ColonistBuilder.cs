@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Controls;
 using TinyCiv.Client.Code.BorderDecorators;
 using TinyCiv.Client.Code.Factories;
 using TinyCiv.Client.Code.units;
@@ -130,7 +131,7 @@ namespace TinyCiv.Client.Code.UnitBuilder
             return colonist;
         }
 
-        public IUnitBuilder SetImage(string imageSource)
+        public IUnitBuilder SetImage(Image imageSource)
         {
             if (imageSource == null)
                 colonist.ImageSource = AbstractGameObjectFactory.getGameObjectImage(colonist.Color, colonist.Type);
