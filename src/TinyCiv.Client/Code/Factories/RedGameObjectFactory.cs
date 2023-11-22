@@ -141,7 +141,10 @@ namespace TinyCiv.Client.Code.Factories
                     unitDirector.SetBuilder(new TarranBuilder());
                     return unitDirector.ConstructUnitDecoyFor(new GameObject(TeamColor.Red, position, images[type]));
                 default:
-                    return new GameObject(type, position, CurrentPlayer.Color, 0.5);
+                    LoadImage(type);
+                    GameObject gameObject = new GameObject(type, position, TeamColor.Red, 0.5);
+                    gameObject.intrinsic.Image = images[type];
+                    return gameObject;
             }
         }
     }
