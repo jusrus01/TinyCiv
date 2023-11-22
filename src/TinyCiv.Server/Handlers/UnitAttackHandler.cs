@@ -30,7 +30,7 @@ public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
     
     protected override Task OnHandleAsync(AttackUnitClientEvent @event)
     {
-        var request = new AttackUnitRequest(@event.AttackerId, @event.OpponentId, MapChangeNotifier, InteractableObjectStateChangeNotifier, NewUnitNotifier);
+        var request = new AttackUnitRequest(@event.AttackerId.Value, @event.OpponentId.Value, MapChangeNotifier, InteractableObjectStateChangeNotifier, NewUnitNotifier);
         GameService.AttackUnit(request);
         return Task.CompletedTask;
         

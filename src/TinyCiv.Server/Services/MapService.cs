@@ -44,7 +44,7 @@ namespace TinyCiv.Server.Services
 
                 bool doesEnumExist = Enum.TryParse<GameObjectType>(Enum.GetName(building.BuildingType), out var gameObjectType);
 
-                if (isTileCorrect = false || player == null || isTownInRange || doesEnumExist == false)
+                if (isTileCorrect == false || player == null || isTownInRange == false || doesEnumExist == false)
                 {
                     return null;
                 }

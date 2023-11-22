@@ -98,15 +98,15 @@ async Task SampleIdAssignmentDemo()
     await Task.Delay(2000);
 
     // Moving units
-    await client.SendAsync(new MoveUnitClientEvent(gameObjects[^1].Id, 10, 5));
+    await client.SendAsync(new MoveUnitClientEvent(gameObjects[^1].OwnerPlayerId, gameObjects[^1].Id, 10, 5));
 
     await Task.Delay(500);
 
-    await client.SendAsync(new MoveUnitClientEvent(gameObjects[1].Id, 6, 7));
+    await client.SendAsync(new MoveUnitClientEvent(gameObjects[1].OwnerPlayerId, gameObjects[1].Id, 6, 7));
     
     await Task.Delay(100);
 
-    await client.SendAsync(new MoveUnitClientEvent(gameObjects[0].Id, 6, 7)); // Should move until collision
+    await client.SendAsync(new MoveUnitClientEvent(gameObjects[0].OwnerPlayerId, gameObjects[0].Id, 6, 7)); // Should move until collision
 
     await client.SendAsync(new CreateBuildingClientEvent(playerList[0].Id, BuildingType.Blacksmith, new ServerPosition { X = 15, Y = 15 }));
     

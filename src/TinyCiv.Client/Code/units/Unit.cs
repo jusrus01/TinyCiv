@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using TinyCiv.Client.Code.MVVM;
 using TinyCiv.Shared.Events.Client;
 
@@ -23,6 +24,6 @@ public abstract class Unit : GameObject
 
     public async Task MoveTo(Position position)
     {
-        await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(Id, position.row, position.column));
+        await ClientSingleton.Instance.serverClient.SendAsync(new MoveUnitClientEvent(OwnerId, Id, position.row, position.column));
     }
 }

@@ -5,13 +5,8 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings;
 
-public class Farm : IBuilding
+public class Farm : ConstantSpeedBuilding
 {
-    public int Price { get; }
-    public BuildingType BuildingType { get; }
-    public GameObjectType TileType { get; }
-    public int IntervalMs { get; set; }
-
     public Farm()
     {
         Price = Constants.Game.FarmPrice;
@@ -20,7 +15,7 @@ public class Farm : IBuilding
         IntervalMs = Constants.Game.FarmInterval;
     }
 
-    public void Trigger(Guid playerId, IResourceService resourceService)
+    protected override void UpdateResources(Guid playerId, IResourceService resourceService)
     {
         resourceService.AddResources(playerId, ResourceType.Food, 2);
         Console.WriteLine($"Building \"{GetType()}\" generated 2 Food for player: {playerId}");

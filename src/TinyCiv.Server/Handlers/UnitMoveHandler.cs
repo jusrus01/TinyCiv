@@ -22,7 +22,7 @@ namespace TinyCiv.Server.Handlers
                 switch (response)
                 {
                     case UnitMoveResponse.Started:
-                        await NotifyCallerAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId, true))
+                        await NotifyCallerAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId.Value, true))
                             .ConfigureAwait(false);
                         break;
                     case UnitMoveResponse.Moved:
@@ -30,14 +30,14 @@ namespace TinyCiv.Server.Handlers
                             .ConfigureAwait(false);
                         break;
                     case UnitMoveResponse.Stopped:
-                        await NotifyCallerAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId, false))
+                        await NotifyCallerAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId.Value, false))
                             .ConfigureAwait(false); 
                         break;
                 }
             }
 
             ServerPosition targetPosition = new() { X = @event.X, Y = @event.Y };
-            var request = new MoveUnitRequest(@event.UnitId, targetPosition, UnitMoveCallback);
+            var request = new MoveUnitRequest(@event.UnitId.Value, targetPosition, UnitMoveCallback);
             GameService.MoveUnit(request);
 
             return Task.CompletedTask;

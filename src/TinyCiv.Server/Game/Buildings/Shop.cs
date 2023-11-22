@@ -5,13 +5,8 @@ using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings
 {
-    public class Shop : IBuilding
+    public class Shop : ConstantSpeedBuilding
     {
-        public int Price { get; }
-        public BuildingType BuildingType { get; }
-        public GameObjectType TileType { get; }
-        public int IntervalMs { get; set; }
-
         public Shop()
         {
             Price = Constants.Game.ShopPrice;
@@ -20,7 +15,7 @@ namespace TinyCiv.Server.Game.Buildings
             IntervalMs = Constants.Game.ShopInterval;
         }
 
-        public void Trigger(Guid playerId, IResourceService resourceService)
+        protected override void UpdateResources(Guid playerId, IResourceService resourceService)
         {
             resourceService.AddResources(playerId, ResourceType.Gold, 2);
             Console.WriteLine($"Building \"{GetType()}\" generated 2 Gold for player: {playerId}");
