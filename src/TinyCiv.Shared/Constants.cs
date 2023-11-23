@@ -47,6 +47,7 @@ public static class Constants
         public const int HeightSquareCount = 20;
 
         public const int MovementSpeedMs = 500;
+        public const int GameModeAbilityDurationMs = 5000;
 
         public const int BuildingSpaceFromTown = 3;
         public const int TownSpaceFromTown = 5;
@@ -86,6 +87,8 @@ public static class Constants
         public const string SendMapChangeToAll = nameof(SendMapChangeToAll);
         public const string SendVictoryEventToAll = nameof(SendVictoryEventToAll);
         public const string SendDefeatEventToAll = nameof(SendDefeatEventToAll);
+
+        public const string SendGameModeChangeEventToAll = nameof(SendGameModeChangeEventToAll);
     }
 
     public static class Assets

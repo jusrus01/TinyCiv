@@ -57,6 +57,11 @@ internal static class ServerHelper
             return JsonSerializer.Deserialize<DefeatServerEvent>(content)!;
         }
 
+        if (type == nameof(GameModeChangeServerEvent))
+        {
+            return JsonSerializer.Deserialize<GameModeChangeServerEvent>(content)!;
+        }
+
         throw new NotSupportedException();
     }
 }
