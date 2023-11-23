@@ -995,6 +995,25 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
     #endregion
 
+    #region ListenForGameModeChange
+    [Fact]
+    public async Task ListenForGameModeChange_WhenOnlyUnitMode_CantBuild()
+    {
+        Guid? playerId = null;
+        _sut.ListenForNewPlayerCreation(resp =>
+        {
+            playerId = resp.Created.Id;
+        });
+
+        var anotherClient = InitializeClient();
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+
+
+    }
+    #endregion
+
     #region Helpers
 
     private static Task WaitForResponseAsync(int? delayMs = null)

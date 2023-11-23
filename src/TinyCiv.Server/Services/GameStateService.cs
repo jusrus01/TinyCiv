@@ -26,7 +26,7 @@ public class GameStateService : IGameStateService
         var currentTime = TimeOnly.FromDateTime(DateTime.Now);
         if ((currentTime - _lastGameStateChange).Milliseconds >= Constants.Game.GameModeAbilityDurationMs)
         {
-            _state = gameState;
+            SetStateInstant(gameState);
             _lastGameStateChange = currentTime;
             return true;
         }
@@ -34,8 +34,9 @@ public class GameStateService : IGameStateService
         return false;
     }
 
-    public void ResetState()
+    public void SetStateInstant(IGameState gameState)
     {
-        _state = new NormalState();
+        Console.WriteLine(gameState.ToString());
+        _state = gameState;
     }
 }

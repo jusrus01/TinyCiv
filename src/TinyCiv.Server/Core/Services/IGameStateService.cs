@@ -6,5 +6,5 @@ public interface IGameStateService
 {
     IGameState GetState();
     bool SetState(IGameState gameState);
-    void ResetState();
+    void SetStateInstant(IGameState gameState);
 }

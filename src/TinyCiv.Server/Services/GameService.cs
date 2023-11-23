@@ -70,7 +70,7 @@ public class GameService : IGameService
     {
         _sessionService.StartGame();
         var map = _mapService.Initialize(mapType) ?? throw new InvalidOperationException("Something went wrong, unable to initialize map");
-        _gameStateService.SetState(new NormalState());
+        _gameStateService.SetStateInstant(new NormalState());
         return map;
     }
 
@@ -229,7 +229,7 @@ public class GameService : IGameService
         Task.Run(async () =>
         {
             await Task.Delay(Constants.Game.GameModeAbilityDurationMs);
-            _gameStateService.ResetState();
+            _gameStateService.SetStateInstant(new NormalState());
         });
         
         return success;
