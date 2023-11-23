@@ -221,15 +221,15 @@ public class GameService : IGameService
         _mapService.MoveUnitAsync(request.UnitId, request.Position, onUnitMoved);
     }
 
-    public bool SetGameMode(GameModeType gameModeType)
+    public bool SetGameMode(Guid playerId, GameModeType gameModeType)
     {
         var gameState = GameModesMapper.GameModes[gameModeType];
-        bool success = _gameStateService.SetState(gameState);
+        bool success = _gameStateService.SetState(playerId, gameState);
         
         Task.Run(async () =>
         {
             await Task.Delay(Constants.Game.GameModeAbilityDurationMs);
-            _gameStateService.SetStateInstant(new NormalState());
+            _gameStateService.ResetState(playerId);
         });
         
         return success;

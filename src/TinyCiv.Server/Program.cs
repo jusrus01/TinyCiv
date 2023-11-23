@@ -8,6 +8,7 @@ using TinyCiv.Server.Handlers.Lobby;
 using TinyCiv.Server.Hubs;
 using TinyCiv.Server.Publishers;
 using TinyCiv.Server.Services;
+using TinyCiv.Shared.Events.Client;
 using Constants = TinyCiv.Shared.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,6 +54,7 @@ builder.Services.AddTransient<IClientHandler, GameStartHandler>();
 builder.Services.AddTransient<IClientHandler, UnitAttackHandler>();
 builder.Services.AddTransient<IClientHandler, CreateBuildingHandler>();
 builder.Services.AddTransient<IClientHandler, PlaceTownHandler>();
+builder.Services.AddTransient<IClientHandler, ChangeGameModeHandler>();
 
 builder.Services.AddHostedService<GameBoardAnalyzerBackgroundJob>();
 

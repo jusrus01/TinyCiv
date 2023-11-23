@@ -7,6 +7,6 @@ public class OnlyUnitState : IGameState
 {
     public bool HandleEvent(ClientEvent @event)
     {
-        return @event is not PlaceTownClientEvent || @event is not CreateBuildingClientEvent;
+        return @event is not PlaceTownClientEvent && @event is not CreateBuildingClientEvent;
     }
 }

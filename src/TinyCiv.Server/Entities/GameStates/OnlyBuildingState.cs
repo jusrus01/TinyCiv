@@ -7,6 +7,6 @@ public class OnlyBuildingState : IGameState
 {
     public bool HandleEvent(ClientEvent @event)
     {
-        return @event is not AttackUnitClientEvent || @event is not CreateUnitClientEvent || @event is not MoveUnitClientEvent;
+        return @event is not AttackUnitClientEvent && @event is not CreateUnitClientEvent && @event is not MoveUnitClientEvent;
     }
 }

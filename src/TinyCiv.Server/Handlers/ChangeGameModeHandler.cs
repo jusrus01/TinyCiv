@@ -18,14 +18,14 @@ public class ChangeGameModeHandler : ClientHandler<ChangeGameModeClientEvent>
 
     protected override async Task OnHandleAsync(ChangeGameModeClientEvent @event)
     {
-        var response = GameService.SetGameMode(@event.GameModeType);
+        var response = GameService.SetGameMode(@event.PlayerId, @event.GameModeType);
 
         if (response == false)
         {
             return;
         } 
 
-        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new GameModeChangeServerEvent(@event.GameModeType))
+        await NotifyAllAsync(Constants.Server.SendGameModeChangeEventToAll, new GameModeChangeServerEvent(@event.GameModeType))
             .ConfigureAwait(false);
     }
 }

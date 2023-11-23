@@ -997,7 +997,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
     #region ListenForGameModeChange
     [Fact]
-    public async Task ListenForGameModeChange_WhenOnlyUnitMode_CantBuild()
+    public async Task ListenForGameModeChange_WhenOnlyBuildingMode_CantMove()
     {
         Guid? playerId = null;
         _sut.ListenForNewPlayerCreation(resp =>
@@ -1005,8 +1005,25 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
             playerId = resp.Created.Id;
         });
 
+        ServerGameObject colonist = null!;
+        _sut.ListenForNewUnitCreation(resp =>
+        {
+            colonist = resp.CreatedUnit;
+        });
+
+        _sut.ListenForMapChange(resp =>
+        {
+            if (colonist != null)
+            {
+                colonist = resp.Map.Objects!
+                    .Where(o => o.Id == colonist.Id)
+                    .FirstOrDefault()!;
+            }
+        });
+
         var anotherClient = InitializeClient();
         await anotherClient.SendAsync(new JoinLobbyClientEvent());
+
         await _sut.SendAsync(new JoinLobbyClientEvent());
         await WaitForResponseAsync();
 
@@ -1016,7 +1033,26 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await _sut.SendAsync(new PlaceTownClientEvent(playerId!.Value));
         await WaitForResponseAsync();
 
-        
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 0, 0, GameObjectType.Warrior));
+        await WaitForResponseAsync();
+
+        ServerPosition colonistPosition = new() { X = colonist.Position!.X, Y = colonist.Position!.Y };
+
+        await _sut.SendAsync(new MoveUnitClientEvent(playerId!.Value, colonist.Id, colonist.Position!.X + 1, colonist.Position.Y));
+        await WaitForResponseAsync();
+
+        ServerPosition colonistPosition2 = new() { X = colonist.Position!.X, Y = colonist.Position!.Y };
+
+        await _sut.SendAsync(new ChangeGameModeClientEvent(playerId!.Value, GameModeType.RestrictedMode));
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new MoveUnitClientEvent(playerId!.Value, colonist.Id, colonist.Position!.X + 1, colonist.Position.Y));
+        await WaitForResponseAsync();
+
+        ServerPosition colonistPosition3 = new() { X = colonist.Position!.X, Y = colonist.Position!.Y };
+
+        Assert.NotEqual(colonistPosition.X, colonistPosition2.X);
+        Assert.Equal(colonistPosition2.X, colonistPosition3.X);
     }
     #endregion
 
