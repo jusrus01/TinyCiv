@@ -31,7 +31,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
     public static IEnumerable<object[]> AvailableEvents_TestData()
     {
-        const int testedClientEventCount = 8;
+        const int testedClientEventCount = 9;
         var actualEventCount = Assembly.GetAssembly(typeof(ClientEvent))!.GetTypes()
             .Count(type => typeof(ClientEvent).IsAssignableFrom(type) && !type.IsAbstract);
         if (actualEventCount != testedClientEventCount)
@@ -47,6 +47,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         yield return new object[] { new AttackUnitClientEvent(Guid.NewGuid(), Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7")) };
         yield return new object[] { new CreateBuildingClientEvent(Guid.NewGuid(), BuildingType.Blacksmith, new ServerPosition { X = 0, Y = 0 }) };
         yield return new object[] { new PlaceTownClientEvent(Guid.NewGuid()) };
+        yield return new object[] { new ChangeGameModeClientEvent(Guid.NewGuid(), GameModeType.Normal) };
     }
 
     #region ListenForGameStart
@@ -1043,7 +1044,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         ServerPosition colonistPosition2 = new() { X = colonist.Position!.X, Y = colonist.Position!.Y };
 
-        await _sut.SendAsync(new ChangeGameModeClientEvent(playerId!.Value, GameModeType.RestrictedMode));
+        await _sut.SendAsync(new ChangeGameModeClientEvent(playerId!.Value, GameModeType.BuildingOnly));
         await WaitForResponseAsync();
 
         await _sut.SendAsync(new MoveUnitClientEvent(playerId!.Value, colonist.Id, colonist.Position!.X + 1, colonist.Position.Y));
@@ -1053,6 +1054,59 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
         Assert.NotEqual(colonistPosition.X, colonistPosition2.X);
         Assert.Equal(colonistPosition2.X, colonistPosition3.X);
+    }
+
+    [Fact]
+    public async Task ListenForGameModeChange_WhenOnlyBuildingMode_CanMoveAfterAbilityDuration()
+    {
+        Guid? playerId = null;
+        _sut.ListenForNewPlayerCreation(resp =>
+        {
+            playerId = resp.Created.Id;
+        });
+
+        ServerGameObject colonist = null!;
+        _sut.ListenForNewUnitCreation(resp =>
+        {
+            colonist = resp.CreatedUnit;
+        });
+
+        _sut.ListenForMapChange(resp =>
+        {
+            if (colonist != null)
+            {
+                colonist = resp.Map.Objects!
+                    .Where(o => o.Id == colonist.Id)
+                    .FirstOrDefault()!;
+            }
+        });
+
+        var anotherClient = InitializeClient();
+        await anotherClient.SendAsync(new JoinLobbyClientEvent());
+
+        await _sut.SendAsync(new JoinLobbyClientEvent());
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync(1000);
+
+        await _sut.SendAsync(new PlaceTownClientEvent(playerId!.Value));
+        await WaitForResponseAsync();
+
+        await _sut.SendAsync(new CreateUnitClientEvent(playerId!.Value, 0, 0, GameObjectType.Warrior));
+        await WaitForResponseAsync();
+
+        ServerPosition colonistPosition = new() { X = colonist.Position!.X, Y = colonist.Position!.Y };
+
+        await _sut.SendAsync(new ChangeGameModeClientEvent(playerId!.Value, GameModeType.BuildingOnly));
+        await WaitForResponseAsync(Constants.Game.GameModeAbilityDurationMs + 100);
+
+        await _sut.SendAsync(new MoveUnitClientEvent(playerId!.Value, colonist.Id, colonist.Position!.X + 1, colonist.Position.Y));
+        await WaitForResponseAsync();
+
+        ServerPosition colonistPosition2 = new() { X = colonist.Position!.X, Y = colonist.Position!.Y };
+
+        Assert.NotEqual(colonistPosition.X, colonistPosition2.X);
     }
     #endregion
 
