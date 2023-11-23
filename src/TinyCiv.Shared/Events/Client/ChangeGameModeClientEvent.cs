@@ -2,4 +2,4 @@
 
 namespace TinyCiv.Shared.Events.Client;
 
-public record ChangeGameModeClientEvent(GameModeType GameModeType) : ClientEvent;
+public record ChangeGameModeClientEvent(Guid PlayerId, GameModeType GameModeType) : ClientEvent;

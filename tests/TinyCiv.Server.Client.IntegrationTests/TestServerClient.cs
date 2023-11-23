@@ -1010,7 +1010,13 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         await _sut.SendAsync(new JoinLobbyClientEvent());
         await WaitForResponseAsync();
 
+        await _sut.SendAsync(new StartGameClientEvent());
+        await WaitForResponseAsync(1000);
 
+        await _sut.SendAsync(new PlaceTownClientEvent(playerId!.Value));
+        await WaitForResponseAsync();
+
+        
     }
     #endregion
 

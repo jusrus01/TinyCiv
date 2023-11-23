@@ -5,6 +5,6 @@ namespace TinyCiv.Server.Core.Services;
 public interface IGameStateService
 {
     IGameState GetState();
-    bool SetState(IGameState gameState);
+    bool SetState(Guid PlayerId, IGameState gameState);
     void SetStateInstant(IGameState gameState);
 }
