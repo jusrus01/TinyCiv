@@ -8,8 +8,9 @@
              d:DesignHeight="200" d:DesignWidth="200">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="24" />
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -44,5 +45,21 @@
 
             </StackPanel>
         </Border>-->
+        <StackPanel Orientation="Vertical"
+                    Grid.Row="3">
+            <Button Height="auto"
+                    Margin="8,2"
+                    Background="Red"
+                    Command="{Binding PanicButtonCommand}"
+                    IsEnabled="{Binding IsPanicButtonEnabled.Value}">
+                Panic Button
+            </Button>
+        </StackPanel>
+        <StackPanel Grid.Row="3"
+                    Grid.Column="1"
+                    Orientation="Horizontal">
+            <TextBlock>Panic Mode: </TextBlock>
+            <TextBlock Text="{Binding PanicModeText.Value}"></TextBlock>
+        </StackPanel>
     </Grid>
 </UserControl>
