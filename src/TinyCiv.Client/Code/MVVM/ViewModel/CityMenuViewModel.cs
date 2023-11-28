@@ -65,32 +65,32 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 
         public async void ExecuteUnitPurchase(Position position)
         {
-            var executionVM = HUDManager.executionVM;
+            //var executionVM = HUDManager.executionVM;
             IGameCommand createUnitCommand = new CreateUnitCommand(CurrentPlayer.Id, position.row, position.column, SelectedBuyUnit.Value);
-            executionVM.AddToQueue(new ClockModel(SelectedBuyUnit.Value, SelectedBuyUnit.Value.ImagePath, TimeSpan.FromMilliseconds(5000))); // exists ~500ms delay
+            HUDManager.Instance.AddToExecutionQueue(new ClockModel(SelectedBuyUnit.Value, SelectedBuyUnit.Value.ImagePath, TimeSpan.FromMilliseconds(5000))); // exists ~500ms delay
 
             Mouse.OverrideCursor = Cursors.Arrow;
             IsUnderPurchase.Value = false;
             SelectedBuyUnit.Value = null;
-            HUDManager.HideLowerMenu();
+            HUDManager.Instance.HideLowerMenu();
 
-            await executionVM.CommandInvoker.AddCommandToQueue(createUnitCommand, 5000, position);
+            //await executionVM.CommandInvoker.AddCommandToQueue(createUnitCommand, 5000, position);
+            await HUDManager.Instance.AddCommandToQueue(createUnitCommand, 5000, position);
         }
 
         public async void ExecuteBuildingPurchase(Position position)
         {
-            var executionVM = HUDManager.executionVM;
             ServerPosition serverPos = new ServerPosition { X = position.row, Y = position.column };
 
             IGameCommand createBuildingCommand = new CreateBuildingCommand(CurrentPlayer.Id, SelectedBuyBuilding.Value, serverPos);
-            executionVM.AddToQueue(new ClockModel(SelectedBuyBuilding.Value, SelectedBuyBuilding.Value.ImagePath, TimeSpan.FromMilliseconds(5000)));
+            HUDManager.Instance.AddToExecutionQueue(new ClockModel(SelectedBuyBuilding.Value, SelectedBuyBuilding.Value.ImagePath, TimeSpan.FromMilliseconds(5000)));
 
             SelectedBuyBuilding.Value = null;
             IsUnderPurchase.Value = false;
             Mouse.OverrideCursor = Cursors.Arrow;
-            HUDManager.HideLowerMenu();
+            HUDManager.Instance.HideLowerMenu();
 
-            await executionVM.CommandInvoker.AddCommandToQueue(createBuildingCommand, 5000, position);
+            await HUDManager.Instance.AddCommandToQueue(createBuildingCommand, 5000, position);
         }
 
         private bool CanBuy(object parameter)
