@@ -26,7 +26,7 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 
         public ExecutionQueueViewModel()
         {
-            gameState = HUDManager.mainVM.GameVM.gameState;
+            gameState = HUDManager.Instance.GetGameState();
             UpdateClocks();
         }
 

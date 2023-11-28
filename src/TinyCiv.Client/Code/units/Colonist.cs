@@ -41,7 +41,7 @@ namespace TinyCiv.Client.Code.units
         public void SettleDown()
         {
             ClientSingleton.Instance.serverClient.SendAsync(new PlaceTownClientEvent(CurrentPlayer.Id));
-            HUDManager.HideLowerMenu();
+            HUDManager.Instance.HideLowerMenu();
         }
     }
 }

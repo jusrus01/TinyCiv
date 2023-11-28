@@ -29,7 +29,7 @@ namespace TinyCiv.Client.Code.MVVM
         public MainViewModel()
         {
             Game.Value = GameVM;
-            HUDManager.mainVM = this;
+            HUDManager.Instance.mainVM = this;
 
             DependencyObject dep = new DependencyObject();
             if (!DesignerProperties.GetIsInDesignMode(dep))
@@ -53,8 +53,8 @@ namespace TinyCiv.Client.Code.MVVM
             {
                 CurrentPlayer.Instance.player = response.Created;
                 CurrentPlayer.Instance.Resources = new Resources{ Industry = Constants.Game.StartingIndustry, Food = Constants.Game.StartingFood, Gold = Constants.Game.StartingGold };                
-                HUDManager.DisplayUpperMenu();
-                HUDManager.DisplayExecutionQueue();
+                HUDManager.Instance.DisplayUpperMenu();
+                HUDManager.Instance.DisplayExecutionQueue();
             }
 
             // If the party is full
@@ -66,19 +66,19 @@ namespace TinyCiv.Client.Code.MVVM
         private void OnGameStart(GameStartServerEvent response)
         {
             GameVM.GameStart(response);
-            HUDManager.HideLowerMenu();       
+            HUDManager.Instance.HideLowerMenu();       
         }
 
         private void OnVictory(VictoryServerEvent response)
         {
             if (response.PlayerId == CurrentPlayer.Id)
-                HUDManager.FinishGameVictory();
+                HUDManager.Instance.FinishGameVictory();
         }
 
         private void OnDefeat(DefeatServerEvent response)
         {
             if (response.PlayerId == CurrentPlayer.Id)
-                HUDManager.FinishGameDefeat();
+                HUDManager.Instance.FinishGameDefeat();
         }
     }
 }

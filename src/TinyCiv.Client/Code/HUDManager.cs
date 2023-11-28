@@ -3,19 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TinyCiv.Client.Code.Commands;
 using TinyCiv.Client.Code.MVVM;
+using TinyCiv.Client.Code.MVVM.Model;
 using TinyCiv.Client.Code.MVVM.ViewModel;
 using TinyCiv.Client.Code.Units;
 
 namespace TinyCiv.Client.Code
 {
-    public static class HUDManager
+    public class HUDManager
     {
-        public static MainViewModel mainVM;
-        public static CityMenuViewModel cityVM { get; private set; }
-        public static ExecutionQueueViewModel executionVM { get; private set; }
+        private static HUDManager _instance = new HUDManager();
+        public static HUDManager Instance { 
+            get
+            {
+                return _instance;
+            }
+        }
 
-        public static void DisplayUnit(Unit unit)
+        public MainViewModel mainVM { private get; set; }
+        private CityMenuViewModel cityVM;
+        private ExecutionQueueViewModel executionVM;
+
+        public void DisplayUnit(Unit unit)
         {
             if (mainVM == null)
                 return;
@@ -23,7 +33,7 @@ namespace TinyCiv.Client.Code
             mainVM.LowerMenu.Value = new UnitMenuViewModel(unit);
         }
 
-        public static void DisplayCityMenu()
+        public void DisplayCityMenu()
         {
             if (mainVM == null)
                 return;
@@ -32,7 +42,7 @@ namespace TinyCiv.Client.Code
             mainVM.LowerMenu.Value = cityVM;
         }
 
-        public static void DisplayLobby()
+        public void DisplayLobby()
         {
             if (mainVM == null)
                 return;
@@ -40,7 +50,7 @@ namespace TinyCiv.Client.Code
             mainVM.LowerMenu.Value = new LobbyMenuViewModel();
         }
 
-        public static void DisplayUpperMenu()
+        public void DisplayUpperMenu()
         {
             if (mainVM == null)
                 return;
@@ -48,7 +58,7 @@ namespace TinyCiv.Client.Code
             mainVM.UpperMenu.Value = new UpperMenuViewModel();
         }
 
-        public static void HideLowerMenu()
+        public void HideLowerMenu()
         {
             if (mainVM == null)
                 return;
@@ -57,7 +67,7 @@ namespace TinyCiv.Client.Code
             mainVM.GameVM.gameState.isGameObjectSelected = false;
         }
 
-        public static void DisplayExecutionQueue()
+        public void DisplayExecutionQueue()
         {
             if (mainVM == null) return;
 
@@ -65,18 +75,63 @@ namespace TinyCiv.Client.Code
             mainVM.ExecutionMenu.Value = executionVM;
         }
 
-        public static void FinishGameVictory()
+        public void FinishGameVictory()
         {
             if (mainVM == null) return;
 
             mainVM.Game.Value = new GameOverViewModel("VICTORY");
         }
 
-        public static void FinishGameDefeat()
+        public void FinishGameDefeat()
         {
             if (mainVM == null) return;
 
             mainVM.Game.Value = new GameOverViewModel("DEFEAT");
+        }
+
+        public void AddToExecutionQueue(ClockModel clockModel)
+        {
+            if (executionVM == null) return;
+
+            executionVM.AddToQueue(clockModel);
+        }
+
+        public Task AddCommandToQueue(IGameCommand createUnitCommand, int v, Position position)
+        {
+            return executionVM.CommandInvoker.AddCommandToQueue(createUnitCommand, v, position);
+        }
+
+        public GameState GetGameState()
+        {
+            return mainVM.GameVM.gameState;
+        }
+
+        public BuildingModel GetSelectedBuyBuilding()
+        {
+            if (cityVM == null) return null;
+
+            return cityVM.SelectedBuyBuilding.Value;
+        }
+
+        public UnitModel GetSelectedBuyUnit()
+        {
+            if (cityVM == null) return null;
+
+            return cityVM.SelectedBuyUnit.Value;
+        }
+
+        public void ExecuteBuildingPurchase(Position position)
+        {
+            if (cityVM == null) return;
+
+            cityVM.ExecuteBuildingPurchase(position);
+        }
+
+        internal void ExecuteUnitPurchase(Position position)
+        {
+            if (cityVM == null) return;
+
+            cityVM.ExecuteUnitPurchase(position);
         }
     }
 }
