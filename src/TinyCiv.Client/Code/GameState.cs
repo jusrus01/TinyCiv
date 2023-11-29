@@ -68,9 +68,9 @@ namespace TinyCiv.Client.Code
             }
             if (isGameObjectSelected && selectedGameObject is City)
             {
-                var CityMenuVM = HUDManager.cityVM;
-                var buildingUnderPurchase = CityMenuVM.SelectedBuyBuilding.Value;
-                var unitUnderPurchase = CityMenuVM.SelectedBuyUnit.Value;
+                var hud = HUDManager.Instance;
+                var buildingUnderPurchase = hud.GetSelectedBuyBuilding();
+                var unitUnderPurchase = hud.GetSelectedBuyUnit();
                 if (unitUnderPurchase != null)
                 {
                     InvokeUnitSpawnProcess(clickedPosition);
@@ -86,9 +86,7 @@ namespace TinyCiv.Client.Code
 
         private void Water_Tile_Click(Position clickedPosition)
         {
-            var CityMenuVM = HUDManager.cityVM;
-
-            var buildingUnderPurchase = CityMenuVM.SelectedBuyBuilding.Value;
+            var buildingUnderPurchase = HUDManager.Instance.GetSelectedBuyBuilding();
             if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Port)
             {
                 InvokeBuildingProcess(clickedPosition);
@@ -97,9 +95,7 @@ namespace TinyCiv.Client.Code
 
         private void Rock_Tile_Click(Position clickedPosition)
         {
-            var CityMenuVM = HUDManager.cityVM;
-
-            var buildingUnderPurchase = CityMenuVM.SelectedBuyBuilding.Value;
+            var buildingUnderPurchase = HUDManager.Instance.GetSelectedBuyBuilding();
             if (buildingUnderPurchase != null && buildingUnderPurchase.Type == GameObjectType.Mine)
             {
                 InvokeBuildingProcess(clickedPosition);
@@ -109,9 +105,9 @@ namespace TinyCiv.Client.Code
         private void InvokeBuildingProcess(Position position)
         {
             if (!InRangeOfCity(position)) return;
-            var buildingUnderPurchase = HUDManager.cityVM.SelectedBuyBuilding.Value;
+            var buildingUnderPurchase = HUDManager.Instance.GetSelectedBuyBuilding();
             AddDecoy(buildingUnderPurchase.Type, position);
-            HUDManager.cityVM.ExecuteBuildingPurchase(position);
+            HUDManager.Instance.ExecuteBuildingPurchase(position);
             onPropertyChanged?.Invoke();
         }
 
@@ -137,9 +133,9 @@ namespace TinyCiv.Client.Code
         private void InvokeUnitSpawnProcess(Position position)
         {
             if (!InRangeOfCity(position)) return;
-            var unitUnderPurchase = HUDManager.cityVM.SelectedBuyUnit.Value;
+            var unitUnderPurchase = HUDManager.Instance.GetSelectedBuyUnit();
             AddDecoy(unitUnderPurchase.Type, position);
-            HUDManager.cityVM.ExecuteUnitPurchase(position);
+            HUDManager.Instance.ExecuteUnitPurchase(position);
             onPropertyChanged?.Invoke();
         }
 
@@ -182,7 +178,7 @@ namespace TinyCiv.Client.Code
             isGameObjectSelected = false;
             (gameObject as City).RemoveHighlight();
             gameObject.RemoveEffects();
-            HUDManager.HideLowerMenu();
+            HUDManager.Instance.HideLowerMenu();
             onPropertyChanged?.Invoke();
         }
 
@@ -198,7 +194,7 @@ namespace TinyCiv.Client.Code
             (gameObject as City).HighlightedArea = (decoratedCity as BorderAreaDecorator).highlightedGameObjects;
 
             decoratedCity.ApplyEffects();
-            HUDManager.DisplayCityMenu();
+            HUDManager.Instance.DisplayCityMenu();
             onPropertyChanged?.Invoke();
         }
 
@@ -219,7 +215,7 @@ namespace TinyCiv.Client.Code
 
             decoratedObject.ApplyEffects();
 
-            HUDManager.DisplayUnit((Unit)gameObject);
+            HUDManager.Instance.DisplayUnit((Unit)gameObject);
             onPropertyChanged?.Invoke();
         }
 
@@ -227,7 +223,7 @@ namespace TinyCiv.Client.Code
         {
             isGameObjectSelected = false;
             gameObject.RemoveEffects();
-            HUDManager.HideLowerMenu();
+            HUDManager.Instance.HideLowerMenu();
             onPropertyChanged?.Invoke();
         }
 
