@@ -1,6 +1,5 @@
 using System.Text.Json;
 using TinyCiv.Server.Core.Handlers;
-using TinyCiv.Server.Core.Middlewares;
 using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Middleware;

@@ -7,6 +7,7 @@ using TinyCiv.Server.Dtos.Buildings;
 using TinyCiv.Server.Core.Game.Buildings;
 using Microsoft.Extensions.Logging.Abstractions;
 using TinyCiv.Server.Core.Game.InteractableObjects;
+using TinyCiv.Server.Core.Publishers;
 
 namespace TinyCiv.Server.Tests.Services;
 
@@ -31,6 +32,7 @@ public class TestResourceService
             _mapServiceMock.Object,
             new Mock<IInteractableObjectService>().Object,
             new Mock<ICombatService>().Object,
+            new Mock<IPublisher>().Object,
             NullLogger<GameService>.Instance);
 
         _playerId = Guid.NewGuid();

@@ -8,31 +8,34 @@ namespace TinyCiv.Server.Publishers;
 
 public class Publisher : IPublisher
 {
-    private readonly ConcurrentDictionary<string, Subscriber> _subscribers = new();
-
     private readonly ILogger<Publisher> _logger;
-
-    public Publisher(ILogger<Publisher> logger)
+    private readonly IPublisherStorage _storage;
+    
+    public Publisher(IPublisherStorage storage, ILogger<Publisher> logger)
     {
         _logger = logger;
+        _storage = storage;
     }
     
     public void Subscribe(Subscriber subscriber)
     {
-        _subscribers.TryAdd(subscriber.ConnectionId ?? throw new InvalidOperationException(), subscriber);
+        _storage.Add(subscriber);
     }
 
     public void Unsubscribe(Subscriber subscriber)
     {
-        _subscribers.TryRemove(subscriber.ConnectionId ?? throw new InvalidOperationException(), out _);
+        _storage.Remove(subscriber);
     }
 
     public Task NotifyAllAsync<T>(string methodName, T serverEvent) where T : ServerEvent
     {
         var notificationTasks = new List<Task>();
-        
-        foreach (var subscriber in _subscribers.Values)
+
+        var iterator = _storage.GetIterator();
+        while (iterator.HasNext())
         {
+            var subscriber = iterator.Next();
+            
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (subscriber == null)
             {
@@ -41,7 +44,7 @@ public class Publisher : IPublisher
             
             notificationTasks.Add(InternalNotifyAsync(subscriber.Proxy, methodName, serverEvent));
         }
-
+        
         return Task.WhenAll(notificationTasks);
     }
 
