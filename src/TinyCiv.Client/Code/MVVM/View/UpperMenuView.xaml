@@ -16,9 +16,9 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">Industry:</TextBlock>
-        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">Gold:</TextBlock>
-        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="5">Food:</TextBlock>
+        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="2">Industry:</TextBlock>
+        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="2">Gold:</TextBlock>
+        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="2">Food:</TextBlock>
         <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Industry.Value}"/>
         <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Gold.Value}"/>
         <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Food.Value}"/>

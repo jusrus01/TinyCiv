@@ -24,6 +24,7 @@ namespace TinyCiv.Client.Code
         public MainViewModel mainVM { private get; set; }
         private CityMenuViewModel cityVM;
         private ExecutionQueueViewModel executionVM;
+        private ChatBoxViewModel chatBoxVM;
 
         public void DisplayUnit(Unit unit)
         {
@@ -73,6 +74,17 @@ namespace TinyCiv.Client.Code
 
             executionVM = new ExecutionQueueViewModel();
             mainVM.ExecutionMenu.Value = executionVM;
+        }
+
+        public void DisplayChatBox()
+        {
+            if (mainVM == null)
+            {
+                return;
+            }
+
+            chatBoxVM = new ChatBoxViewModel();
+            mainVM.ChatBoxMenu.Value = chatBoxVM;
         }
 
         public void FinishGameVictory()
