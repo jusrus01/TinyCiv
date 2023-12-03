@@ -1,4 +1,7 @@
-﻿using TinyCiv.Server.Core.Game.Buildings;
+﻿using TinyCiv.Server.Core.Extensions;
+using TinyCiv.Server.Core.Game.Buildings;
+using TinyCiv.Server.Core.Game.InteractableObjects;
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Dtos.Buildings;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Server;
@@ -8,6 +11,8 @@ using TinyCiv.Server.Dtos.Units;
 using TinyCiv.Shared.Game;
 using TinyCiv.Shared;
 using TinyCiv.Server.Enums;
+using TinyCiv.Server.Interpreter;
+using TinyCiv.Server.Interpreter.Expressions;
 
 namespace TinyCiv.Server.Services;
 
@@ -19,6 +24,7 @@ public class GameService : IGameService
     private readonly IMapService _mapService;
     private readonly IInteractableObjectService _interactableObjectService;
     private readonly ICombatService _combatService;
+    private readonly IPublisher _publisher;
     private readonly ILogger<GameService> _logger;
 
     public GameService(
@@ -28,6 +34,7 @@ public class GameService : IGameService
         IMapService mapService,
         IInteractableObjectService interactableObjectService,
         ICombatService combatService,
+        IPublisher publisher,
         ILogger<GameService> logger)
     {
         _sessionService = sessionService;
@@ -36,6 +43,7 @@ public class GameService : IGameService
         _mapService = mapService;
         _interactableObjectService = interactableObjectService;
         _combatService = combatService;
+        _publisher = publisher;
         _logger = logger;
     }
 
@@ -70,17 +78,17 @@ public class GameService : IGameService
 
     public Map InitializeColonists()
     {
-        var players = _sessionService.GetPlayers();
-
-        foreach (var player in players)
+        var playerIterator = _sessionService.GetIterator();
+        while (playerIterator.HasNext())
         {
+            var player = playerIterator.Next();
             var random = new Random();
             int x = random.Next(0, Constants.Game.WidthSquareCount);
             int y = random.Next(0, Constants.Game.HeightSquareCount);
             var position = new ServerPosition { X = x, Y = y };
 
             while (_mapService.IsInRange(position, Constants.Game.TownSpaceFromTown, GameObjectType.Colonist) ||
-                _mapService.GetUnit(position)!.Type == GameObjectType.StaticWater)
+                   _mapService.GetUnit(position)!.Type == GameObjectType.StaticWater)
             {
                 x = random.Next(0, Constants.Game.WidthSquareCount);
                 y = random.Next(0, Constants.Game.HeightSquareCount);
@@ -200,7 +208,7 @@ public class GameService : IGameService
 
     public void MoveUnit(MoveUnitRequest request)
     {
-        void onUnitMoved(UnitMoveResponse unitMoveResponse)
+        void OnUnitMoved(UnitMoveResponse unitMoveResponse)
         {
             Map? map = null;
 
@@ -212,7 +220,7 @@ public class GameService : IGameService
             request.UnitMoveCallback?.Invoke(unitMoveResponse, map);
         } 
 
-        _mapService.MoveUnitAsync(request.UnitId, request.Position, onUnitMoved);
+        _mapService.MoveUnitAsync(request.UnitId, request.Position, OnUnitMoved);
     }
 
     public IMapService GetMapService()
@@ -223,5 +231,112 @@ public class GameService : IGameService
     public ISessionService GetSessionService()
     {
         return _sessionService;
+    }
+    
+    public ConditionContext? EvaluateCondition(ConditionContext lastEvaluationContext)
+    {
+        var latestContext = new ConditionContext
+        {
+            Condition = lastEvaluationContext.Condition,
+            PlayerId = lastEvaluationContext.PlayerId,
+        };
+
+        if (lastEvaluationContext.Condition == Condition.None)
+        {
+            latestContext.Result = false;
+            latestContext.UnitCount = 0;
+            return latestContext;
+        }
+
+        var mapObjects = _mapService.GetMapObjects();
+        var playerInteractableUnits = mapObjects
+            .Where(obj => obj.OwnerPlayerId == lastEvaluationContext.PlayerId && obj.IsInteractable())
+            .ToList();
+        latestContext.UnitCount = playerInteractableUnits.Count;
+
+        switch (lastEvaluationContext.Condition)
+        {
+            case Condition.AnyUnitsAlive:
+                latestContext.Result = playerInteractableUnits.Any(unit => unit.Type != GameObjectType.City);
+                break;
+            case Condition.NotUnderAttack:
+                latestContext.Result = playerInteractableUnits.All(unit => unit.OpponentId == null);
+                break;
+            case Condition.MoreThanOneUnitLeft:
+                latestContext.Result = playerInteractableUnits.Count > 1;
+                break;
+            case Condition.AllCurrentUnitsAlive:
+                latestContext.Result = playerInteractableUnits.Count >= lastEvaluationContext.UnitCount;
+                break;
+            default:
+                return null;
+        }
+
+        return latestContext;
+    }
+
+    public void PerformMassAttackOnFirstEnemyUnit(
+        Guid playerId,
+        GameObjectType playerUnits,
+        GameObjectType enemyUnits,
+        TeamColor colorToAttack)
+    {
+        var mapObjects = _mapService.GetMapObjects();
+        var availableUnitsForAttack = mapObjects
+            .Where(obj => obj.OwnerPlayerId == playerId && obj.Type == playerUnits && obj.IsInteractable() && obj.Type != GameObjectType.City)
+            .ToList();
+
+        if (!availableUnitsForAttack.Any())
+        {
+            return;
+        }
+
+        var unitToAttack = mapObjects
+            .FirstOrDefault(obj => obj.Type == enemyUnits && obj.IsInteractable() && obj.Color == colorToAttack);
+        if (unitToAttack == null)
+        {
+            return;
+        }
+        
+        foreach (var unitToMove in availableUnitsForAttack)
+        {
+            _mapService.MoveUnitAsync(
+                unitToMove.Id,
+                unitToAttack.Position!,
+                OnUnitMoved);
+        }
+        
+        // copy-paste from handlers
+        // ...
+        Task MapChangeNotifier(Map updatedMap) =>
+            _publisher.NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(updatedMap));
+
+        // NOTE: not used by client
+        Task NewUnitNotifier(ServerGameObject gameObject) =>
+            _publisher.NotifyAllAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(gameObject));
+        
+        Task InteractableObjectStateChangeNotifier(IInteractableObject interactableObject) =>
+            _publisher.NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, new InteractableObjectServerEvent(interactableObject.GameObjectReferenceId, interactableObject.Health, interactableObject.AttackDamage));
+        
+        void OnUnitMoved(UnitMoveResponse unitMoveResponse)
+        {
+            if (unitMoveResponse == UnitMoveResponse.Moved)
+            {
+                _publisher.NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!)).GetAwaiter().GetResult();
+            }
+
+            if (unitMoveResponse == UnitMoveResponse.Stopped)
+            {
+                foreach (var unit in availableUnitsForAttack)
+                {
+                    _combatService.InitiateCombatAsync(
+                        unit.Id,
+                        unitToAttack.Id,
+                        MapChangeNotifier,
+                        InteractableObjectStateChangeNotifier,
+                        NewUnitNotifier);
+                }
+            }
+        }
     }
 }

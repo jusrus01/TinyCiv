@@ -31,7 +31,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
 
     public static IEnumerable<object[]> AvailableEvents_TestData()
     {
-        const int testedClientEventCount = 8;
+        const int testedClientEventCount = 9;
         var actualEventCount = Assembly.GetAssembly(typeof(ClientEvent))!.GetTypes()
             .Count(type => typeof(ClientEvent).IsAssignableFrom(type) && !type.IsAbstract);
         if (actualEventCount != testedClientEventCount)
@@ -47,6 +47,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         yield return new object[] { new AttackUnitClientEvent(Guid.NewGuid(), Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7"), Guid.Parse("C71E41FF-24AA-46C9-8CBC-5C2A51702AE7")) };
         yield return new object[] { new CreateBuildingClientEvent(Guid.NewGuid(), BuildingType.Blacksmith, new ServerPosition { X = 0, Y = 0 }) };
         yield return new object[] { new PlaceTownClientEvent(Guid.NewGuid()) };
+        yield return new object[] { new InterpretClientEvent(Guid.NewGuid(), "") };
     }
 
     #region ListenForGameStart

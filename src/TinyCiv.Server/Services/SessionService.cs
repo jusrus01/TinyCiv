@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using TinyCiv.Server.Core.Iterators;
 using TinyCiv.Server.Core.Services;
+using TinyCiv.Server.Game;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Game;
 
@@ -9,13 +11,13 @@ namespace TinyCiv.Server.Services;
 public class SessionService : ISessionService
 {
     private readonly object _playerLocker;
-    private readonly List<Player> _players;
+    private readonly HashSet<Player> _players;
 
     private bool _isGameStarted;
 
     public SessionService()
     {
-        _players = new List<Player>();
+        _players = new HashSet<Player>();
         _playerLocker = new object();
     }
 
@@ -61,19 +63,11 @@ public class SessionService : ISessionService
         return _players.Single(p => p.Id == playerId);
     }
 
-    public List<Player> GetPlayers()
+    public IIterator<Player> GetIterator()
     {
         lock (_playerLocker)
         {
-            return _players;
-        }
-    }
-
-    public List<Guid> GetPlayerIds()
-    {
-        lock (_playerLocker)
-        {
-            return _players.Select(i => i.Id).ToList();
+            return new PlayerIterator(new HashSet<Player>(_players));
         }
     }
 
