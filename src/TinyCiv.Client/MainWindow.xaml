@@ -25,7 +25,8 @@
 
         <Grid x:Name="sidePanelGrid" Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="100"/>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="40"/>
                 <RowDefinition/>
                 <RowDefinition Height="100"/>
             </Grid.RowDefinitions>
@@ -36,10 +37,14 @@
 
             <ContentControl
                 Grid.Row="1"
+                Content="{Binding ChatBoxMenu.Value}"/>
+            
+            <ContentControl
+                Grid.Row="2"
                 Content="{Binding LowerMenu.Value}"/>
 
             <ContentControl
-                Grid.Row="2"
+                Grid.Row="3"
                 Content="{Binding ExecutionMenu.Value}"/>
         </Grid>
         
