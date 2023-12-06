@@ -14,13 +14,26 @@ namespace TinyCiv.Client.Code.MVVM.Model
         public long Duration;
         public CancellationTokenSource CancellationTokenSource;
         public Position Position;
+        public CommandInvoker CommandInvoker;
+        private ICommandInvokerMemento memento;
 
-        public CommandQueueModel(IGameCommand command, long duration, CancellationTokenSource cancellationTokenSource, Position position)
+        public CommandQueueModel(IGameCommand command, long duration, CancellationTokenSource cancellationTokenSource, Position position, CommandInvoker commandInvoker)
         {
             Command = command;
             Duration = duration;
             CancellationTokenSource = cancellationTokenSource;
             Position = position;
+            CommandInvoker = commandInvoker;
+        }
+
+        public void MakeBackup()
+        {
+            memento = CommandInvoker.CreateMemento();
+        }
+
+        public void RestoreBackup()
+        {
+            CommandInvoker.SetMemento(memento);
         }
     }
 }
