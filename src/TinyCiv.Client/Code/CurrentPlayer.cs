@@ -13,6 +13,8 @@ namespace TinyCiv.Client.Code
 
         public static TeamColor Color { get { return instance.player.Color; } }
 
+        public static Player Player { get { return instance.player; } }
+
         public Resources Resources { get; set; }
         public static bool IsOwner(GameObject gameObject)
         {
