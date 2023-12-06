@@ -201,6 +201,9 @@ namespace TinyCiv.Client.Code
         private async Task MoveUnit(Position clickedPosition)
         {
             var unit = selectedGameObject as Unit;
+            
+            if (unit == null) return;
+
             await unit.MoveTo(clickedPosition);
             UnselectUnit(unit);
         }
