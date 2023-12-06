@@ -30,8 +30,8 @@ namespace TinyCiv.Client.Code
         public Dictionary<int, GameObject> DecoyObjects = new();
         public UnitMenuViewModel UnitMenuVM;
         public UpperMenuViewModel UpperMenuVM;
-        private int Rows;
-        private int Columns;
+        public int Rows { get; private set; }
+        public int Columns { get; private set; }
         public bool isGameObjectSelected = false;
         private GameObject selectedGameObject;
 
@@ -182,7 +182,7 @@ namespace TinyCiv.Client.Code
             onPropertyChanged?.Invoke();
         }
 
-        private void SelectCity(GameObject gameObject)
+        protected virtual void SelectCity(GameObject gameObject)
         {
             isGameObjectSelected = true;
             selectedGameObject = gameObject;
