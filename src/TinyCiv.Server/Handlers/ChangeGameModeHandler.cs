@@ -4,6 +4,7 @@ using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared.Events.Client;
 using TinyCiv.Shared.Events.Server;
 using TinyCiv.Shared;
+using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Handlers;
 
@@ -18,7 +19,13 @@ public class ChangeGameModeHandler : ClientHandler<ChangeGameModeClientEvent>
 
     protected override async Task OnHandleAsync(ChangeGameModeClientEvent @event)
     {
-        var response = GameService.SetGameMode(@event.PlayerId, @event.GameModeType);
+        void onGamemodeReset()
+        {
+            NotifyAllAsync(Constants.Server.SendGameModeChangeEventToAll, new GameModeChangeServerEvent(GameModeType.Normal))
+                .ConfigureAwait(false);
+        }
+
+        var response = GameService.SetGameMode(@event.PlayerId, @event.GameModeType, onGamemodeReset);
 
         if (response == false)
         {

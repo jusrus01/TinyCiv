@@ -9,7 +9,7 @@ namespace TinyCiv.Server.Services;
 public class GameStateService : IGameStateService
 {
     private IGameState _state;
-    private int _lastGameStateChange;
+    private DateTime _lastGameStateChange;
     private Guid _lastAbilityUser;
     private Dictionary<string, List<Guid>> _usedAbilities = new();
     private object _gameStateLock = new();
@@ -20,7 +20,7 @@ public class GameStateService : IGameStateService
         {
             _state = new NotStartedState();
             _lastAbilityUser = Guid.NewGuid();
-            _lastGameStateChange = int.MinValue / 2;
+            _lastGameStateChange = DateTime.Now.AddDays(-1);
             _usedAbilities = new Dictionary<string, List<Guid>>
             {
                 { nameof(RestrictedState), new() },
@@ -46,8 +46,8 @@ public class GameStateService : IGameStateService
                 return false;
             }
 
-            var currentTime = DateTime.Now.Millisecond;
-            if (currentTime - _lastGameStateChange >= Constants.Game.GameModeAbilityDurationMs)
+            var currentTime = DateTime.Now;
+            if ((currentTime - _lastGameStateChange).TotalMilliseconds >= Constants.Game.GameModeAbilityDurationMs)
             {
                 SetStateInstant(gameState);
                 _usedAbilities[gameStateName].Add(playerId);

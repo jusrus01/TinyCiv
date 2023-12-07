@@ -24,6 +24,7 @@ public class GameStartHandler : ClientHandler<StartGameClientEvent>
         Map map = GameService.StartGame(@event.MapType);
         await NotifyAllAsync(Constants.Server.SendGameStartToAll, new GameStartServerEvent(map))
             .ConfigureAwait(false);
+        await NotifyAllAsync(Constants.Server.SendGameModeChangeEventToAll, new GameModeChangeServerEvent(GameModeType.Normal));
 
         map = GameService.InitializeColonists();
         await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(map))

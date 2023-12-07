@@ -11,6 +11,7 @@
             <RowDefinition Height="24" />
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -23,7 +24,7 @@
         <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Industry.Value}"/>
         <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Gold.Value}"/>
         <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Food.Value}"/>
-        
+
         <!--<Border BorderBrush="Black">
             <StackPanel>
                 
@@ -50,16 +51,37 @@
             <Button Height="auto"
                     Margin="8,2"
                     Background="Red"
-                    Command="{Binding PanicButtonCommand}"
-                    IsEnabled="{Binding IsPanicButtonEnabled.Value}">
-                Panic Button
+                    Command="{Binding UnitOnlyButtonCommand}"
+                    IsEnabled="{Binding IsUnitOnlyButtonEnabled.Value}">
+                Unit Only
             </Button>
         </StackPanel>
         <StackPanel Grid.Row="3"
                     Grid.Column="1"
                     Orientation="Horizontal">
-            <TextBlock>Panic Mode: </TextBlock>
-            <TextBlock Text="{Binding PanicModeText.Value}"></TextBlock>
+            <TextBlock>GameMode:</TextBlock>
+            <TextBlock Text="{Binding GameModeText.Value}"></TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Vertical"
+                    Grid.Row="4">
+            <Button Height="auto"
+                    Margin="8,2"
+                    Background="Red"
+                    Command="{Binding BuildingOnlyButtonCommand}"
+                    IsEnabled="{Binding IsBuildingOnlyButtonEnabled.Value}">
+                Building Only
+            </Button>
+        </StackPanel>
+        <StackPanel Orientation="Vertical"
+                    Grid.Row="4"
+                    Grid.Column="1">
+            <Button Height="auto"
+                    Margin="8,2"
+                    Background="Red"
+                    Command="{Binding ResitrictedButtonCommand}"
+                    IsEnabled="{Binding IsRestrictedButtonEnabled.Value}">
+                Restricted
+            </Button>
         </StackPanel>
     </Grid>
 </UserControl>

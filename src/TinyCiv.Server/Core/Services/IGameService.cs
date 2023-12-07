@@ -22,7 +22,7 @@ public interface IGameService
     void AttackUnit(AttackUnitRequest request);
     void MoveUnit(MoveUnitRequest request);
 
-    bool SetGameMode(Guid playerId, GameModeType gameMode);
+    bool SetGameMode(Guid playerId, GameModeType gameMode, Action onGamemodeReset);
 
     public IMapService GetMapService();
     public ISessionService GetSessionService();

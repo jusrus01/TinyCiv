@@ -10,6 +10,7 @@ using TinyCiv.Shared.Game;
 using TinyCiv.Server.Enums;
 using TinyCiv.Shared;
 using TinyCiv.Server.Core.Game.GameModes;
+using TinyCiv.Server.Core.Publishers;
 
 namespace TinyCiv.Server.Services;
 
@@ -221,15 +222,16 @@ public class GameService : IGameService
         _mapService.MoveUnitAsync(request.UnitId, request.Position, onUnitMoved);
     }
 
-    public bool SetGameMode(Guid playerId, GameModeType gameModeType)
+    public bool SetGameMode(Guid playerId, GameModeType gameModeType, Action onGamemodeReset)
     {
         var gameState = GameModesMapper.GameModes[gameModeType];
         bool success = _gameStateService.SetState(playerId, gameState);
-        
+
         Task.Run(async () =>
         {
             await Task.Delay(Constants.Game.GameModeAbilityDurationMs);
             _gameStateService.ResetState(playerId);
+            onGamemodeReset?.Invoke();
         });
         
         return success;

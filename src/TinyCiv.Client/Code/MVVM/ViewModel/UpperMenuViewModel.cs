@@ -13,25 +13,42 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
         public ObservableValue<int> Gold { get; } = new ObservableValue<int>(Constants.Game.StartingGold);
         public ObservableValue<int> Food { get; } = new ObservableValue<int>(Constants.Game.StartingFood);
         public ObservableValue<TeamColor> PlayerColor { get; } = new ObservableValue<TeamColor>();
-        public ObservableValue<bool> IsPanicButtonEnabled { get; } = new ObservableValue<bool>(true);
-        public ObservableValue<string> PanicModeText { get; } = new ObservableValue<string>("Off");
+        public ObservableValue<bool> IsUnitOnlyButtonEnabled { get; } = new ObservableValue<bool>(true);
+        public ObservableValue<bool> IsBuildingOnlyButtonEnabled { get; } = new ObservableValue<bool>(true);
+        public ObservableValue<bool> IsRestrictedButtonEnabled { get; } = new ObservableValue<bool>(true);
+        public ObservableValue<string> GameModeText { get; } = new ObservableValue<string>("NotStarted");
 
-        public RelayCommand PanicButtonCommand => new RelayCommand(execute => TogglePanic());
+        public RelayCommand UnitOnlyButtonCommand => new RelayCommand(execute => ActivateUnitOnly());
+        public RelayCommand BuildingOnlyButtonCommand => new RelayCommand(execute => ActivateBuildingOnly());
+        public RelayCommand ResitrictedButtonCommand => new RelayCommand(execute => ActivateRestricted());
 
-        private bool _playerHasUsedPanic = false;
+        private bool _playerHasUsedUnitOnly = false;
+        private bool _playerHasUsedBuildingOnly = false;
+        private bool _playerHasUsedRestricted = false;
 
-        private void TogglePanic()
+        private void ActivateUnitOnly()
         {
-            if (_playerHasUsedPanic)
-            {
-                ClientSingleton.Instance.serverClient.SendAsync(new ChangeGameModeClientEvent(CurrentPlayer.Id, GameModeType.Normal));
-                IsPanicButtonEnabled.Value = false;
-            }
-            else
-            {
-                ClientSingleton.Instance.serverClient.SendAsync(new ChangeGameModeClientEvent(CurrentPlayer.Id, GameModeType.RestrictedMode));
-                _playerHasUsedPanic = true;
-            }
+            ClientSingleton.Instance.serverClient.SendAsync(new ChangeGameModeClientEvent(CurrentPlayer.Id, GameModeType.UnitOnly));
+            _playerHasUsedUnitOnly = true;
+        }
+
+        private void ActivateBuildingOnly()
+        {
+            ClientSingleton.Instance.serverClient.SendAsync(new ChangeGameModeClientEvent(CurrentPlayer.Id, GameModeType.BuildingOnly));
+            _playerHasUsedBuildingOnly = true;
+        }
+
+        private void ActivateRestricted()
+        {
+            ClientSingleton.Instance.serverClient.SendAsync(new ChangeGameModeClientEvent(CurrentPlayer.Id, GameModeType.RestrictedMode));
+            _playerHasUsedRestricted = true;
+        }
+
+        private void SetAbilityButtonsState(bool isActive)
+        {
+            IsUnitOnlyButtonEnabled.Value = isActive && !_playerHasUsedUnitOnly;
+            IsBuildingOnlyButtonEnabled.Value = isActive && !_playerHasUsedBuildingOnly;
+            IsRestrictedButtonEnabled.Value = isActive & !_playerHasUsedRestricted;
         }
 
         public UpperMenuViewModel()
@@ -43,18 +60,8 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 
         private void OnGameModeUpdate(GameModeChangeServerEvent response)
         {
-            switch (response.GameModeType)
-            {
-                case GameModeType.Normal:
-                    PanicModeText.Value = "Off";
-                    break;
-                case GameModeType.RestrictedMode:
-                    PanicModeText.Value = "On";
-                    break;
-                default:
-                    PanicModeText.Value = "Partial";
-                    break;
-            }
+            SetAbilityButtonsState(response.GameModeType == GameModeType.Normal);
+            GameModeText.Value = response.GameModeType.ToString();
         }
 
         public void OnResourceUpdate(ResourcesUpdateServerEvent response)

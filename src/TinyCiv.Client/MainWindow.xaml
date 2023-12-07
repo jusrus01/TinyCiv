@@ -25,9 +25,9 @@
 
         <Grid x:Name="sidePanelGrid" Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="100"/>
+                <RowDefinition Height="125"/>
                 <RowDefinition/>
-                <RowDefinition Height="100"/>
+                <RowDefinition Height="90"/>
             </Grid.RowDefinitions>
 
             <ContentControl

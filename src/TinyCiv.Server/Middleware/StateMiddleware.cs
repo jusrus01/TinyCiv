@@ -21,6 +21,7 @@ public class StateMiddleware<TEvent> : Core.Middlewares.Middleware<TEvent>
             return false;
         }
 
-        return _gameStateService.GetState().HandleEvent(clientEvent);
+        var result = _gameStateService.GetState().HandleEvent(clientEvent);
+        return result;
     }
 }
