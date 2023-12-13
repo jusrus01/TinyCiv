@@ -27,7 +27,6 @@ namespace TinyCiv.Client.Code.MVVM
         public ObservableValue<object> LowerMenu { get; } = new ObservableValue<object>(new LobbyMenuViewModel());
         public ObservableValue<ExecutionQueueViewModel> ExecutionMenu { get; } = new ObservableValue<ExecutionQueueViewModel>();
         public ObservableValue<ChatBoxViewModel> ChatBoxMenu { get; } = new();
-        public ObservableValue<BottomLineView> BottomLine { get; } = new();
 
         public MainViewModel()
         {

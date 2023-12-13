@@ -5,14 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TinyCiv.Client.Code.MVVM.View"
              mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="200">
+             d:DesignHeight="134" d:DesignWidth="200">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="24" />
             <RowDefinition Height="24"/>
             <RowDefinition Height="24"/>
+            <RowDefinition Height="34"/>
             <RowDefinition Height="24"/>
-            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -46,8 +46,10 @@
 
             </StackPanel>
         </Border>-->
-        <StackPanel Orientation="Vertical"
-                    Grid.Row="3">
+        <StackPanel VerticalAlignment="Center"
+                    Orientation="Vertical"
+                    Grid.Row="3"
+                    >
             <Button Height="auto"
                     Margin="8,2"
                     Background="Red"
@@ -56,13 +58,15 @@
                 Unit Only
             </Button>
         </StackPanel>
-        <StackPanel Grid.Row="3"
+        <StackPanel VerticalAlignment="Center"
+                    Grid.Row="3"
                     Grid.Column="1"
-                    Orientation="Horizontal">
+                    Orientation="Vertical">
             <TextBlock>GameMode:</TextBlock>
             <TextBlock Text="{Binding GameModeText.Value}"></TextBlock>
         </StackPanel>
-        <StackPanel Orientation="Vertical"
+        <StackPanel VerticalAlignment="Center"
+                    Orientation="Vertical"
                     Grid.Row="4">
             <Button Height="auto"
                     Margin="8,2"
@@ -72,7 +76,8 @@
                 Building Only
             </Button>
         </StackPanel>
-        <StackPanel Orientation="Vertical"
+        <StackPanel VerticalAlignment="Center"
+                    Orientation="Vertical"
                     Grid.Row="4"
                     Grid.Column="1">
             <Button Height="auto"
