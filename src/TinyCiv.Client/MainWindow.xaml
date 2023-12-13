@@ -19,6 +19,11 @@
             <ColumnDefinition Width ="200"/>
         </Grid.ColumnDefinitions>
 
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
         <ContentControl
             Content="{Binding Game.Value}"/>
 
@@ -28,7 +33,7 @@
                 <RowDefinition Height="60"/>
                 <RowDefinition Height="40"/>
                 <RowDefinition/>
-                <RowDefinition Height="90"/>
+                <RowDefinition Height="100"/>
             </Grid.RowDefinitions>
 
             <ContentControl
@@ -38,7 +43,7 @@
             <ContentControl
                 Grid.Row="1"
                 Content="{Binding ChatBoxMenu.Value}"/>
-            
+
             <ContentControl
                 Grid.Row="2"
                 Content="{Binding LowerMenu.Value}"/>
@@ -47,6 +52,42 @@
                 Grid.Row="3"
                 Content="{Binding ExecutionMenu.Value}"/>
         </Grid>
-        
+
+        <Grid x:Name="bottomLine" Grid.Row="1" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Height="auto"
+                    Margin="8,2"
+                    Background="Red"
+                    Command="{Binding UnitOnlyButtonCommand}"
+                    IsEnabled="{Binding IsUnitOnlyButtonEnabled.Value}">
+                Unit Only
+            </Button>
+            <Button Grid.Column="1"
+                    Height="auto"
+                    Margin="8,2"
+                    Background="Red"
+                    Command="{Binding BuildingOnlyButtonCommand}"
+                    IsEnabled="{Binding IsBuildingOnlyButtonEnabled.Value}">
+                Building Only
+            </Button>
+            <Button Grid.Column="2"
+                    Height="auto"
+                    Margin="8,2"
+                    Background="Red"
+                    Command="{Binding ResitrictedButtonCommand}"
+                    IsEnabled="{Binding IsRestrictedButtonEnabled.Value}">
+                Restricted
+            </Button>
+            <TextBlock Grid.Column="3">GameMode:</TextBlock>
+            <TextBlock Grid.Column="4" Text="{Binding GameModeText.Value}"></TextBlock>
+        </Grid>
     </Grid>
 </Window>

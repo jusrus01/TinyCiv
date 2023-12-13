@@ -39,7 +39,7 @@ public class GameService : IGameService
         IMapService mapService,
         IInteractableObjectService interactableObjectService,
         ICombatService combatService,
-        IGameStateService gameStateService)
+        IGameStateService gameStateService,
         IPublisher publisher,
         ILogger<GameService> logger)
     {
