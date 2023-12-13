@@ -53,41 +53,8 @@
                 Content="{Binding ExecutionMenu.Value}"/>
         </Grid>
 
-        <Grid x:Name="bottomLine" Grid.Row="1" Grid.Column="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-
-            <Button Grid.Column="0"
-                    Height="auto"
-                    Margin="8,2"
-                    Background="Red"
-                    Command="{Binding UnitOnlyButtonCommand}"
-                    IsEnabled="{Binding IsUnitOnlyButtonEnabled.Value}">
-                Unit Only
-            </Button>
-            <Button Grid.Column="1"
-                    Height="auto"
-                    Margin="8,2"
-                    Background="Red"
-                    Command="{Binding BuildingOnlyButtonCommand}"
-                    IsEnabled="{Binding IsBuildingOnlyButtonEnabled.Value}">
-                Building Only
-            </Button>
-            <Button Grid.Column="2"
-                    Height="auto"
-                    Margin="8,2"
-                    Background="Red"
-                    Command="{Binding ResitrictedButtonCommand}"
-                    IsEnabled="{Binding IsRestrictedButtonEnabled.Value}">
-                Restricted
-            </Button>
-            <TextBlock Grid.Column="3">GameMode:</TextBlock>
-            <TextBlock Grid.Column="4" Text="{Binding GameModeText.Value}"></TextBlock>
-        </Grid>
+        <ContentControl
+                Grid.Row="1"
+                Content="{Binding ExecutionMenu.Value}"/>
     </Grid>
 </Window>
