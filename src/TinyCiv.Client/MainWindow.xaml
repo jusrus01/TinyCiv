@@ -19,15 +19,25 @@
             <ColumnDefinition Width ="200"/>
         </Grid.ColumnDefinitions>
 
-        <ContentControl
-            Content="{Binding Game.Value}"/>
-
-
-        <Grid x:Name="sidePanelGrid" Grid.Column="1">
+        <Grid Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="40"/>
+                <RowDefinition Height="600"/>
                 <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <ContentControl
+                Grid.Row="0"
+                Content="{Binding Game.Value}"/>
+
+            <ContentControl
+                Grid.Row="1"
+                Content="{Binding ChatBoxMenu.Value}"/>
+        </Grid>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="134"/>
+                <RowDefinition Height="430"/>
                 <RowDefinition Height="100"/>
             </Grid.RowDefinitions>
 
@@ -37,16 +47,11 @@
 
             <ContentControl
                 Grid.Row="1"
-                Content="{Binding ChatBoxMenu.Value}"/>
-            
-            <ContentControl
-                Grid.Row="2"
                 Content="{Binding LowerMenu.Value}"/>
 
             <ContentControl
-                Grid.Row="3"
+                Grid.Row="2"
                 Content="{Binding ExecutionMenu.Value}"/>
         </Grid>
-        
     </Grid>
 </Window>

@@ -10,6 +10,7 @@ using TinyCiv.Server.Interpreter;
 using TinyCiv.Server.Interpreter.Expressions;
 using TinyCiv.Server.Publishers;
 using TinyCiv.Server.Services;
+using TinyCiv.Shared.Events.Client;
 using Constants = TinyCiv.Shared.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +41,7 @@ builder.Services.AddSingleton<ISessionService, SessionService>();
 builder.Services.AddSingleton<IMapService, MapService>();
 builder.Services.AddSingleton<IInteractableObjectService, InteractableObjectService>();
 builder.Services.AddSingleton<ICombatService, CombatService>();
+builder.Services.AddSingleton<IGameStateService, GameStateService>();
 
 builder.Services.AddScoped<IConnectionIdAccessor, ConnectionIdAccessor>();
 
@@ -58,6 +60,7 @@ builder.Services.AddTransient<IClientHandler, GameStartHandler>();
 builder.Services.AddTransient<IClientHandler, UnitAttackHandler>();
 builder.Services.AddTransient<IClientHandler, CreateBuildingHandler>();
 builder.Services.AddTransient<IClientHandler, PlaceTownHandler>();
+builder.Services.AddTransient<IClientHandler, ChangeGameModeHandler>();
 builder.Services.AddTransient<IClientHandler, InterpreterHandler>();
 
 builder.Services.AddHostedService<GameBoardAnalyzerBackgroundJob>();

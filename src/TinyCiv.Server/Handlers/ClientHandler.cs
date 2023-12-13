@@ -52,6 +52,8 @@ public abstract class ClientHandler<TEvent> : IClientHandler
         var authorizationMiddleware = new AuthorizationMiddleware<TEvent>(GameService.GetMapService());
         var inputValidationMiddleware = new InputValidationMiddleware<TEvent>();
         var logicValidationMiddleware = new LogicValidationMiddleware<TEvent>(GameService.GetMapService());
+        var stateMiddleware = new StateMiddleware<TEvent>(GameService.GetGameStateService());
+        logicValidationMiddleware.SetNext(stateMiddleware);
         inputValidationMiddleware.SetNext(logicValidationMiddleware);
         authorizationMiddleware.SetNext(inputValidationMiddleware);
         loggerMiddleware.SetNext(authorizationMiddleware);

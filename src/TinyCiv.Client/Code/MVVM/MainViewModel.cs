@@ -14,6 +14,7 @@ using System.Threading;
 using System.ComponentModel;
 using TinyCiv.Shared.Events.Client.Lobby;
 using TinyCiv.Shared;
+using TinyCiv.Client.Code.MVVM.View;
 
 namespace TinyCiv.Client.Code.MVVM
 {

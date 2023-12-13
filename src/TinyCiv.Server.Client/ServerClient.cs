@@ -92,6 +92,11 @@ public class ServerClient : IServerClient, IAsyncDisposable
         Listen(Constants.Server.SendDefeatEventToAll, callback);
     }
 
+    public void ListenForGameModeChangeEvent(Action<GameModeChangeServerEvent> callback)
+    {
+        Listen(Constants.Server.SendGameModeChangeEventToAll, callback);
+    }
+
     private void Listen<T>(string methodName, Action<T> callback) where T : ServerEvent
     {
         void callbackWrapper(ServerEvent @event) => callback((T)@event);

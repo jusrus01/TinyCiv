@@ -17,4 +17,5 @@ public interface IServerClient
     void ListenForInteractableObjectChanges(Action<InteractableObjectServerEvent> callback);
     void ListenForVictoryEvent(Action<VictoryServerEvent> callback);
     void ListenForDefeatEvent(Action<DefeatServerEvent> callback);
+    void ListenForGameModeChangeEvent(Action<GameModeChangeServerEvent> callback);
 }

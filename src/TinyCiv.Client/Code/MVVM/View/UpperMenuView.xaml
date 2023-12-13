@@ -5,12 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TinyCiv.Client.Code.MVVM.View"
              mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="200">
+             d:DesignHeight="134" d:DesignWidth="200">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="24" />
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="34"/>
+            <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -22,7 +24,7 @@
         <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Industry.Value}"/>
         <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Gold.Value}"/>
         <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Food.Value}"/>
-        
+
         <!--<Border BorderBrush="Black">
             <StackPanel>
                 
@@ -44,5 +46,47 @@
 
             </StackPanel>
         </Border>-->
+        <StackPanel VerticalAlignment="Center"
+                    Orientation="Vertical"
+                    Grid.Row="3"
+                    >
+            <Button Height="auto"
+                    Margin="8,2"
+                    Background="Red"
+                    Command="{Binding UnitOnlyButtonCommand}"
+                    IsEnabled="{Binding IsUnitOnlyButtonEnabled.Value}">
+                Unit Only
+            </Button>
+        </StackPanel>
+        <StackPanel VerticalAlignment="Center"
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Orientation="Vertical">
+            <TextBlock>GameMode:</TextBlock>
+            <TextBlock Text="{Binding GameModeText.Value}"></TextBlock>
+        </StackPanel>
+        <StackPanel VerticalAlignment="Center"
+                    Orientation="Vertical"
+                    Grid.Row="4">
+            <Button Height="auto"
+                    Margin="8,2"
+                    Background="Red"
+                    Command="{Binding BuildingOnlyButtonCommand}"
+                    IsEnabled="{Binding IsBuildingOnlyButtonEnabled.Value}">
+                Building Only
+            </Button>
+        </StackPanel>
+        <StackPanel VerticalAlignment="Center"
+                    Orientation="Vertical"
+                    Grid.Row="4"
+                    Grid.Column="1">
+            <Button Height="auto"
+                    Margin="8,2"
+                    Background="Red"
+                    Command="{Binding ResitrictedButtonCommand}"
+                    IsEnabled="{Binding IsRestrictedButtonEnabled.Value}">
+                Restricted
+            </Button>
+        </StackPanel>
     </Grid>
 </UserControl>

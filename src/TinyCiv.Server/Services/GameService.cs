@@ -1,3 +1,5 @@
+﻿using TinyCiv.Server.Entities.GameStates;
+using TinyCiv.Server.Core.Game.Buildings;
 ﻿using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Game.Buildings;
 using TinyCiv.Server.Core.Game.InteractableObjects;
@@ -9,8 +11,10 @@ using TinyCiv.Server.Dtos.Players;
 using TinyCiv.Server.Dtos.Towns;
 using TinyCiv.Server.Dtos.Units;
 using TinyCiv.Shared.Game;
-using TinyCiv.Shared;
 using TinyCiv.Server.Enums;
+using TinyCiv.Shared;
+using TinyCiv.Server.Core.Game.GameModes;
+using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Interpreter;
 using TinyCiv.Server.Interpreter.Expressions;
 
@@ -26,6 +30,7 @@ public class GameService : IGameService
     private readonly ICombatService _combatService;
     private readonly IPublisher _publisher;
     private readonly ILogger<GameService> _logger;
+    private readonly IGameStateService _gameStateService;
 
     public GameService(
         ISessionService sessionService,
@@ -34,6 +39,7 @@ public class GameService : IGameService
         IMapService mapService,
         IInteractableObjectService interactableObjectService,
         ICombatService combatService,
+        IGameStateService gameStateService,
         IPublisher publisher,
         ILogger<GameService> logger)
     {
@@ -45,6 +51,7 @@ public class GameService : IGameService
         _combatService = combatService;
         _publisher = publisher;
         _logger = logger;
+        _gameStateService = gameStateService;
     }
 
     public ConnectPlayerResponse? ConnectPlayer()
@@ -73,6 +80,7 @@ public class GameService : IGameService
     {
         _sessionService.StartGame();
         var map = _mapService.Initialize(mapType) ?? throw new InvalidOperationException("Something went wrong, unable to initialize map");
+        _gameStateService.SetStateInstant(new NormalState());
         return map;
     }
 
@@ -223,6 +231,21 @@ public class GameService : IGameService
         _mapService.MoveUnitAsync(request.UnitId, request.Position, OnUnitMoved);
     }
 
+    public bool SetGameMode(Guid playerId, GameModeType gameModeType, Action onGamemodeReset)
+    {
+        var gameState = GameModesMapper.GameModes[gameModeType];
+        bool success = _gameStateService.SetState(playerId, gameState);
+
+        Task.Run(async () =>
+        {
+            await Task.Delay(Constants.Game.GameModeAbilityDurationMs);
+            _gameStateService.ResetState(playerId);
+            onGamemodeReset?.Invoke();
+        });
+        
+        return success;
+    }
+
     public IMapService GetMapService()
     {
         return _mapService;
@@ -232,6 +255,11 @@ public class GameService : IGameService
     {
         return _sessionService;
     }
+
+    public IGameStateService GetGameStateService()
+    {
+        return _gameStateService;
+	}
     
     public ConditionContext? EvaluateCondition(ConditionContext lastEvaluationContext)
     {
