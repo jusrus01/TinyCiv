@@ -33,7 +33,9 @@ namespace TinyCiv.Client.Code.MVVM.ViewModel
 
         public GameViewModel()
         {
-            gameState = new GameState(Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount);
+            gameState = new GameStateProtectionProxy(
+                new GameState(Constants.Game.HeightSquareCount, Constants.Game.WidthSquareCount));
+
             gameState.onPropertyChanged = () => { OnPropertyChanged("GameObjectList"); };
         }
 

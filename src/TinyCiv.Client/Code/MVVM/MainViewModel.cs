@@ -25,6 +25,7 @@ namespace TinyCiv.Client.Code.MVVM
         public ObservableValue<object> UpperMenu { get; } = new ObservableValue<object>();
         public ObservableValue<object> LowerMenu { get; } = new ObservableValue<object>(new LobbyMenuViewModel());
         public ObservableValue<ExecutionQueueViewModel> ExecutionMenu { get; } = new ObservableValue<ExecutionQueueViewModel>();
+        public ObservableValue<ChatBoxViewModel> ChatBoxMenu { get; } = new();
 
         public MainViewModel()
         {
@@ -67,6 +68,7 @@ namespace TinyCiv.Client.Code.MVVM
         {
             GameVM.GameStart(response);
             HUDManager.Instance.HideLowerMenu();       
+            HUDManager.Instance.DisplayChatBox();
         }
 
         private void OnVictory(VictoryServerEvent response)

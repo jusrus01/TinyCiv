@@ -48,6 +48,7 @@ public class TestServerClient : IClassFixture<WebApplicationFactory<Program>>, I
         yield return new object[] { new CreateBuildingClientEvent(Guid.NewGuid(), BuildingType.Blacksmith, new ServerPosition { X = 0, Y = 0 }) };
         yield return new object[] { new PlaceTownClientEvent(Guid.NewGuid()) };
         yield return new object[] { new ChangeGameModeClientEvent(Guid.NewGuid(), GameModeType.Normal) };
+        yield return new object[] { new InterpretClientEvent(Guid.NewGuid(), "") };
     }
 
     #region ListenForGameStart

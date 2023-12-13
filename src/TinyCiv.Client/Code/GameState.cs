@@ -30,8 +30,8 @@ namespace TinyCiv.Client.Code
         public Dictionary<int, GameObject> DecoyObjects = new();
         public UnitMenuViewModel UnitMenuVM;
         public UpperMenuViewModel UpperMenuVM;
-        private int Rows;
-        private int Columns;
+        public int Rows { get; private set; }
+        public int Columns { get; private set; }
         public bool isGameObjectSelected = false;
         private GameObject selectedGameObject;
 
@@ -143,7 +143,7 @@ namespace TinyCiv.Client.Code
         {
             var gameObjectIndex = selectedGameObject.Position.column * Columns + selectedGameObject.Position.row;
 
-            if (!isGameObjectSelected && CurrentPlayer.IsOwner(GameObjects[gameObjectIndex]))
+            if (!isGameObjectSelected)
             {
                 SelectUnit(selectedGameObject);
             } 
@@ -159,7 +159,7 @@ namespace TinyCiv.Client.Code
 
         private async void City_Click(GameObject gameObject) 
         {
-            if (!isGameObjectSelected && CurrentPlayer.IsOwner(gameObject))
+            if (!isGameObjectSelected)
             {
                 SelectCity(gameObject);
             }
@@ -182,7 +182,7 @@ namespace TinyCiv.Client.Code
             onPropertyChanged?.Invoke();
         }
 
-        private void SelectCity(GameObject gameObject)
+        protected virtual void SelectCity(GameObject gameObject)
         {
             isGameObjectSelected = true;
             selectedGameObject = gameObject;
@@ -201,11 +201,14 @@ namespace TinyCiv.Client.Code
         private async Task MoveUnit(Position clickedPosition)
         {
             var unit = selectedGameObject as Unit;
+            
+            if (unit == null) return;
+
             await unit.MoveTo(clickedPosition);
             UnselectUnit(unit);
         }
 
-        private void SelectUnit(GameObject gameObject)
+        protected virtual void SelectUnit(GameObject gameObject)
         {
             isGameObjectSelected = true;
             selectedGameObject = gameObject;

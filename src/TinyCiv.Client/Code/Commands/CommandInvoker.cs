@@ -12,11 +12,23 @@ namespace TinyCiv.Client.Code.Commands
     {
         private LinkedList<CommandQueueModel> commandQueue = new LinkedList<CommandQueueModel>();
         private bool isExecuting = false;
+        public ICommandInvokerMemento CreateMemento()
+        {
+            return new CommandInvokerMemento(commandQueue.ToList(), isExecuting);
+        }
+        
+        public void SetMemento(ICommandInvokerMemento memento)
+        {
+            commandQueue = new LinkedList<CommandQueueModel>(memento.GetCommandQueue());
+            isExecuting = memento.GetIsExecuting();
+        }
 
         public async Task AddCommandToQueue(IGameCommand command, long durationInMillis, Position position)
         {
             var cancellationTokenSource = new CancellationTokenSource();
-            commandQueue.AddLast(new CommandQueueModel(command, durationInMillis, cancellationTokenSource, position));
+            var queueCommand = new CommandQueueModel(command, durationInMillis, cancellationTokenSource, position, this);
+            queueCommand.MakeBackup();
+            commandQueue.AddLast(queueCommand);
 
             if (!isExecuting)
             {
@@ -61,7 +73,7 @@ namespace TinyCiv.Client.Code.Commands
                 var commandTask = commandQueue.Last();
                 commandTask.CancellationTokenSource.Cancel();
                 commandTask.CancellationTokenSource.Dispose();
-                commandQueue.RemoveLast();
+                commandTask.RestoreBackup();
                 return commandTask;
             }
             return null;
@@ -70,6 +82,28 @@ namespace TinyCiv.Client.Code.Commands
         public int GetCommandCount()
         {
             return commandQueue.Count;
+        }
+
+        private class CommandInvokerMemento : ICommandInvokerMemento
+        {
+            private readonly List<CommandQueueModel> commandQueue;
+            private readonly bool isExecuting;
+
+            public CommandInvokerMemento(List<CommandQueueModel> commandQueue, bool isExecuting)
+            {
+                this.commandQueue = commandQueue;
+                this.isExecuting = isExecuting;
+            }
+
+            public LinkedList<CommandQueueModel> GetCommandQueue()
+            {
+                return new LinkedList<CommandQueueModel>(commandQueue);
+            }
+
+            public bool GetIsExecuting()
+            {
+                return isExecuting;
+            }
         }
     }
 }

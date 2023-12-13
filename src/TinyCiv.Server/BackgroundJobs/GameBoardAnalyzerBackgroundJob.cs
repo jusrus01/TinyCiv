@@ -55,7 +55,21 @@ public class GameBoardAnalyzerBackgroundJob : BackgroundService
                     .Where(result => result.Value?.Count == 0)
                     .Select(result => result.Key)
                     .ToList();
-                foreach (var playerId in playersToRemove.Union(_sessionService.GetPlayerIds().Where(i => !latestScanResult.Keys.Contains(i))))
+
+                var currentPlayerIterator = _sessionService.GetIterator();
+                var notFoundPlayerIdsInBoard = new List<Guid>();
+                while (currentPlayerIterator.HasNext())
+                {
+                    var player = currentPlayerIterator.Next();
+                    if (latestScanResult.ContainsKey(player.Id))
+                    {
+                        continue;
+                    }
+                    
+                    notFoundPlayerIdsInBoard.Add(player.Id);
+                }
+                
+                foreach (var playerId in playersToRemove.Union(notFoundPlayerIdsInBoard))
                 {
                     _sessionService.RemovePlayer(playerId);
                 
