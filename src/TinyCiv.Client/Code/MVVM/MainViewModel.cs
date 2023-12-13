@@ -14,6 +14,7 @@ using System.Threading;
 using System.ComponentModel;
 using TinyCiv.Shared.Events.Client.Lobby;
 using TinyCiv.Shared;
+using TinyCiv.Client.Code.MVVM.View;
 
 namespace TinyCiv.Client.Code.MVVM
 {
@@ -26,6 +27,7 @@ namespace TinyCiv.Client.Code.MVVM
         public ObservableValue<object> LowerMenu { get; } = new ObservableValue<object>(new LobbyMenuViewModel());
         public ObservableValue<ExecutionQueueViewModel> ExecutionMenu { get; } = new ObservableValue<ExecutionQueueViewModel>();
         public ObservableValue<ChatBoxViewModel> ChatBoxMenu { get; } = new();
+        public ObservableValue<BottomLineView> BottomLine { get; } = new();
 
         public MainViewModel()
         {
