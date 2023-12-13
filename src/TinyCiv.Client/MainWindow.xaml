@@ -20,7 +20,7 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="650"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
@@ -30,9 +30,9 @@
 
         <Grid x:Name="sidePanelGrid" Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="60"/>
+                <RowDefinition Height="120"/>
                 <RowDefinition Height="40"/>
-                <RowDefinition/>
+                <RowDefinition Height="450"/>
                 <RowDefinition Height="100"/>
             </Grid.RowDefinitions>
 
