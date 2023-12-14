@@ -1,11 +1,12 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
+using TinyCiv.Server.Core.Interfaces;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings;
 
-public class Farm : ConstantSpeedBuilding
+public class Farm : ConstantSpeedBuilding, IVisitorElement
 {
     public Farm()
     {
@@ -19,5 +20,10 @@ public class Farm : ConstantSpeedBuilding
     {
         resourceService.AddResources(playerId, ResourceType.Food, 2);
         Console.WriteLine($"Building \"{GetType()}\" generated 2 Food for player: {playerId}");
+    }
+
+    public void Accept(IVisitor visitor)
+    {
+        visitor.Visit(this);
     }
 }

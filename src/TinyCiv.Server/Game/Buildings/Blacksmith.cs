@@ -1,11 +1,12 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
+using TinyCiv.Server.Core.Interfaces;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings
 {
-    public class Blacksmith : ConstantSpeedBuilding
+    public class Blacksmith : ConstantSpeedBuilding, IVisitorElement
     {
         public Blacksmith()
         {
@@ -27,6 +28,11 @@ namespace TinyCiv.Server.Game.Buildings
             resourceService.AddResources(playerId, ResourceType.Industry, 5);
             resourceService.AddResources(playerId, ResourceType.Gold, -1);
             Console.WriteLine($"Building \"{GetType()}\" generated 5 Industry in exchange for 1 Gold for player: {playerId}");
+        }
+
+        public void Accept(IVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

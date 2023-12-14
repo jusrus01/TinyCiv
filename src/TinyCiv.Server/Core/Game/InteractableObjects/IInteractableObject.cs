@@ -1,3 +1,5 @@
+using TinyCiv.Server.Core.Interfaces;
+
 namespace TinyCiv.Server.Core.Game.InteractableObjects;
 
 public interface IInteractableObject : IInteractableInfo, IPrototype<IInteractableObject>

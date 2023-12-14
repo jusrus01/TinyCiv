@@ -1,11 +1,12 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
+using TinyCiv.Server.Core.Interfaces;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings
 {
-    public class Bank : ConstantSpeedBuilding
+    public class Bank : ConstantSpeedBuilding, IVisitorElement
     {
         public Bank()
         {
@@ -19,6 +20,11 @@ namespace TinyCiv.Server.Game.Buildings
         {
             resourceService.AddResources(playerId, ResourceType.Gold, 5);
             Console.WriteLine($"Building \"{GetType()}\" generated 5 Gold for player: {playerId}");
+        }
+
+        public void Accept(IVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

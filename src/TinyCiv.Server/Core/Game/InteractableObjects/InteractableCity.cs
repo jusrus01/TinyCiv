@@ -1,3 +1,4 @@
+using TinyCiv.Server.Core.Interfaces;
 using TinyCiv.Shared;
 
 namespace TinyCiv.Server.Core.Game.InteractableObjects;
