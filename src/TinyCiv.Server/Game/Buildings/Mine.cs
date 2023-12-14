@@ -1,11 +1,12 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
+using TinyCiv.Server.Core.Interfaces;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings
 {
-    public class Mine : ConstantSpeedBuilding
+    public class Mine : ConstantSpeedBuilding, IVisitorElement
     {
         public Mine()
         {
@@ -20,6 +21,11 @@ namespace TinyCiv.Server.Game.Buildings
             int amount = new Random().Next(1, 5);
             resourceService.AddResources(playerId, ResourceType.Industry, amount);
             Console.WriteLine($"Building \"{GetType()}\" generated {amount} Industry for player: {playerId}");
+        }
+
+        public void Accept(IVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

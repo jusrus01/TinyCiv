@@ -4,6 +4,8 @@ using TinyCiv.Server.Core.Services;
 using TinyCiv.Server.Entities;
 using TinyCiv.Shared.Game;
 using TinyCiv.Shared;
+using TinyCiv.Server.Core.Interfaces;
+using TinyCiv.Server.Visitor;
 
 namespace TinyCiv.Server.Services;
 
@@ -11,11 +13,13 @@ public class ResourceService : IResourceService
 {
     private readonly List<PlayerResources> _resources;
     private readonly object _resourceLocker;
+    private readonly List<IVisitorElement> _visitorBuildings;
 
     public ResourceService()
     {
         _resources = new List<PlayerResources>();
         _resourceLocker = new object();
+        _visitorBuildings = new List<IVisitorElement>();
     }
 
     public Resources InitializeResources(Guid playerId)
@@ -33,6 +37,11 @@ public class ResourceService : IResourceService
 
     public void AddBuilding(Guid playerId, IBuilding building, Action<Resources> callback)
     {
+        _visitorBuildings.Add((IVisitorElement)building);
+
+        RandomizeIntervals();
+        PrintStatistics();
+
         Task.Run(async () =>
         {
             while (true)
@@ -46,6 +55,20 @@ public class ResourceService : IResourceService
                 callback?.Invoke(playerResources!.GetResources());
             }
         });
+    }
+
+    private void PrintStatistics()
+    {
+        StatsVisitor statsVisitor = new();
+        Console.WriteLine("\nExisting buildings");
+        _visitorBuildings.ForEach(b => b.Accept(statsVisitor));
+        Console.WriteLine();
+    }
+
+    private void RandomizeIntervals()
+    {
+        ModsVisitor modsVisitor = new();
+        _visitorBuildings.ForEach(b => b.Accept(modsVisitor));
     }
 
     public void AddResources(Guid PlayerId, ResourceType resourceType, int amount)

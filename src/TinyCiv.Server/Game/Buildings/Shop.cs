@@ -1,11 +1,12 @@
 ﻿using TinyCiv.Server.Core.Game.Buildings;
+using TinyCiv.Server.Core.Interfaces;
 using TinyCiv.Server.Core.Services;
 using TinyCiv.Shared;
 using TinyCiv.Shared.Game;
 
 namespace TinyCiv.Server.Game.Buildings
 {
-    public class Shop : ConstantSpeedBuilding
+    public class Shop : ConstantSpeedBuilding, IVisitorElement
     {
         public Shop()
         {
@@ -26,6 +27,11 @@ namespace TinyCiv.Server.Game.Buildings
                 IntervalMs -= upgrade;
                 Console.WriteLine($"Building \"{GetType()}\" upgraded itself (-{upgrade} from interval)");
             }
+        }
+
+        public void Accept(IVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }
