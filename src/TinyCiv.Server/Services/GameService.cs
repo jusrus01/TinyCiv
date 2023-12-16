@@ -1,7 +1,6 @@
 ﻿using TinyCiv.Server.Entities.GameStates;
 using TinyCiv.Server.Core.Game.Buildings;
-﻿using TinyCiv.Server.Core.Extensions;
-using TinyCiv.Server.Core.Game.Buildings;
+using TinyCiv.Server.Core.Extensions;
 using TinyCiv.Server.Core.Game.InteractableObjects;
 using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Dtos.Buildings;
@@ -14,10 +13,8 @@ using TinyCiv.Shared.Game;
 using TinyCiv.Server.Enums;
 using TinyCiv.Shared;
 using TinyCiv.Server.Core.Game.GameModes;
-using TinyCiv.Server.Core.Publishers;
 using TinyCiv.Server.Interpreter;
 using TinyCiv.Server.Interpreter.Expressions;
-using TinyCiv.Server.Core.Interfaces;
 
 namespace TinyCiv.Server.Services;
 
@@ -160,7 +157,7 @@ public class GameService : IGameService
         }
         
         var interactable = _interactableObjectService.Initialize(createdTown);
-        var interactableInitEvent = new InteractableObjectServerEvent(createdTown.Id, interactable.Health, interactable.AttackDamage);
+        var interactableInitEvent = new InteractableObjectServerEvent(createdTown.Id, interactable.Health, interactable.AttackDamage, _accessor.ConnectionId);
 
         return new PlaceTownResponse(_mapService.GetMap()!, interactableInitEvent);
     }
@@ -184,7 +181,7 @@ public class GameService : IGameService
                 return null;
             }
             
-            responseServerEvents.Add(new ResourcesUpdateServerEvent(resourcesAfterPurchase));
+            responseServerEvents.Add(new ResourcesUpdateServerEvent(resourcesAfterPurchase, _accessor.ConnectionId));
         }
         
         var unit = _mapService.CreateUnit(request.PlayerId, request.Position, request.UnitType);
@@ -197,7 +194,7 @@ public class GameService : IGameService
         if (interactableStaticInfo != null)
         {
             var interactable = _interactableObjectService.Initialize(unit);
-            responseServerEvents.Add(new InteractableObjectServerEvent(unit.Id, interactable.Health, interactable.AttackDamage));
+            responseServerEvents.Add(new InteractableObjectServerEvent(unit.Id, interactable.Health, interactable.AttackDamage, _accessor.ConnectionId));
         }
 
         var map = _mapService.GetMap()!;
@@ -338,20 +335,20 @@ public class GameService : IGameService
         // copy-paste from handlers
         // ...
         Task MapChangeNotifier(Map updatedMap) =>
-            _publisher.NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(updatedMap));
+            _publisher.NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(updatedMap, _accessor.ConnectionId));
 
         // NOTE: not used by client
         Task NewUnitNotifier(ServerGameObject gameObject) =>
-            _publisher.NotifyAllAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(gameObject));
+            _publisher.NotifyAllAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(gameObject, _accessor.ConnectionId));
         
         Task InteractableObjectStateChangeNotifier(IInteractableObject interactableObject) =>
-            _publisher.NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, new InteractableObjectServerEvent(interactableObject.GameObjectReferenceId, interactableObject.Health, interactableObject.AttackDamage));
+            _publisher.NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, new InteractableObjectServerEvent(interactableObject.GameObjectReferenceId, interactableObject.Health, interactableObject.AttackDamage, _accessor.ConnectionId));
         
         void OnUnitMoved(UnitMoveResponse unitMoveResponse)
         {
             if (unitMoveResponse == UnitMoveResponse.Moved)
             {
-                _publisher.NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!)).GetAwaiter().GetResult();
+                _publisher.NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(_mapService.GetMap()!, _accessor.ConnectionId)).GetAwaiter().GetResult();
             }
 
             if (unitMoveResponse == UnitMoveResponse.Stopped)

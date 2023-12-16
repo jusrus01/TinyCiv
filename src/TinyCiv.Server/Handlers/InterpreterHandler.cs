@@ -17,7 +17,7 @@ public class InterpreterHandler : ClientHandler<InterpretClientEvent>
         _sessionService = sessionService;
     }
 
-    protected override bool IgnoreWhen(InterpretClientEvent @event) => !_sessionService.IsStarted();
+    // protected override bool IgnoreWhen(InterpretClientEvent @event) => !_sessionService.IsStarted();
 
     protected override Task OnHandleAsync(InterpretClientEvent @event)
     {

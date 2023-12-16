@@ -1,3 +1,4 @@
+using System.Net;
 using Serilog;
 using TinyCiv.Server.BackgroundJobs;
 using TinyCiv.Server.Core.Handlers;
@@ -10,12 +11,15 @@ using TinyCiv.Server.Interpreter;
 using TinyCiv.Server.Interpreter.Expressions;
 using TinyCiv.Server.Publishers;
 using TinyCiv.Server.Services;
-using TinyCiv.Shared.Events.Client;
 using Constants = TinyCiv.Shared.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Listen(IPAddress.Loopback, 5001);
+});
 
-var enableLogging = Environment.GetEnvironmentVariable("DISABLE_LOGS") != "YES";
+var enableLogging = false;// Environment.GetEnvironmentVariable("DISABLE_LOGS") != "YES";
 if (enableLogging)
 {
     Log.Logger = new LoggerConfiguration()

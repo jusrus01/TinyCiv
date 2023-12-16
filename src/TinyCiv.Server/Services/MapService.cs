@@ -441,10 +441,10 @@ namespace TinyCiv.Server.Services
         {
             lock (_mapChangeLocker)
             {
-                if (_map != null)
-                {
-                    return null;
-                }
+                // if (_map != null)
+                // {
+                //     return null;
+                // }
 
                 _map = new Map
                 {

@@ -2,4 +2,4 @@
 
 namespace TinyCiv.Shared.Events.Server;
 
-public record GameModeChangeServerEvent(GameModeType GameModeType) : ServerEvent;
+public record GameModeChangeServerEvent(GameModeType GameModeType, string ConnectionId) : ServerEvent;

@@ -2,4 +2,4 @@
 
 namespace TinyCiv.Shared.Events.Server;
 
-public record ResourcesUpdateServerEvent(Resources Resources) : ServerEvent;
+public record ResourcesUpdateServerEvent(Resources Resources, string ConnectionId) : ServerEvent;

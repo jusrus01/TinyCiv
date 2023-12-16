@@ -11,8 +11,11 @@ namespace TinyCiv.Server.Handlers
 {
     public class UnitMoveHandler : ClientHandler<MoveUnitClientEvent>
     {
-        public UnitMoveHandler(ILogger<UnitMoveHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, gameService, logger)
+        private readonly IConnectionIdAccessor _accessor;
+
+        public UnitMoveHandler(ILogger<UnitMoveHandler> logger, IConnectionIdAccessor accessor, IGameService gameService, IPublisher publisher) : base(publisher, gameService, logger)
         {
+            _accessor = accessor;    
         }
 
         protected override Task OnHandleAsync(MoveUnitClientEvent @event)
@@ -22,15 +25,15 @@ namespace TinyCiv.Server.Handlers
                 switch (response)
                 {
                     case UnitMoveResponse.Started:
-                        await NotifyCallerAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId.Value, true))
+                        await NotifyCallerAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId.Value, true, _accessor.ConnectionId))
                             .ConfigureAwait(false);
                         break;
                     case UnitMoveResponse.Moved:
-                        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(map!))
+                        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(map!, _accessor.ConnectionId))
                             .ConfigureAwait(false);
                         break;
                     case UnitMoveResponse.Stopped:
-                        await NotifyCallerAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId.Value, false))
+                        await NotifyCallerAsync(Constants.Server.SendUnitStatusUpdate, new UnitStatusUpdateServerEvent(@event.UnitId.Value, false, _accessor.ConnectionId))
                             .ConfigureAwait(false); 
                         break;
                 }
