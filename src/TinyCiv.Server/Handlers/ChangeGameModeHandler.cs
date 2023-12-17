@@ -10,18 +10,22 @@ namespace TinyCiv.Server.Handlers;
 
 public class ChangeGameModeHandler : ClientHandler<ChangeGameModeClientEvent>
 {
+    private readonly IConnectionIdAccessor _accessor;
+
     public ChangeGameModeHandler(
         IPublisher publisher,
         IGameService gameService,
+        IConnectionIdAccessor accessor,
         ILogger<IClientHandler> logger) : base(publisher, gameService, logger)
     {
+        _accessor = accessor;
     }
 
     protected override async Task OnHandleAsync(ChangeGameModeClientEvent @event)
     {
         void onGamemodeReset()
         {
-            NotifyAllAsync(Constants.Server.SendGameModeChangeEventToAll, new GameModeChangeServerEvent(GameModeType.Normal))
+            NotifyAllAsync(Constants.Server.SendGameModeChangeEventToAll, new GameModeChangeServerEvent(GameModeType.Normal, _accessor.ConnectionId))
                 .ConfigureAwait(false);
         }
 
@@ -32,7 +36,7 @@ public class ChangeGameModeHandler : ClientHandler<ChangeGameModeClientEvent>
             return;
         } 
 
-        await NotifyAllAsync(Constants.Server.SendGameModeChangeEventToAll, new GameModeChangeServerEvent(@event.GameModeType))
+        await NotifyAllAsync(Constants.Server.SendGameModeChangeEventToAll, new GameModeChangeServerEvent(@event.GameModeType, _accessor.ConnectionId))
             .ConfigureAwait(false);
     }
 }

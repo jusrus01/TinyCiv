@@ -11,15 +11,18 @@ namespace TinyCiv.Server.Handlers;
 
 public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
 {
-    public CreateBuildingHandler(ILogger<IClientHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, gameService, logger)
+    private readonly IConnectionIdAccessor _accessor;
+
+    public CreateBuildingHandler(ILogger<IClientHandler> logger, IConnectionIdAccessor accessor, IGameService gameService, IPublisher publisher) : base(publisher, gameService, logger)
     {
+        _accessor = accessor;
     }
 
     protected override async Task OnHandleAsync(CreateBuildingClientEvent @event)
     {
         async void ResourceUpdateCallback(Resources resources)
         {
-            await NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, new ResourcesUpdateServerEvent(resources))
+            await NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, new ResourcesUpdateServerEvent(resources, _accessor.ConnectionId))
                 .ConfigureAwait(false);
         }
 
@@ -28,10 +31,10 @@ public class CreateBuildingHandler : ClientHandler<CreateBuildingClientEvent>
 
         if (response == null) return;
 
-        await NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, new ResourcesUpdateServerEvent(response.Resources))
+        await NotifyCallerAsync(Constants.Server.SendResourcesStatusUpdate, new ResourcesUpdateServerEvent(response.Resources, _accessor.ConnectionId))
             .ConfigureAwait(false);
 
-        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(response.Map))
+        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(response.Map, _accessor.ConnectionId))
             .ConfigureAwait(false);
     }
 }

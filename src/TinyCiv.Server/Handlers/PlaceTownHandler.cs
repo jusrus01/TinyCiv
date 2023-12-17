@@ -9,8 +9,11 @@ namespace TinyCiv.Server.Handlers;
 
 public class PlaceTownHandler : ClientHandler<PlaceTownClientEvent>
 {
-    public PlaceTownHandler(ILogger<IClientHandler> logger, IGameService gameService, IPublisher publisher) : base(publisher, gameService, logger)
+    private readonly IConnectionIdAccessor _accessor;
+
+    public PlaceTownHandler(ILogger<IClientHandler> logger, IConnectionIdAccessor accessor, IGameService gameService, IPublisher publisher) : base(publisher, gameService, logger)
     {
+        _accessor = accessor;
     }
 
     protected override async Task OnHandleAsync(PlaceTownClientEvent @event)
@@ -25,7 +28,7 @@ public class PlaceTownHandler : ClientHandler<PlaceTownClientEvent>
             return;
         }
         
-        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(townResponse.Map))
+        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(townResponse.Map, _accessor.ConnectionId))
             .ConfigureAwait(false);
 
         var interactableEvent = townResponse.Events?.SingleOrDefault(e => e is InteractableObjectServerEvent);

@@ -73,7 +73,7 @@ public class GameBoardAnalyzerBackgroundJob : BackgroundService
                 {
                     _sessionService.RemovePlayer(playerId);
                 
-                    await _publisher.NotifyAllAsync(Constants.Server.SendDefeatEventToAll, new DefeatServerEvent(playerId));
+                    await _publisher.NotifyAllAsync(Constants.Server.SendDefeatEventToAll, new DefeatServerEvent(playerId, null));
                 
                     _logger.LogWarning("Loser found '{player_id}' and everyone notified", playerId);
                 }
@@ -83,7 +83,7 @@ public class GameBoardAnalyzerBackgroundJob : BackgroundService
                     _sessionService.StopGame();
 
                     var winnerId = latestScanResult.FirstOrDefault(result => result.Value?.Count > 0).Key;
-                    await _publisher.NotifyAllAsync(Constants.Server.SendVictoryEventToAll, new VictoryServerEvent(winnerId));
+                    await _publisher.NotifyAllAsync(Constants.Server.SendVictoryEventToAll, new VictoryServerEvent(winnerId, null));
                 
                     _logger.LogWarning("Winner found '{player_id}' and everyone notified", winnerId);
                 

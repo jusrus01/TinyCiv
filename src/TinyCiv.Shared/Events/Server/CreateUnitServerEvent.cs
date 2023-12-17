@@ -2,4 +2,4 @@
 
 namespace TinyCiv.Shared.Events.Server;
 
-public record CreateUnitServerEvent(ServerGameObject CreatedUnit) : ServerEvent;
+public record CreateUnitServerEvent(ServerGameObject CreatedUnit, string ConnectionId) : ServerEvent;

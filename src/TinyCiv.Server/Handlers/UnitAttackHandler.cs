@@ -13,15 +13,18 @@ namespace TinyCiv.Server.Handlers;
 public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
 {
     private readonly ISessionService _sessionService;
+    private readonly IConnectionIdAccessor _accessor;
 
     public UnitAttackHandler(
         ISessionService sessionService,
         ILogger<IClientHandler> logger,
+        IConnectionIdAccessor accessor,
         IGameService gameService,
         IPublisher publisher)
         :
         base(publisher, gameService, logger)
     {
+        _accessor = accessor;    
         _sessionService = sessionService;
     }
 
@@ -35,13 +38,13 @@ public class UnitAttackHandler : ClientHandler<AttackUnitClientEvent>
         return Task.CompletedTask;
         
         Task MapChangeNotifier(Map updatedMap) =>
-            NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(updatedMap));
+            NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(updatedMap, _accessor.ConnectionId));
 
         // NOTE: not used by client
         Task NewUnitNotifier(ServerGameObject gameObject) =>
-            NotifyAllAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(gameObject));
+            NotifyAllAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(gameObject, _accessor.ConnectionId));
         
         Task InteractableObjectStateChangeNotifier(IInteractableObject interactableObject) =>
-            NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, new InteractableObjectServerEvent(interactableObject.GameObjectReferenceId, interactableObject.Health, interactableObject.AttackDamage));
+            NotifyAllAsync(Constants.Server.SendInteractableObjectChangesToAll, new InteractableObjectServerEvent(interactableObject.GameObjectReferenceId, interactableObject.Health, interactableObject.AttackDamage, _accessor.ConnectionId));
     }
 }

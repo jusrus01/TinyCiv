@@ -32,6 +32,7 @@ public class TestResourceService
             _mapServiceMock.Object,
             new Mock<IInteractableObjectService>().Object,
             new Mock<ICombatService>().Object,
+            new Mock<GameStateService>().Object,
             new Mock<IPublisher>().Object,
             NullLogger<GameService>.Instance);
 

@@ -10,9 +10,12 @@ namespace TinyCiv.Server.Handlers;
 
 public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
 {
-    public UnitAddHandler(ILogger<UnitAddHandler> logger, IGameService gameService, IPublisher publisher) : base(
+    private readonly IConnectionIdAccessor _accessor;
+
+    public UnitAddHandler(ILogger<UnitAddHandler> logger, IConnectionIdAccessor accessor, IGameService gameService, IPublisher publisher) : base(
         publisher, gameService, logger)
     {
+        _accessor = accessor;
     }
 
     protected override async Task OnHandleAsync(CreateUnitClientEvent @event)
@@ -26,7 +29,7 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
             return;
         }
 
-        await NotifyCallerAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(response.Unit))
+        await NotifyCallerAsync(Constants.Server.SendCreatedUnit, new CreateUnitServerEvent(response.Unit, _accessor.ConnectionId))
             .ConfigureAwait(false);
 
         var interactableEvent = response.Events?.SingleOrDefault(e => e is InteractableObjectServerEvent);
@@ -44,7 +47,7 @@ public class UnitAddHandler : ClientHandler<CreateUnitClientEvent>
         await Task.WhenAll(interactableNotifyTask, resourceNotifyTask);
 
         // Trigger map update when interactable and resources are updated
-        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(response.Map))
+        await NotifyAllAsync(Constants.Server.SendMapChangeToAll, new MapChangeServerEvent(response.Map, _accessor.ConnectionId))
             .ConfigureAwait(false);
     }
 

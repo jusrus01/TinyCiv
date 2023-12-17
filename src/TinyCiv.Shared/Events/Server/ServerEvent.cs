@@ -8,4 +8,6 @@ public abstract record ServerEvent
 {
     public DateTime ExistenceStart = DateTime.UtcNow;
     public string Type => GetType().Name;
+
+    public abstract string ConnectionId { get; init; }
 }

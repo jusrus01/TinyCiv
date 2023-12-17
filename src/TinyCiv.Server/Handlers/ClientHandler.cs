@@ -48,23 +48,23 @@ public abstract class ClientHandler<TEvent> : IClientHandler
             return Task.CompletedTask;
         }
 
-        var loggerMiddleware = new LoggerMiddleware<TEvent>(_logger);
-        var authorizationMiddleware = new AuthorizationMiddleware<TEvent>(GameService.GetMapService());
-        var inputValidationMiddleware = new InputValidationMiddleware<TEvent>();
-        var logicValidationMiddleware = new LogicValidationMiddleware<TEvent>(GameService.GetMapService());
-        var stateMiddleware = new StateMiddleware<TEvent>(GameService.GetGameStateService());
-        logicValidationMiddleware.SetNext(stateMiddleware);
-        inputValidationMiddleware.SetNext(logicValidationMiddleware);
-        authorizationMiddleware.SetNext(inputValidationMiddleware);
-        loggerMiddleware.SetNext(authorizationMiddleware);
+        // var loggerMiddleware = new LoggerMiddleware<TEvent>(_logger);
+        // var authorizationMiddleware = new AuthorizationMiddleware<TEvent>(GameService.GetMapService());
+        // var inputValidationMiddleware = new InputValidationMiddleware<TEvent>();
+        // var logicValidationMiddleware = new LogicValidationMiddleware<TEvent>(GameService.GetMapService());
+        // var stateMiddleware = new StateMiddleware<TEvent>(GameService.GetGameStateService());
+        // logicValidationMiddleware.SetNext(stateMiddleware);
+        // inputValidationMiddleware.SetNext(logicValidationMiddleware);
+        // authorizationMiddleware.SetNext(inputValidationMiddleware);
+        // loggerMiddleware.SetNext(authorizationMiddleware);
+        //
+        // bool result = loggerMiddleware.Handle(@event);
 
-        bool result = loggerMiddleware.Handle(@event);
-
-        if (result == false)
-        {
-            _logger.LogInformation("{handler}.{method_name}: failed to process event in middlewares '{@data}'", handlerName, HandleMethodName, @event);
-            return Task.CompletedTask;
-        }
+        // if (result == false)
+        // {
+        //     _logger.LogInformation("{handler}.{method_name}: failed to process event in middlewares '{@data}'", handlerName, HandleMethodName, @event);
+        //     return Task.CompletedTask;
+        // }
 
         try
         {
